@@ -1,19 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { MOOD_IMAGES, questions, MoodState } from '@/data/questions';
+import { useState } from 'react';
+import { MOOD_IMAGES, questions, MoodState, CHEER_MESSAGES, SYMPATHY_MESSAGES, CORRECT_IMAGES } from '@/data/questions';
+
+function pickRandomIndex(length: number): number {
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  return array[0] % length;
+}
 
 export default function AwsQuizApp() {
-  const [playerName, setPlayerName] = useState<string | null>(null);
+  const [playerName, setPlayerName] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') return sessionStorage.getItem('quiz_player_name');
+    return null;
+  });
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [mood, setMood] = useState<MoodState>('idle');
   const [gameOver, setGameOver] = useState(false);
-
-  useEffect(() => {
-    const saved = sessionStorage.getItem('quiz_player_name');
-    if (saved) setPlayerName(saved);
-  }, []);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [revealed, setRevealed] = useState(false);
+  const [questionKey, setQuestionKey] = useState(0);
+  const [cheerIdx, setCheerIdx] = useState(0);
+  const [sympathyIdx, setSympathyIdx] = useState(0);
+  const [correctImage, setCorrectImage] = useState(CORRECT_IMAGES[0]);
 
   if (!playerName) {
     return <WelcomeScreen onStart={(name) => { sessionStorage.setItem('quiz_player_name', name); setPlayerName(name); }} />;
@@ -22,12 +32,24 @@ export default function AwsQuizApp() {
   const currentQ = questions[currentQIndex];
 
   const handleAnswer = (selectedOptionIndex: number) => {
+    if (revealed) return;
     const isCorrect = selectedOptionIndex === currentQ.correctIndex;
+    setSelectedAnswer(selectedOptionIndex);
+    setRevealed(true);
     if (isCorrect) setScore(prev => prev + 1);
     setMood(isCorrect ? 'correct' : 'wrong');
+    setCheerIdx(pickRandomIndex(CHEER_MESSAGES.length));
+    setSympathyIdx(pickRandomIndex(SYMPATHY_MESSAGES.length));
+    if (isCorrect) setCorrectImage(CORRECT_IMAGES[pickRandomIndex(CORRECT_IMAGES.length)]);
 
     if (currentQIndex < questions.length - 1) {
-      setTimeout(() => { setCurrentQIndex(prev => prev + 1); setMood('idle'); }, 1500);
+      setTimeout(() => {
+        setCurrentQIndex(prev => prev + 1);
+        setMood('idle');
+        setRevealed(false);
+        setSelectedAnswer(null);
+        setQuestionKey(prev => prev + 1);
+      }, 1500);
     } else {
       setTimeout(() => {
         setMood(score >= questions.length / 2 ? 'passed' : 'failed');
@@ -41,12 +63,17 @@ export default function AwsQuizApp() {
     setScore(0);
     setGameOver(false);
     setMood('idle');
+    setRevealed(false);
+    setSelectedAnswer(null);
+    setQuestionKey(prev => prev + 1);
   };
 
   const changeName = () => {
     sessionStorage.removeItem('quiz_player_name');
     setPlayerName(null);
   };
+
+  const mascotAnimation = mood === 'correct' ? 'animate-pop' : mood === 'wrong' ? 'animate-shake' : 'animate-floaty';
 
   return (
     <div className="flex flex-col items-center justify-between min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans">
@@ -57,14 +84,12 @@ export default function AwsQuizApp() {
 
       {!gameOver ? (
         <div className="w-full max-w-lg flex flex-col gap-6 pb-8">
-          <div className="flex flex-col items-center relative">
-            <img src={MOOD_IMAGES[mood]} alt={mood} className="w-48 h-48 object-contain drop-shadow-xl transition-all duration-300" />
+          <div key={`mascot-${mood}-${currentQIndex}`} className="flex flex-col items-center relative">
+            <img src={mood === 'correct' ? correctImage : MOOD_IMAGES[mood]} alt={mood} className={`w-48 h-48 object-contain drop-shadow-xl transition-all duration-300 ${mascotAnimation}`} />
             <div className="absolute top-2 right-[-10px] sm:right-[-30px] w-36 bg-white px-3 py-2 rounded-xl shadow-md border-2 border-purple-200 text-xs font-bold text-gray-700 animate-bounce">
               {mood === 'idle' && `พร้อมแล้วนะ ${playerName}~! 💖`}
-              {mood === 'correct' && "เย้! เก่งมากจ๊ะ~ ❤️"}
-              {mood === 'wrong' && "อุ้ย... ดูดีๆ สิคะ! 😤"}
-              {mood === 'passed' && "สุดยอด! ผ่านฉลุย! 🎓✨"}
-              {mood === 'failed' && "ไม่เป็นไรนะ ลองใหม่อีกครั้ง... 💖"}
+              {mood === 'correct' && CHEER_MESSAGES[cheerIdx]}
+              {mood === 'wrong' && SYMPATHY_MESSAGES[sympathyIdx]}
             </div>
           </div>
 
@@ -72,26 +97,60 @@ export default function AwsQuizApp() {
             <div className="bg-gradient-to-r from-pink-400 to-purple-500 h-full rounded-full transition-all duration-500" style={{ width: `${((currentQIndex + 1) / questions.length) * 100}%` }}></div>
           </div>
 
-          <div className="w-full bg-white rounded-3xl shadow-xl p-6 space-y-4">
-            <span className="inline-block bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full uppercase tracking-wide font-bold">{currentQ.topic}</span>
-            <h2 className="text-base font-bold text-gray-800 leading-relaxed">{currentQ.english}</h2>
-            <p className="text-sm text-purple-600 italic bg-purple-50 p-3 rounded-xl border border-purple-200">"{currentQ.thai_drama}"</p>
-            <div className="space-y-3 pt-2">
-              {currentQ.options.map((opt, idx) => (
-                <button key={idx} onClick={() => handleAnswer(idx)} className="w-full text-left p-4 rounded-2xl hover:bg-pink-50 active:bg-pink-100 transition-all border-2 border-gray-100 hover:border-pink-300 group flex justify-between items-center">
-                  <div>
-                    <span className="font-bold text-pink-500 mr-2">{String.fromCharCode(65 + idx)}.</span>
-                    <span className="font-medium text-gray-700 group-hover:text-pink-600">{opt}</span>
-                  </div>
-                  <span className="text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity font-bold">→</span>
-                </button>
-              ))}
+          <div key={`card-${questionKey}`} className="w-full bg-white rounded-3xl shadow-xl p-6 space-y-4 animate-bounce-in">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-block bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full uppercase tracking-wide font-bold">{currentQ.topic}</span>
+              {currentQ.chapter && <span className="text-xs text-purple-400 font-medium">{currentQ.chapter}</span>}
             </div>
+            <h2 className="text-base font-bold text-gray-800 leading-relaxed">{currentQ.english}</h2>
+            <p className="text-sm text-purple-600 italic bg-purple-50 p-3 rounded-xl border border-purple-200">&ldquo;{currentQ.thai_drama}&rdquo;</p>
+            <div className="space-y-3 pt-2">
+              {currentQ.options.map((opt, idx) => {
+                const isCorrectOption = idx === currentQ.correctIndex;
+                const isWrongSelection = revealed && idx === selectedAnswer && !isCorrectOption;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleAnswer(idx)}
+                    disabled={revealed}
+                    className={`w-full text-left p-4 rounded-2xl transition-all border-2 flex justify-between items-center ${
+                      revealed && isCorrectOption
+                        ? 'border-green-400 bg-green-50'
+                        : isWrongSelection
+                        ? 'border-red-400 bg-red-50'
+                        : 'border-gray-100 hover:border-pink-300 hover:bg-pink-50'
+                    } ${revealed ? 'cursor-default' : 'group'}`}
+                  >
+                    <div>
+                      <span className="font-bold text-pink-500 mr-2">{String.fromCharCode(65 + idx)}.</span>
+                      <span className={`font-medium ${revealed && isCorrectOption ? 'text-green-700' : isWrongSelection ? 'text-red-700' : 'text-gray-700 group-hover:text-pink-600'}`}>{opt}</span>
+                    </div>
+                    {revealed && isCorrectOption && <span className="text-green-500 font-bold text-lg">✓</span>}
+                    {isWrongSelection && <span className="text-red-500 font-bold text-lg">✗</span>}
+                    {!revealed && <span className="text-pink-400 opacity-0 group-hover:opacity-100 transition-opacity font-bold">→</span>}
+                  </button>
+                );
+              })}
+            </div>
+
+            {revealed && currentQ.funFact && (
+              <div className="animate-bounce-in bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 leading-relaxed">
+                <span className="font-bold">💡 รู้หรือไม่? </span>
+                {currentQ.funFact}
+              </div>
+            )}
+
+            {revealed && !currentQ.funFact && (
+              <div className="animate-bounce-in bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm text-gray-600">
+                <span className="font-bold">🔑 Hint: </span>
+                {currentQ.hint_keyword}
+              </div>
+            )}
           </div>
         </div>
       ) : (
-        <div className="w-full max-w-lg text-center bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 space-y-4">
-          <img src={MOOD_IMAGES[mood]} alt="Result" className="w-40 h-40 object-contain mx-auto drop-shadow-xl" />
+        <div className="w-full max-w-lg text-center bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 space-y-4 animate-bounce-in">
+          <img src={MOOD_IMAGES[mood]} alt="Result" className={`w-40 h-40 object-contain mx-auto drop-shadow-xl ${mood === 'passed' ? 'animate-wiggle' : ''}`} />
           <h1 className="text-3xl font-extrabold text-gray-800">{score >= questions.length / 2 ? '🎉 PASSED!' : '😭 TRY AGAIN'}</h1>
           <p className="text-gray-500 text-sm">คุณได้คะแนน</p>
           <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">{score}/{questions.length}</div>
@@ -128,7 +187,7 @@ function WelcomeScreen({ onStart }: { onStart: (name: string) => void }) {
         <p className="text-purple-500 text-center font-bold mb-8 tracking-wider uppercase text-xs">Practice • Play • Pass</p>
         <div className="flex justify-center mb-8">
           <div className="relative group cursor-pointer">
-            <img src="/images/idle.png" alt="Waiting..." className="w-56 h-56 object-contain drop-shadow-xl transition-transform duration-500 group-hover:rotate-6" />
+            <img src="/images/idle.png" alt="Waiting..." className="w-56 h-56 object-contain drop-shadow-xl transition-transform duration-500 group-hover:rotate-6 animate-floaty" />
             <div className="absolute -top-4 -right-8 bg-white px-3 py-1.5 rounded-xl shadow-md border-2 border-purple-200 text-xs font-bold text-gray-600 animate-pulse">สวัสดีค่ะ~! 👋</div>
           </div>
         </div>

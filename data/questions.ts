@@ -8,15 +8,35 @@ export interface ExamQuestion {
   options: string[];
   correctIndex: number;
   hint_keyword: string;
+  funFact?: string;
+  chapter?: string;
 }
+
+export const CHEER_MESSAGES = [
+  "เย้! เก่งมากจ๊ะ~ ❤️",
+  "เป๊ะเวอร์! ตอบได้แม่นมาก 💯",
+  "สุดยอดเลย! ไปต่อกันเลยจ้า 🚀",
+  "โอ้โห! รู้จริงเรื่องนี้เลยนะ ✨",
+  "วิเศษไปเลย! ถูกต้องค่า~ 🎯",
+];
+
+export const SYMPATHY_MESSAGES = [
+  "อุ้ย... ไม่เป็นไรนะ ลองดูใหม่ 😤",
+  "เกือบแล้ว! ตั้งใจอีกนิดน้า 💪",
+  "อ๋อ... ข้อนี้ยากจริงๆ ดู hint นะ 👀",
+  "อย่าเพิ่งท้อ! ผิดคือการเรียนรู้ 📚",
+  "แง่ว... ข้อนี้หลายคนพลาดเหมือนกัน 🤗",
+];
 
 export const MOOD_IMAGES: Record<MoodState, string> = {
   idle: '/images/idle.png',
-  correct: '/images/correct.png',
-  wrong: '/images/wrong.png',
+  correct: '/images/correct1.png',
+  wrong: '/images/wrong.jpeg',
   passed: '/images/pass.png',
   failed: '/images/fail.png',
 };
+
+export const CORRECT_IMAGES = ['/images/correct1.png', '/images/correct2.png'];
 
 export const questions: ExamQuestion[] = [
   {
@@ -27,6 +47,8 @@ export const questions: ExamQuestion[] = [
     options: ['AWS Shield', 'Amazon Guardrails', 'VPC Peering', 'API Gateway'],
     correctIndex: 1,
     hint_keyword: 'prevent sensitive data leakage',
+    funFact: 'Amazon Guardrails ใช้กรองทั้งคำต้องห้าม (hate speech) และข้อมูลส่วนตัว (PII) ในคราวเดียว! ป้องกันข้อมูลรั่วไหลก่อนถึงโมเดล 🛡️',
+    chapter: 'ด่าน 1: กำแพงแห่งความปลอดภัย 🔒',
   },
   {
     id: 2,
@@ -36,5 +58,7 @@ export const questions: ExamQuestion[] = [
     options: ['Hourly Subscription', 'EC2 Reserved Instance', 'Pay-per-request', 'Monthly Flat Fee'],
     correctIndex: 2,
     hint_keyword: 'billing mechanism',
+    funFact: 'Lambda คิดเงินเป็นมิลลิวินาที! เรียกกี่ครั้งก็จ่ายเท่าที่ใช้ — ถ้าไม่ถูกเรียกเลย = ฟรี 💸',
+    chapter: 'ด่าน 2: ปริศนาแห่งค่าใช้จ่าย 💰',
   },
 ];
