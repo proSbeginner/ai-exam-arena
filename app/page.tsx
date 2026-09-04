@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { MOOD_IMAGES, questions, MoodState, CHEER_MESSAGES, SYMPATHY_MESSAGES, CORRECT_IMAGES } from '@/data/questions';
+import { useState, useEffect } from 'react';
+import { MOOD_IMAGES, questions, MoodState, CHEER_MESSAGES, SYMPATHY_MESSAGES, CORRECT_IMAGES, RANKS } from '@/data/questions';
 
 function pickRandomIndex(length: number): number {
   const array = new Uint32Array(1);
@@ -9,13 +9,57 @@ function pickRandomIndex(length: number): number {
   return array[0] % length;
 }
 
-export default function AwsQuizApp() {
-  const [playerName, setPlayerName] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') return sessionStorage.getItem('quiz_player_name');
-    return null;
+function getRank(score: number) {
+  return RANKS.filter(r => score >= r.min).at(-1) ?? RANKS[0];
+}
+
+function getParticles(count: number) {
+  const colors = ['#f472b6', '#a78bfa', '#60a5fa', '#fbbf24', '#34d399', '#fb923c'];
+  const sizes = ['w-2 h-3', 'w-1.5 h-2.5', 'w-2.5 h-2', 'w-1 h-4'];
+  return Array.from({ length: count }, (_, i) => {
+    const r = new Uint32Array(4);
+    crypto.getRandomValues(r);
+    return {
+      id: i,
+      color: colors[i % colors.length],
+      size: sizes[i % sizes.length],
+      left: `${r[0] % 100}%`,
+      delay: `${(r[1] % 500) / 1000}s`,
+      dx: `${(Number(r[2] % 401)) - 200}px`,
+      rot: `${r[3] % 720}deg`,
+      dur: `${1.5 + (r[0] % 1500) / 1000}s`,
+    };
   });
+}
+
+function ConfettiBurst({ burstKey }: { burstKey: number }) {
+  if (burstKey === 0) return null;
+  const particles = getParticles(30);
+  return (
+    <div key={burstKey} className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {particles.map(p => (
+        <div
+          key={p.id}
+          className={`confetti-piece ${p.size}`}
+          style={{
+            left: p.left,
+            backgroundColor: p.color,
+            animationDelay: p.delay,
+            animationDuration: p.dur,
+            '--dx': p.dx,
+            '--rot': p.rot,
+          } as React.CSSProperties}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default function AwsQuizApp() {
+  const [playerName, setPlayerName] = useState<string | null>(null);
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
   const [mood, setMood] = useState<MoodState>('idle');
   const [gameOver, setGameOver] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -24,6 +68,15 @@ export default function AwsQuizApp() {
   const [cheerIdx, setCheerIdx] = useState(0);
   const [sympathyIdx, setSympathyIdx] = useState(0);
   const [correctImage, setCorrectImage] = useState(CORRECT_IMAGES[0]);
+  const [confettiKey, setConfettiKey] = useState(0);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem('quiz_player_name');
+    if (saved) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPlayerName(saved);
+    }
+  }, []);
 
   if (!playerName) {
     return <WelcomeScreen onStart={(name) => { sessionStorage.setItem('quiz_player_name', name); setPlayerName(name); }} />;
@@ -36,7 +89,23 @@ export default function AwsQuizApp() {
     const isCorrect = selectedOptionIndex === currentQ.correctIndex;
     setSelectedAnswer(selectedOptionIndex);
     setRevealed(true);
-    if (isCorrect) setScore(prev => prev + 1);
+
+    let newScore = score;
+    let newStreak = streak;
+
+    if (isCorrect) {
+      newScore = score + 1;
+      newStreak = streak + 1;
+      setScore(newScore);
+      setStreak(newStreak);
+      if ([3, 5, 7, 10].includes(newStreak)) setConfettiKey(prev => prev + 1);
+      const oldRank = getRank(score);
+      const newRank = getRank(newScore);
+      if (oldRank.title !== newRank.title) setConfettiKey(prev => prev + 1);
+    } else {
+      setStreak(0);
+    }
+
     setMood(isCorrect ? 'correct' : 'wrong');
     setCheerIdx(pickRandomIndex(CHEER_MESSAGES.length));
     setSympathyIdx(pickRandomIndex(SYMPATHY_MESSAGES.length));
@@ -61,11 +130,13 @@ export default function AwsQuizApp() {
   const restartGame = () => {
     setCurrentQIndex(0);
     setScore(0);
+    setStreak(0);
     setGameOver(false);
     setMood('idle');
     setRevealed(false);
     setSelectedAnswer(null);
     setQuestionKey(prev => prev + 1);
+    setConfettiKey(0);
   };
 
   const changeName = () => {
@@ -74,17 +145,27 @@ export default function AwsQuizApp() {
   };
 
   const mascotAnimation = mood === 'correct' ? 'animate-pop' : mood === 'wrong' ? 'animate-shake' : 'animate-floaty';
+  const currentRank = getRank(score);
 
   return (
     <div className="flex flex-col items-center justify-between min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans">
+      <ConfettiBurst burstKey={confettiKey} />
       <header className="w-full max-w-lg flex justify-between items-center py-4">
-        <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">AI EXAM ARENA</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">AI EXAM ARENA</h1>
+          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">{currentRank.emoji} {currentRank.title}</span>
+        </div>
         <button onClick={changeName} className="text-xs text-gray-400 hover:text-pink-500 transition-colors">เปลี่ยนชื่อ 👋</button>
       </header>
 
       {!gameOver ? (
         <div className="w-full max-w-lg flex flex-col gap-6 pb-8">
           <div key={`mascot-${mood}-${currentQIndex}`} className="flex flex-col items-center relative">
+            {streak > 1 && (
+              <div className="absolute -top-3 -left-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg animate-bounce-in z-10">
+                🔥 x{streak}
+              </div>
+            )}
             <img src={mood === 'correct' ? correctImage : MOOD_IMAGES[mood]} alt={mood} className={`w-48 h-48 object-contain drop-shadow-xl transition-all duration-300 ${mascotAnimation}`} />
             <div className="absolute top-2 right-[-10px] sm:right-[-30px] w-36 bg-white px-3 py-2 rounded-xl shadow-md border-2 border-purple-200 text-xs font-bold text-gray-700 animate-bounce">
               {mood === 'idle' && `พร้อมแล้วนะ ${playerName}~! 💖`}
