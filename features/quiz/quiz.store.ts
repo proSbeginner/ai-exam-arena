@@ -105,13 +105,13 @@ export function useQuizStore() {
   }, [quizState.currentQIndex, quizState.gameOver]);
 
   const answerQuestion = useCallback(
-    (selectedOptionIndex: number) => {
+    (selectedOptionId: string) => {
       if (quizState.answeredMap.has(quizState.currentQIndex) || quizState.gameOver || questions.length === 0) return;
 
       const result = evaluateAnswer(
         quizState,
         questions[quizState.currentQIndex],
-        selectedOptionIndex,
+        selectedOptionId,
       );
 
       setQuizState((current) => ({

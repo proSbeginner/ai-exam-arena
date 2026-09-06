@@ -23,7 +23,10 @@ function makeState(opts: Partial<QuizState> = {}): QuizState {
 }
 
 function mockQuestion(correctIdx: number) {
-  return { ...questions[0], correctIndex: correctIdx } as typeof questions[0];
+  return {
+    ...questions[0],
+    correctOptionId: questions[0].options[correctIdx].id,
+  };
 }
 
 describe('getRank', () => {
@@ -50,7 +53,7 @@ describe('handleAnswer — correct answer', () => {
 
   it('increments score by 1 on first correct', () => {
     const state = makeState();
-    const result = evaluateAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, q.options[0].id);
     expect(result.score).toBe(1);
     expect(result.streak).toBe(1);
     expect(result.mood).toBe('correct');
@@ -60,15 +63,15 @@ describe('handleAnswer — correct answer', () => {
 
   it('increments score for a correct selection', () => {
     const state = makeState({ score: 0 });
-    const result = evaluateAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, q.options[0].id);
     expect(result.score).toBe(1);
   });
 
   it('tracks answer in answeredMap', () => {
     const state = makeState();
-    const result = evaluateAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, q.options[0].id);
     expect(result.answeredMap.size).toBe(1);
-    expect(result.answeredMap.get(0)).toBe(0);
+    expect(result.answeredMap.get(0)).toBe(q.options[0].id);
   });
 });
 
@@ -77,19 +80,19 @@ describe('handleAnswer — wrong answer', () => {
 
   it('score does not increase', () => {
     const state = makeState({ score: 2, streak: 1 });
-    const result = evaluateAnswer(state, q, 1);
+    const result = evaluateAnswer(state, q, q.options[1].id);
     expect(result.score).toBe(2);
   });
 
   it('resets streak to 0', () => {
     const state = makeState({ streak: 3 });
-    const result = evaluateAnswer(state, q, 1);
+    const result = evaluateAnswer(state, q, q.options[1].id);
     expect(result.streak).toBe(0);
   });
 
   it('sets mood to wrong', () => {
     const state = makeState();
-    const result = evaluateAnswer(state, q, 1);
+    const result = evaluateAnswer(state, q, q.options[1].id);
     expect(result.mood).toBe('wrong');
   });
 });
@@ -99,19 +102,19 @@ describe('handleAnswer — streak milestones & confetti', () => {
 
   it('triggers confetti at streak milestone 3', () => {
     const state = makeState({ score: 2, streak: 2 });
-    const result = evaluateAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, q.options[0].id);
     expect(result.triggerConfetti).toBe(true);
   });
 
   it('triggers confetti at streak milestone 5', () => {
     const state = makeState({ score: 4, streak: 4 });
-    const result = evaluateAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, q.options[0].id);
     expect(result.triggerConfetti).toBe(true);
   });
 
   it('does NOT trigger confetti at non-milestone streak (e.g. 4)', () => {
     const state = makeState({ score: 3, streak: 3 });
-    const result = evaluateAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, q.options[0].id);
     expect(result.triggerConfetti).toBe(false);
   });
 });
@@ -121,7 +124,7 @@ describe('handleAnswer — rank up triggers confetti', () => {
 
   it('triggers confetti when promoted from Intern to Apprentice (score 2→3)', () => {
     const state = makeState({ score: 2, streak: 2 });
-    const result = evaluateAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, q.options[0].id);
     expect(result.rankChanged).toBe(true);
     expect(result.triggerConfetti).toBe(true);
     expect(result.score).toBe(3);
@@ -129,7 +132,7 @@ describe('handleAnswer — rank up triggers confetti', () => {
 
   it('triggers confetti when promoted from Apprentice to Practitioner (score 5→6)', () => {
     const state = makeState({ score: 5, streak: 5 });
-    const result = evaluateAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, q.options[0].id);
     expect(result.rankChanged).toBe(true);
     expect(result.triggerConfetti).toBe(true);
     expect(result.score).toBe(6);
@@ -137,7 +140,7 @@ describe('handleAnswer — rank up triggers confetti', () => {
 
   it('does not trigger when staying at same rank (score 3→4)', () => {
     const state = makeState({ score: 3, streak: 3 });
-    const result = evaluateAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, q.options[0].id);
     expect(result.rankChanged).toBe(false);
     expect(result.triggerConfetti).toBe(false);
   });
@@ -162,8 +165,8 @@ describe('goToNext', () => {
       currentQIndex: questions.length - 1,
       score: 1,
       answeredMap: new Map([
-        [0, 1],
-        [1, 0],
+        [0, questions[0].options[0].id],
+        [1, questions[1].options[0].id],
       ]),
     });
 

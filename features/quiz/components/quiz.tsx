@@ -16,7 +16,7 @@ import type { QuizState } from '../quiz.types';
 import { QuizLoadingSkeleton } from './quiz-loading-skeleton';
 
 interface QuizProps {
-  answerQuestion: (selectedOptionIndex: number) => void;
+  answerQuestion: (selectedOptionId: string) => void;
   answeredCount: number;
   changePlayerName: () => void;
   cheerIdx: number;
@@ -36,7 +36,7 @@ interface QuizProps {
   quizState: QuizState;
   restartGame: () => void;
   retryQuestionLoad: () => void;
-  selectedAnswer: number | undefined;
+  selectedAnswer: string | undefined;
   sympathyIdx: number;
 }
 
@@ -269,15 +269,15 @@ export function Quiz({
             </p>
             <div className="space-y-3 pt-2">
               {currentQuestion.options.map((option, index) => {
-                const isCorrectOption = index === currentQuestion.correctIndex;
+                const isCorrectOption = option.id === currentQuestion.correctOptionId;
                 const isWrongSelection =
-                  hasAnsweredCurrentQuestion && selectedAnswer === index && !isCorrectOption;
+                  hasAnsweredCurrentQuestion && selectedAnswer === option.id && !isCorrectOption;
 
                 return (
                   <button
                     key={index}
                     type="button"
-                    onClick={() => answerQuestion(index)}
+                    onClick={() => answerQuestion(option.id)}
                     disabled={hasAnsweredCurrentQuestion}
                     className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left transition-all ${
                       hasAnsweredCurrentQuestion && isCorrectOption
@@ -298,7 +298,8 @@ export function Quiz({
                               : 'text-gray-700 group-hover:text-pink-600'
                         }`}
                       >
-                        {option}
+                        <span className="block">{option.english}</span>
+                        <span className="mt-1 block text-xs text-gray-400">{option.thai_drama}</span>
                       </span>
                     </span>
                     {hasAnsweredCurrentQuestion && isCorrectOption && <span className="text-lg font-bold text-green-500">✓</span>}

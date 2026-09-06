@@ -11,11 +11,11 @@ export const STREAK_MILESTONES = [3, 5, 7, 10];
 export function evaluateAnswer(
   state: QuizState,
   question: ExamQuestion,
-  selectedOptionIndex: number,
+  selectedOptionId: string,
 ): AnswerResult {
-  const isCorrect = selectedOptionIndex === question.correctIndex;
+  const isCorrect = selectedOptionId === question.correctOptionId;
   const answeredMap = new Map(state.answeredMap);
-  answeredMap.set(state.currentQIndex, selectedOptionIndex);
+  answeredMap.set(state.currentQIndex, selectedOptionId);
 
   if (!isCorrect) {
     return {

@@ -1,7 +1,7 @@
 import { getMockQuizQuestions } from '@/mock-api/quiz/mock-questions';
+import type { ExamQuestion } from '@/features/quiz/quiz.types';
 
 import { DataSourceConfigError, getDataSource } from './data-source';
-import type { ExamQuestion } from '@/features/quiz/quiz.types';
 
 export interface QuizProvider {
   getQuestions(): Promise<ExamQuestion[]>;
