@@ -1,11 +1,25 @@
+'use client';
+
+import { useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 import {
   PLAYER_NAME_STORAGE_KEY,
   type PlayerNameValidation,
 } from './welcome.types';
+import { registerPlayer, WelcomeApiError } from './services/welcome.api';
 
 const MAX_PLAYER_NAME_LENGTH = 20;
 const PLAYER_NAME_PATTERN = /^[A-Z_]+$/;
 const playerNameListeners = new Set<() => void>();
+
+export interface WelcomeStore {
+  error: string | null;
+  isSubmitting: boolean;
+  playerName: string;
+  submitPlayerName: () => Promise<void>;
+  updatePlayerName: (value: string) => void;
+}
 
 function notifyPlayerNameListeners(): void {
   playerNameListeners.forEach((listener) => listener());
@@ -59,5 +73,54 @@ export function subscribeToPlayerName(listener: () => void): () => void {
   return () => {
     playerNameListeners.delete(listener);
     window.removeEventListener('storage', listener);
+  };
+}
+
+export function useWelcomeStore(): WelcomeStore {
+  const router = useRouter();
+  const [playerName, setPlayerName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const updatePlayerName = useCallback((value: string) => {
+    const normalizedPlayerName = normalizePlayerName(value);
+    const validation = validatePlayerName(normalizedPlayerName);
+
+    setPlayerName(normalizedPlayerName);
+    setError(normalizedPlayerName && !validation.isValid ? validation.message : null);
+  }, []);
+
+  const submitPlayerName = useCallback(async () => {
+    const normalizedPlayerName = normalizePlayerName(playerName);
+    const validation = validatePlayerName(normalizedPlayerName);
+
+    if (!validation.isValid) {
+      setError(validation.message);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await registerPlayer(normalizedPlayerName);
+      savePlayerName(normalizedPlayerName);
+      router.replace('/quiz');
+    } catch (submissionError) {
+      if (submissionError instanceof WelcomeApiError && submissionError.code === 'PLAYER_NAME_TAKEN') {
+        setError('ชื่อผู้เล่นนี้มีผู้ใช้งานแล้ว กรุณาเลือกชื่ออื่น');
+      } else {
+        setError('ไม่สามารถเริ่มเกมได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [playerName, router]);
+
+  return {
+    error,
+    isSubmitting,
+    playerName,
+    submitPlayerName,
+    updatePlayerName,
   };
 }

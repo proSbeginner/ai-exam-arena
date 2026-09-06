@@ -7,12 +7,37 @@ import { useRouter } from 'next/navigation';
 import {
   CHEER_MESSAGES,
   MOOD_IMAGES,
-  questions,
   SYMPATHY_MESSAGES,
 } from '@/data/questions';
+import type { ExamQuestion } from '@/data/questions';
 import { AppLoadingSkeleton } from '@/features/shared/components/app-loading-skeleton';
 
-import { useQuizStore } from '../quiz.store';
+import type { QuizState } from '../quiz.types';
+
+interface QuizProps {
+  answerQuestion: (selectedOptionIndex: number) => void;
+  answeredCount: number;
+  changePlayerName: () => void;
+  cheerIdx: number;
+  confettiKey: number;
+  correctImage: string;
+  currentQuestion: ExamQuestion | undefined;
+  currentRank: { emoji: string; title: string };
+  goToNext: () => void;
+  goToPrevious: () => void;
+  hasAnsweredCurrentQuestion: boolean;
+  isPlayerReady: boolean;
+  pageKey: number;
+  playerName: string | null;
+  questionLoadError: string | null;
+  questionLoadStatus: 'loading' | 'ready' | 'empty' | 'error';
+  questions: ExamQuestion[];
+  quizState: QuizState;
+  restartGame: () => void;
+  retryQuestionLoad: () => void;
+  selectedAnswer: number | undefined;
+  sympathyIdx: number;
+}
 
 function getParticles(count: number) {
   const colors = ['#f472b6', '#a78bfa', '#60a5fa', '#fbbf24', '#34d399', '#fb923c'];
@@ -82,28 +107,31 @@ function useSwipe(onUp: () => void, onDown: () => void) {
   return { onTouchEnd, onTouchStart };
 }
 
-export function Quiz() {
+export function Quiz({
+  answerQuestion,
+  answeredCount,
+  changePlayerName,
+  cheerIdx,
+  confettiKey,
+  correctImage,
+  currentQuestion,
+  currentRank,
+  goToNext,
+  goToPrevious,
+  hasAnsweredCurrentQuestion,
+  isPlayerReady,
+  pageKey,
+  playerName,
+  questionLoadError,
+  questionLoadStatus,
+  questions,
+  quizState,
+  restartGame,
+  retryQuestionLoad,
+  selectedAnswer,
+  sympathyIdx,
+}: QuizProps) {
   const router = useRouter();
-  const {
-    answerQuestion,
-    answeredCount,
-    changePlayerName,
-    cheerIdx,
-    confettiKey,
-    correctImage,
-    currentQuestion,
-    currentRank,
-    goToNext,
-    goToPrevious,
-    hasAnsweredCurrentQuestion,
-    isPlayerReady,
-    pageKey,
-    playerName,
-    quizState,
-    restartGame,
-    selectedAnswer,
-    sympathyIdx,
-  } = useQuizStore();
 
   useEffect(() => {
     if (isPlayerReady && !playerName) {
@@ -125,6 +153,32 @@ export function Quiz() {
 
   if (!isPlayerReady || !playerName) {
     return <AppLoadingSkeleton variant="quiz" />;
+  }
+
+  if (questionLoadStatus === 'loading') {
+    return <AppLoadingSkeleton variant="quiz" />;
+  }
+
+  if (questionLoadStatus === 'error') {
+    return (
+      <QuizNotice
+        heading="ไม่สามารถโหลดคำถามได้"
+        message={questionLoadError ?? 'กรุณาลองใหม่อีกครั้ง'}
+        actionLabel="ลองใหม่"
+        onAction={retryQuestionLoad}
+      />
+    );
+  }
+
+  if (questionLoadStatus === 'empty' || !currentQuestion) {
+    return (
+      <QuizNotice
+        heading="ยังไม่มีคำถามในชุดนี้"
+        message="ผู้ดูแลระบบยังไม่ได้เผยแพร่คำถามสำหรับการฝึกฝน"
+        actionLabel="เปลี่ยนชื่อผู้เล่น"
+        onAction={changePlayerName}
+      />
+    );
   }
 
   const mascotAnimation =
@@ -295,14 +349,14 @@ export function Quiz() {
             className={`mx-auto h-40 w-40 object-contain drop-shadow-xl ${quizState.mood === 'passed' ? 'animate-wiggle' : ''}`}
           />
           <h1 className="text-3xl font-extrabold text-gray-800">
-            {quizState.score >= 1 ? '🎉 PASSED!' : '😭 TRY AGAIN'}
+            {quizState.score >= Math.ceil(questions.length / 2) ? '🎉 PASSED!' : '😭 TRY AGAIN'}
           </h1>
           <p className="text-sm text-gray-500">คุณได้คะแนน</p>
           <div className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-5xl font-black text-transparent">
             {quizState.score}/{questions.length}
           </div>
           <p className="text-sm text-gray-600">
-            {quizState.score >= 1
+            {quizState.score >= Math.ceil(questions.length / 2)
               ? `${playerName} เก่งมาก! พร้อมไปสอบจริงแล้ว~ ✨`
               : `${playerName} อย่าท้อใจนะ ลองทบทวนแล้วมาใหม่! 💪`}
           </p>
@@ -325,5 +379,34 @@ export function Quiz() {
         </div>
       )}
     </div>
+  );
+}
+
+function QuizNotice({
+  actionLabel,
+  heading,
+  message,
+  onAction,
+}: {
+  actionLabel: string;
+  heading: string;
+  message: string;
+  onAction: () => void;
+}) {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
+      <section className="w-full max-w-md space-y-4 rounded-3xl bg-white p-8 text-center shadow-xl">
+        <div className="text-4xl" aria-hidden>📝</div>
+        <h1 className="text-2xl font-extrabold text-gray-800">{heading}</h1>
+        <p className="text-sm text-gray-500">{message}</p>
+        <button
+          type="button"
+          onClick={onAction}
+          className="w-full rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white shadow-lg transition-all active:scale-95"
+        >
+          {actionLabel}
+        </button>
+      </section>
+    </main>
   );
 }

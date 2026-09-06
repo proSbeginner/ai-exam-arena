@@ -1,32 +1,27 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
-import {
-  normalizePlayerName,
-  savePlayerName,
-  validatePlayerName,
-} from '../welcome.store';
+import { TextInput } from '@/features/shared/components/text-input';
 
-export function Welcome() {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [name, setName] = useState('');
+interface WelcomeProps {
+  error: string | null;
+  isSubmitting: boolean;
+  playerName: string;
+  submitPlayerName: () => Promise<void>;
+  updatePlayerName: (value: string) => void;
+}
 
+export function Welcome({
+  error,
+  isSubmitting,
+  playerName,
+  submitPlayerName,
+  updatePlayerName,
+}: WelcomeProps) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const playerName = normalizePlayerName(name);
-    const validation = validatePlayerName(playerName);
-
-    if (!validation.isValid) {
-      setError(validation.message);
-      return;
-    }
-
-    savePlayerName(playerName);
-    router.replace('/quiz');
+    void submitPlayerName();
   };
 
   return (
@@ -65,38 +60,26 @@ export function Welcome() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <p className="rounded-lg bg-red-50 p-2 text-center text-sm font-medium text-red-500" role="alert">
-              {error}
-            </p>
-          )}
-          <div className="relative">
-            <input
-              id="player-name"
-              name="playerName"
-              type="text"
-              required
-              maxLength={20}
-              value={name}
-              onChange={(event) => {
-                setName(normalizePlayerName(event.target.value));
-                setError(null);
-              }}
-              placeholder="PLAYER_NAME"
-              autoComplete="username"
-              className="w-full rounded-xl border-2 border-purple-200 bg-purple-50 py-3 pl-4 pr-14 font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-0"
-              aria-describedby="player-name-rules"
-            />
-            <span className="absolute right-4 top-3.5 text-xs text-gray-400">/20</span>
-          </div>
-          <p id="player-name-rules" className="text-center text-xs text-gray-400">
-            ใช้ A–Z และ _ เท่านั้น
-          </p>
+          <TextInput
+            id="player-name"
+            name="playerName"
+            type="text"
+            required
+            maxLength={20}
+            value={playerName}
+            onChange={(event) => updatePlayerName(event.target.value)}
+            placeholder="PLAYER_NAME"
+            autoComplete="off"
+            error={error}
+            hint="ใช้ A–Z และ _ เท่านั้น"
+            showCounter
+          />
           <button
             type="submit"
+            disabled={isSubmitting}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3.5 text-lg font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
           >
-            <span>เริ่มฝึกฝน!</span>
+            <span>{isSubmitting ? 'กำลังเตรียมเกม...' : 'เริ่มฝึกฝน!'}</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="m9 18 6-6-6-6" />
             </svg>

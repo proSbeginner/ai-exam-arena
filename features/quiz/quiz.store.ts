@@ -1,13 +1,13 @@
 'use client';
 
-import { useCallback, useMemo, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 
 import {
   CHEER_MESSAGES,
   CORRECT_IMAGES,
-  questions,
   SYMPATHY_MESSAGES,
 } from '@/data/questions';
+import type { ExamQuestion } from '@/data/questions';
 import {
   clearPlayerName,
   getStoredPlayerName,
@@ -21,7 +21,10 @@ import {
   getPreviousQuestion,
   getRank,
 } from './quiz.logic';
+import { getQuizQuestions } from './services/quiz.api';
 import type { QuizState } from './quiz.types';
+
+type QuestionLoadStatus = 'loading' | 'ready' | 'empty' | 'error';
 
 function pickRandomIndex(length: number): number {
   const randomValues = new Uint32Array(1);
@@ -41,14 +44,46 @@ export function useQuizStore() {
     () => false,
   );
   const [quizState, setQuizState] = useState<QuizState>(createInitialQuizState);
+  const [questions, setQuestions] = useState<ExamQuestion[]>([]);
+  const [questionLoadStatus, setQuestionLoadStatus] = useState<QuestionLoadStatus>('loading');
+  const [questionLoadError, setQuestionLoadError] = useState<string | null>(null);
+  const [questionLoadAttempt, setQuestionLoadAttempt] = useState(0);
   const [cheerIdx, setCheerIdx] = useState(0);
   const [sympathyIdx, setSympathyIdx] = useState(0);
   const [correctImage, setCorrectImage] = useState(CORRECT_IMAGES[0]);
   const [confettiKey, setConfettiKey] = useState(0);
   const [pageKey, setPageKey] = useState(0);
 
+  useEffect(() => {
+    let isCurrentRequest = true;
+
+    const loadQuestions = async () => {
+      setQuestionLoadStatus('loading');
+      setQuestionLoadError(null);
+
+      try {
+        const loadedQuestions = await getQuizQuestions();
+        if (!isCurrentRequest) return;
+
+        setQuestions(loadedQuestions);
+        setQuestionLoadStatus(loadedQuestions.length === 0 ? 'empty' : 'ready');
+      } catch {
+        if (!isCurrentRequest) return;
+
+        setQuestionLoadStatus('error');
+        setQuestionLoadError('ไม่สามารถโหลดคำถามได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง');
+      }
+    };
+
+    void loadQuestions();
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [questionLoadAttempt]);
+
   const goToNext = useCallback(() => {
-    if (quizState.gameOver) return;
+    if (quizState.gameOver || questions.length === 0) return;
 
     const next = getNextQuestion(quizState, questions.length);
     setQuizState((current) => ({
@@ -61,7 +96,7 @@ export function useQuizStore() {
     if (!next.gameOver && next.currentQIndex !== quizState.currentQIndex) {
       setPageKey((current) => current + 1);
     }
-  }, [quizState]);
+  }, [questions.length, quizState]);
 
   const goToPrevious = useCallback(() => {
     if (quizState.currentQIndex === 0 || quizState.gameOver) return;
@@ -71,7 +106,7 @@ export function useQuizStore() {
 
   const answerQuestion = useCallback(
     (selectedOptionIndex: number) => {
-      if (quizState.answeredMap.has(quizState.currentQIndex) || quizState.gameOver) return;
+      if (quizState.answeredMap.has(quizState.currentQIndex) || quizState.gameOver || questions.length === 0) return;
 
       const result = evaluateAnswer(
         quizState,
@@ -97,7 +132,7 @@ export function useQuizStore() {
         setConfettiKey((current) => current + 1);
       }
     },
-    [quizState],
+    [questions, quizState],
   );
 
   const restartGame = useCallback(() => {
@@ -108,6 +143,10 @@ export function useQuizStore() {
 
   const changePlayerName = useCallback(() => {
     clearPlayerName();
+  }, []);
+
+  const retryQuestionLoad = useCallback(() => {
+    setQuestionLoadAttempt((current) => current + 1);
   }, []);
 
   const answeredCount = quizState.answeredMap.size;
@@ -131,9 +170,15 @@ export function useQuizStore() {
     isPlayerReady,
     pageKey,
     playerName,
+    questionLoadError,
+    questionLoadStatus,
+    questions,
     quizState,
     restartGame,
+    retryQuestionLoad,
     selectedAnswer,
     sympathyIdx,
   };
 }
+
+export type QuizStore = ReturnType<typeof useQuizStore>;
