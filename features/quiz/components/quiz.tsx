@@ -10,10 +10,10 @@ import {
   SYMPATHY_MESSAGES,
 } from '@/data/questions';
 import type { ExamQuestion } from '@/data/questions';
-import { AppLoadingSkeleton } from '@/features/shared/components/app-loading-skeleton';
 import { APP_ROUTES } from '@/features/shared/routes';
 
 import type { QuizState } from '../quiz.types';
+import { QuizLoadingSkeleton } from './quiz-loading-skeleton';
 
 interface QuizProps {
   answerQuestion: (selectedOptionIndex: number) => void;
@@ -105,7 +105,13 @@ function useSwipe(onUp: () => void, onDown: () => void) {
     [onDown, onUp],
   );
 
-  return { onTouchEnd, onTouchStart };
+  const onTouchMove = useCallback((event: React.TouchEvent) => {
+    if (startYRef.current !== null) {
+      event.preventDefault();
+    }
+  }, []);
+
+  return { onTouchEnd, onTouchMove, onTouchStart };
 }
 
 export function Quiz({
@@ -153,11 +159,11 @@ export function Quiz({
   const swipe = useSwipe(goToNext, goToPrevious);
 
   if (!isPlayerReady || !playerName) {
-    return <AppLoadingSkeleton variant="quiz" />;
+    return <QuizLoadingSkeleton />;
   }
 
   if (questionLoadStatus === 'loading') {
-    return <AppLoadingSkeleton variant="quiz" />;
+    return <QuizLoadingSkeleton />;
   }
 
   if (questionLoadStatus === 'error') {
@@ -193,7 +199,7 @@ export function Quiz({
   return (
     <div
       {...swipe}
-      className="flex min-h-screen touch-pan-y flex-col items-center justify-between bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
+      className="flex min-h-screen touch-none flex-col items-center justify-between bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
     >
       <ConfettiBurst burstKey={confettiKey} />
       <header className="flex w-full max-w-lg items-center justify-between py-4">

@@ -1,5 +1,5 @@
-import { AppLoadingSkeleton } from '@/features/shared/components/app-loading-skeleton';
+import { WelcomeLoadingSkeleton } from '@/features/welcome/components/welcome-loading-skeleton';
 
 export default function WelcomeLoading() {
-  return <AppLoadingSkeleton variant="welcome" />;
+  return <WelcomeLoadingSkeleton />;
 }

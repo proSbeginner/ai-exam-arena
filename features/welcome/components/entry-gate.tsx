@@ -1,27 +1,31 @@
 'use client';
 
-import { useEffect, useSyncExternalStore } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { AppLoadingSkeleton } from '@/features/shared/components/app-loading-skeleton';
 import { APP_ROUTES } from '@/features/shared/routes';
 import {
   getStoredPlayerName,
   subscribeToPlayerName,
 } from '../welcome.store';
+import { QuizLoadingSkeleton } from '../../quiz/components/quiz-loading-skeleton';
+import { WelcomeLoadingSkeleton } from './welcome-loading-skeleton';
 
 export function EntryGate() {
   const router = useRouter();
-  const playerName = useSyncExternalStore(
-    subscribeToPlayerName,
-    getStoredPlayerName,
-    () => null,
-  );
-  const isPlayerReady = useSyncExternalStore(
-    subscribeToPlayerName,
-    () => true,
-    () => false,
-  );
+  const [playerName, setPlayerName] = useState<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    const syncPlayerName = () => {
+      setPlayerName(getStoredPlayerName());
+    };
+
+    syncPlayerName();
+
+    return subscribeToPlayerName(syncPlayerName);
+  }, []);
+
+  const isPlayerReady = playerName !== undefined;
 
   useEffect(() => {
     if (isPlayerReady) {
@@ -29,5 +33,5 @@ export function EntryGate() {
     }
   }, [isPlayerReady, playerName, router]);
 
-  return <AppLoadingSkeleton variant={playerName ? 'quiz' : 'welcome'} />;
+  return playerName ? <QuizLoadingSkeleton /> : <WelcomeLoadingSkeleton />;
 }

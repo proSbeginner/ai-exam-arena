@@ -1,5 +1,5 @@
-import { AppLoadingSkeleton } from '@/features/shared/components/app-loading-skeleton';
+import { QuizLoadingSkeleton } from '@/features/quiz/components/quiz-loading-skeleton';
 
 export default function QuizLoading() {
-  return <AppLoadingSkeleton variant="quiz" />;
+  return <QuizLoadingSkeleton />;
 }
