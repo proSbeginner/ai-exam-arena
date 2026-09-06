@@ -59,7 +59,7 @@ export function Welcome({
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="space-y-4">
           <TextInput
             id="player-name"
             name="playerName"
