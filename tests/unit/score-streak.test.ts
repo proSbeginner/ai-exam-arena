@@ -6,8 +6,9 @@ import {
   getPreviousQuestion,
   getRank,
 } from '@/features/quiz/quiz.logic';
+import { RANKS } from '@/features/quiz/quiz.constants';
 import type { QuizState } from '@/features/quiz/quiz.types';
-import { questions, RANKS } from '@/data/questions';
+import { questions } from '@/mock-api/quiz/questions.mock';
 
 // --- Helper factories ---
 function makeState(opts: Partial<QuizState> = {}): QuizState {

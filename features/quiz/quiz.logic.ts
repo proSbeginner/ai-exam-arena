@@ -1,6 +1,5 @@
-import type { ExamQuestion } from '@/data/questions';
-import { RANKS } from '@/data/questions';
-
+import { RANKS } from './quiz.constants';
+import type { ExamQuestion } from './quiz.types';
 import type { AnswerResult, NextQuestionResult, QuizState } from './quiz.types';
 
 export function getRank(score: number): (typeof RANKS)[number] {

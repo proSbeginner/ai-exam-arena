@@ -1,4 +1,4 @@
-import { questions } from '@/data/questions';
+import { questions } from './questions.mock';
 
 import {
   getMockScenario,

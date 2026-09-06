@@ -6,10 +6,10 @@ import { useRouter } from 'next/navigation';
 
 import {
   CHEER_MESSAGES,
-  MOOD_IMAGES,
   SYMPATHY_MESSAGES,
-} from '@/data/questions';
-import type { ExamQuestion } from '@/data/questions';
+} from '../quiz.content';
+import { MOOD_IMAGES } from '../quiz.assets';
+import type { ExamQuestion } from '../quiz.types';
 import { APP_ROUTES } from '@/features/shared/routes';
 
 import type { QuizState } from '../quiz.types';

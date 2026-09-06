@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 
 
 import {
   CHEER_MESSAGES,
-  CORRECT_IMAGES,
   SYMPATHY_MESSAGES,
-} from '@/data/questions';
-import type { ExamQuestion } from '@/data/questions';
+} from './quiz.content';
+import { CORRECT_IMAGES } from './quiz.assets';
+import type { ExamQuestion } from './quiz.types';
 import {
   clearPlayerName,
   getStoredPlayerName,

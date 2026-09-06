@@ -1,4 +1,4 @@
-import type { ExamQuestion } from '@/data/questions';
+import type { ExamQuestion } from '../quiz.types';
 
 interface QuestionsResponse {
   questions: ExamQuestion[];
