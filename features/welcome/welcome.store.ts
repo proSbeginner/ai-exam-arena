@@ -3,6 +3,8 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { APP_ROUTES } from '@/features/shared/routes';
+
 import {
   PLAYER_NAME_STORAGE_KEY,
   type PlayerNameValidation,
@@ -104,7 +106,7 @@ export function useWelcomeStore(): WelcomeStore {
     try {
       await registerPlayer(normalizedPlayerName);
       savePlayerName(normalizedPlayerName);
-      router.replace('/quiz');
+      router.replace(APP_ROUTES.quiz);
     } catch (submissionError) {
       if (submissionError instanceof WelcomeApiError && submissionError.code === 'PLAYER_NAME_TAKEN') {
         setError('ชื่อผู้เล่นนี้มีผู้ใช้งานแล้ว กรุณาเลือกชื่ออื่น');

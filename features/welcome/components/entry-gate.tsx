@@ -4,6 +4,7 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { AppLoadingSkeleton } from '@/features/shared/components/app-loading-skeleton';
+import { APP_ROUTES } from '@/features/shared/routes';
 import {
   getStoredPlayerName,
   subscribeToPlayerName,
@@ -24,7 +25,7 @@ export function EntryGate() {
 
   useEffect(() => {
     if (isPlayerReady) {
-      router.replace(playerName ? '/quiz' : '/welcome');
+      router.replace(playerName ? APP_ROUTES.quiz : APP_ROUTES.welcome);
     }
   }, [isPlayerReady, playerName, router]);
 

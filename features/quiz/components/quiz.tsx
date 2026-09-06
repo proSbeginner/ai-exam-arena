@@ -11,6 +11,7 @@ import {
 } from '@/data/questions';
 import type { ExamQuestion } from '@/data/questions';
 import { AppLoadingSkeleton } from '@/features/shared/components/app-loading-skeleton';
+import { APP_ROUTES } from '@/features/shared/routes';
 
 import type { QuizState } from '../quiz.types';
 
@@ -135,7 +136,7 @@ export function Quiz({
 
   useEffect(() => {
     if (isPlayerReady && !playerName) {
-      router.replace('/welcome');
+      router.replace(APP_ROUTES.welcome);
     }
   }, [isPlayerReady, playerName, router]);
 
