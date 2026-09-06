@@ -1,5 +1,6 @@
 import { MockApiError } from '@/mock-api/mock-api.config';
-import { createMockPlayer } from '@/mock-api/welcome/mock-player';
+import { DataSourceConfigError } from '@/server/providers/data-source';
+import { getPlayerProvider } from '@/server/providers/player.provider';
 
 export async function POST(request: Request) {
   const body = (await request.json()) as { playerName?: unknown };
@@ -12,7 +13,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const player = await createMockPlayer(body.playerName);
+    const player = await getPlayerProvider().createPlayer(body.playerName);
     return Response.json({ player }, { status: 201 });
   } catch (error) {
     if (error instanceof MockApiError) {
@@ -22,8 +23,15 @@ export async function POST(request: Request) {
       );
     }
 
+    if (error instanceof DataSourceConfigError) {
+      return Response.json(
+        { error: { code: error.code, message: error.message } },
+        { status: 503 },
+      );
+    }
+
     return Response.json(
-      { error: { code: 'UNKNOWN_ERROR', message: 'The mock service failed unexpectedly.' } },
+      { error: { code: 'UNKNOWN_ERROR', message: 'The player service failed unexpectedly.' } },
       { status: 500 },
     );
   }
