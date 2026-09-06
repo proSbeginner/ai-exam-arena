@@ -8,7 +8,8 @@ This document records the approved project structure for the AWS AI Cert quiz ap
 features/quiz/
 ├── components/
 │   ├── quiz.tsx
-│   └── quiz-loading-skeleton.tsx
+│   ├── quiz-loading-skeleton.tsx
+│   └── quiz-setup.tsx
 ├── services/
 │   └── quiz.api.ts
 ├── quiz.types.ts
@@ -16,7 +17,8 @@ features/quiz/
 ├── quiz.assets.ts
 ├── quiz.constants.ts
 ├── quiz.logic.ts
-└── quiz.store.ts
+├── quiz.store.ts
+└── quiz-setup.store.ts
 
 mock-api/quiz/
 ├── mock-questions.ts
@@ -29,6 +31,7 @@ mock-api/quiz/
 | --- | --- | --- |
 | `MoodState` | `features/quiz/quiz.types.ts` | Mascot mood type |
 | `ExamQuestion` | `features/quiz/quiz.types.ts` | Quiz question type |
+| `QuizSetup` | `features/quiz/quiz.types.ts` | Selected mode and question limit |
 | `QuizState` | `features/quiz/quiz.types.ts` | Quiz game state |
 | `CHEER_MESSAGES` | `features/quiz/quiz.content.ts` | Correct-answer messages |
 | `SYMPATHY_MESSAGES` | `features/quiz/quiz.content.ts` | Wrong-answer messages |
@@ -48,6 +51,8 @@ quiz.store
   → mock-api/quiz/mock-questions.ts
   → mock-api/quiz/questions.mock.ts
 ```
+
+The quiz setup page uses the same API flow to count published questions for the selected mode. It stores the selected mode and optional question limit in session storage before routing to the quiz page.
 
 When `DATA_SOURCE=supabase`, the provider resolver will use the Supabase implementation instead of the mock provider.
 

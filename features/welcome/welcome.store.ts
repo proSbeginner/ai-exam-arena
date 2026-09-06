@@ -106,7 +106,7 @@ export function useWelcomeStore(): WelcomeStore {
     try {
       await registerPlayer(normalizedPlayerName);
       savePlayerName(normalizedPlayerName);
-      router.replace(APP_ROUTES.quiz);
+      router.replace(APP_ROUTES.quizSetup);
     } catch (submissionError) {
       if (submissionError instanceof WelcomeApiError && submissionError.code === 'PLAYER_NAME_TAKEN') {
         setError('ชื่อผู้เล่นนี้มีผู้ใช้งานแล้ว กรุณาเลือกชื่ออื่น');

@@ -29,7 +29,7 @@ export function EntryGate() {
 
   useEffect(() => {
     if (isPlayerReady) {
-      router.replace(playerName ? APP_ROUTES.quiz : APP_ROUTES.welcome);
+      router.replace(playerName ? APP_ROUTES.quizSetup : APP_ROUTES.welcome);
     }
   }, [isPlayerReady, playerName, router]);
 

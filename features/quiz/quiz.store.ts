@@ -9,6 +9,10 @@ import {
 import { CORRECT_IMAGES } from './quiz.assets';
 import type { ExamQuestion } from './quiz.types';
 import {
+  getStoredQuizSetup,
+  subscribeToQuizSetup,
+} from './quiz-setup.store';
+import {
   clearPlayerName,
   getStoredPlayerName,
   subscribeToPlayerName,
@@ -38,6 +42,11 @@ export function useQuizStore() {
     getStoredPlayerName,
     () => null,
   );
+  const quizSetup = useSyncExternalStore(
+    subscribeToQuizSetup,
+    getStoredQuizSetup,
+    () => null,
+  );
   const isPlayerReady = useSyncExternalStore(
     subscribeToPlayerName,
     () => true,
@@ -65,8 +74,17 @@ export function useQuizStore() {
         const loadedQuestions = await getQuizQuestions();
         if (!isCurrentRequest) return;
 
-        setQuestions(loadedQuestions);
-        setQuestionLoadStatus(loadedQuestions.length === 0 ? 'empty' : 'ready');
+        const modeQuestions = quizSetup
+          ? loadedQuestions.filter(
+              (question) => question.mode === quizSetup.mode && question.status === 'published',
+            )
+          : [];
+        const selectedQuestions = quizSetup?.questionLimit
+          ? modeQuestions.slice(0, quizSetup.questionLimit)
+          : modeQuestions;
+
+        setQuestions(selectedQuestions);
+        setQuestionLoadStatus(selectedQuestions.length === 0 ? 'empty' : 'ready');
       } catch {
         if (!isCurrentRequest) return;
 
@@ -80,7 +98,7 @@ export function useQuizStore() {
     return () => {
       isCurrentRequest = false;
     };
-  }, [questionLoadAttempt]);
+  }, [questionLoadAttempt, quizSetup]);
 
   const goToNext = useCallback(() => {
     if (quizState.gameOver || questions.length === 0) return;
@@ -167,6 +185,7 @@ export function useQuizStore() {
     goToNext,
     goToPrevious,
     hasAnsweredCurrentQuestion,
+    hasQuizSetup: Boolean(quizSetup),
     isPlayerReady,
     pageKey,
     playerName,

@@ -16,6 +16,7 @@ export default function QuizPage() {
     goToNext,
     goToPrevious,
     hasAnsweredCurrentQuestion,
+    hasQuizSetup,
     isPlayerReady,
     pageKey,
     playerName,
@@ -42,6 +43,7 @@ export default function QuizPage() {
       goToNext={goToNext}
       goToPrevious={goToPrevious}
       hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
+      hasQuizSetup={hasQuizSetup}
       isPlayerReady={isPlayerReady}
       pageKey={pageKey}
       playerName={playerName}

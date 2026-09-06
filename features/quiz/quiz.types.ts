@@ -53,6 +53,11 @@ export interface QuizAnswer {
   answeredAt: string;
 }
 
+export interface QuizSetup {
+  mode: QuizMode;
+  questionLimit: number | null;
+}
+
 export interface QuizState {
   currentQIndex: number;
   score: number;

@@ -27,6 +27,7 @@ interface QuizProps {
   goToNext: () => void;
   goToPrevious: () => void;
   hasAnsweredCurrentQuestion: boolean;
+  hasQuizSetup: boolean;
   isPlayerReady: boolean;
   pageKey: number;
   playerName: string | null;
@@ -126,6 +127,7 @@ export function Quiz({
   goToNext,
   goToPrevious,
   hasAnsweredCurrentQuestion,
+  hasQuizSetup,
   isPlayerReady,
   pageKey,
   playerName,
@@ -144,7 +146,10 @@ export function Quiz({
     if (isPlayerReady && !playerName) {
       router.replace(APP_ROUTES.welcome);
     }
-  }, [isPlayerReady, playerName, router]);
+    if (isPlayerReady && playerName && !hasQuizSetup) {
+      router.replace(APP_ROUTES.quizSetup);
+    }
+  }, [hasQuizSetup, isPlayerReady, playerName, router]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -158,7 +163,7 @@ export function Quiz({
 
   const swipe = useSwipe(goToNext, goToPrevious);
 
-  if (!isPlayerReady || !playerName) {
+  if (!isPlayerReady || !playerName || !hasQuizSetup) {
     return <QuizLoadingSkeleton />;
   }
 
