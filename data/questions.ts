@@ -31,7 +31,7 @@ export const SYMPATHY_MESSAGES = [
 export const MOOD_IMAGES: Record<MoodState, string> = {
   idle: '/images/idle.png',
   correct: '/images/correct1.png',
-  wrong: '/images/wrong.jpeg',
+  wrong: '/images/wrong.png',
   passed: '/images/pass.png',
   failed: '/images/fail.png',
 };

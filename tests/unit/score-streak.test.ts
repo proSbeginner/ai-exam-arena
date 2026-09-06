@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { handleAnswer, goToPrev, goToNext, restartGame, getRank, STREAK_MILESTONES } from '@/lib/quiz-logic';
-import type { QuizState } from '@/lib/quiz-logic';
+import {
+  createInitialQuizState,
+  evaluateAnswer,
+  getNextQuestion,
+  getPreviousQuestion,
+  getRank,
+} from '@/features/quiz/quiz.logic';
+import type { QuizState } from '@/features/quiz/quiz.types';
 import { questions, RANKS } from '@/data/questions';
 
 // --- Helper factories ---
@@ -43,7 +49,7 @@ describe('handleAnswer — correct answer', () => {
 
   it('increments score by 1 on first correct', () => {
     const state = makeState();
-    const result = handleAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, 0);
     expect(result.score).toBe(1);
     expect(result.streak).toBe(1);
     expect(result.mood).toBe('correct');
@@ -51,15 +57,15 @@ describe('handleAnswer — correct answer', () => {
     expect(result.rankChanged).toBe(false);
   });
 
-  it('does not change score on wrong when already answered', () => {
+  it('increments score for a correct selection', () => {
     const state = makeState({ score: 0 });
-    const result = handleAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, 0);
     expect(result.score).toBe(1);
   });
 
   it('tracks answer in answeredMap', () => {
     const state = makeState();
-    const result = handleAnswer(state, q, 0);
+    const result = evaluateAnswer(state, q, 0);
     expect(result.answeredMap.size).toBe(1);
     expect(result.answeredMap.get(0)).toBe(0);
   });
@@ -70,19 +76,19 @@ describe('handleAnswer — wrong answer', () => {
 
   it('score does not increase', () => {
     const state = makeState({ score: 2, streak: 1 });
-    const result = handleAnswer(state, q, 1);
+    const result = evaluateAnswer(state, q, 1);
     expect(result.score).toBe(2);
   });
 
   it('resets streak to 0', () => {
     const state = makeState({ streak: 3 });
-    const result = handleAnswer(state, q, 1);
+    const result = evaluateAnswer(state, q, 1);
     expect(result.streak).toBe(0);
   });
 
   it('sets mood to wrong', () => {
     const state = makeState();
-    const result = handleAnswer(state, q, 1);
+    const result = evaluateAnswer(state, q, 1);
     expect(result.mood).toBe('wrong');
   });
 });
@@ -91,20 +97,20 @@ describe('handleAnswer — streak milestones & confetti', () => {
   const q = mockQuestion(0);
 
   it('triggers confetti at streak milestone 3', () => {
-    let state = makeState({ score: 2, streak: 2 });
-    let result = handleAnswer(state, q, 0);
+    const state = makeState({ score: 2, streak: 2 });
+    const result = evaluateAnswer(state, q, 0);
     expect(result.triggerConfetti).toBe(true);
   });
 
   it('triggers confetti at streak milestone 5', () => {
-    let state = makeState({ score: 4, streak: 4 });
-    let result = handleAnswer(state, q, 0);
+    const state = makeState({ score: 4, streak: 4 });
+    const result = evaluateAnswer(state, q, 0);
     expect(result.triggerConfetti).toBe(true);
   });
 
   it('does NOT trigger confetti at non-milestone streak (e.g. 4)', () => {
-    let state = makeState({ score: 3, streak: 3 });
-    let result = handleAnswer(state, q, 0);
+    const state = makeState({ score: 3, streak: 3 });
+    const result = evaluateAnswer(state, q, 0);
     expect(result.triggerConfetti).toBe(false);
   });
 });
@@ -113,24 +119,24 @@ describe('handleAnswer — rank up triggers confetti', () => {
   const q = mockQuestion(0);
 
   it('triggers confetti when promoted from Intern to Apprentice (score 2→3)', () => {
-    let state = makeState({ score: 2, streak: 2 });
-    const result = handleAnswer(state, q, 0);
+    const state = makeState({ score: 2, streak: 2 });
+    const result = evaluateAnswer(state, q, 0);
     expect(result.rankChanged).toBe(true);
     expect(result.triggerConfetti).toBe(true);
     expect(result.score).toBe(3);
   });
 
   it('triggers confetti when promoted from Apprentice to Practitioner (score 5→6)', () => {
-    let state = makeState({ score: 5, streak: 5 });
-    const result = handleAnswer(state, q, 0);
+    const state = makeState({ score: 5, streak: 5 });
+    const result = evaluateAnswer(state, q, 0);
     expect(result.rankChanged).toBe(true);
     expect(result.triggerConfetti).toBe(true);
     expect(result.score).toBe(6);
   });
 
   it('does not trigger when staying at same rank (score 3→4)', () => {
-    let state = makeState({ score: 3, streak: 3 });
-    const result = handleAnswer(state, q, 0);
+    const state = makeState({ score: 3, streak: 3 });
+    const result = evaluateAnswer(state, q, 0);
     expect(result.rankChanged).toBe(false);
     expect(result.triggerConfetti).toBe(false);
   });
@@ -139,41 +145,51 @@ describe('handleAnswer — rank up triggers confetti', () => {
 describe('goToNext', () => {
   it('advances question index when not at last', () => {
     const state = makeState({ currentQIndex: 0, answeredMap: new Map() });
-    const result = goToNext(state);
+    const result = getNextQuestion(state, questions.length);
     expect(result.currentQIndex).toBe(1);
     expect(result.gameOver).toBe(false);
   });
 
   it('does not advance past last question', () => {
     const state = makeState({ currentQIndex: questions.length - 1, answeredMap: new Map() });
-    const result = goToNext(state);
+    const result = getNextQuestion(state, questions.length);
     expect(result.currentQIndex).toBe(questions.length - 1);
+  });
+
+  it('ends the quiz with the appropriate final mood after every question is answered', () => {
+    const state = makeState({
+      currentQIndex: questions.length - 1,
+      score: 1,
+      answeredMap: new Map([
+        [0, 1],
+        [1, 0],
+      ]),
+    });
+
+    expect(getNextQuestion(state, questions.length)).toMatchObject({
+      gameOver: true,
+      mood: 'passed',
+    });
   });
 });
 
 describe('goToPrev', () => {
   it('decrements question index when not at first', () => {
     const state = makeState({ currentQIndex: 2 });
-    const result = goToPrev(state);
+    const result = getPreviousQuestion(state);
     expect(result.currentQIndex).toBe(1);
   });
 
   it('does not go below zero', () => {
     const state = makeState({ currentQIndex: 0 });
-    const result = goToPrev(state);
+    const result = getPreviousQuestion(state);
     expect(result.currentQIndex).toBe(0);
   });
 });
 
 describe('restartGame', () => {
   it('resets everything to initial state', () => {
-    const fullState = makeState({
-      currentQIndex: 5,
-      score: 8,
-      streak: 4,
-      gameOver: true,
-    });
-    const reset = restartGame();
+    const reset = createInitialQuizState();
     expect(reset).toEqual({
       currentQIndex: 0,
       score: 0,

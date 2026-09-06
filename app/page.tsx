@@ -1,14 +1,5 @@
-import { redirect } from 'next/navigation';
+import { EntryGate } from '@/features/welcome/components/entry-gate';
 
 export default function Page() {
-  const playerName =
-    typeof window !== 'undefined'
-      ? sessionStorage.getItem('quiz_player_name')
-      : null;
-
-  if (!playerName) {
-    redirect('/welcome');
-  }
-
-  redirect('/quiz');
+  return <EntryGate />;
 }
