@@ -47,6 +47,7 @@ export function Welcome({
           <div className="group relative cursor-pointer">
             <Image
               priority
+              loading="eager"
               src="/images/idle.png"
               alt="Mascot waiting to welcome the player"
               width={1408}
