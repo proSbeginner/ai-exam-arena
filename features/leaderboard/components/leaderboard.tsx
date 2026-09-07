@@ -64,11 +64,13 @@ export function Leaderboard() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans sm:p-8">
-      <section className="mx-auto w-full max-w-3xl rounded-3xl bg-white/80 p-6 shadow-xl backdrop-blur-sm sm:p-8">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-400 via-fuchsia-400 to-purple-600 p-4 font-sans sm:p-8">
+      <section className="mx-auto w-full max-w-3xl rounded-3xl bg-white/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8">
         <div className="text-center">
           <p className="text-sm font-bold uppercase tracking-wide text-purple-500">Hall of Fame</p>
-          <h1 className="mt-1 text-3xl font-black text-gray-800">Leaderboard</h1>
+          <h1 className="mt-1 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-3xl font-black tracking-tight text-transparent">
+            Leaderboard
+          </h1>
           <p className="mt-2 text-sm text-gray-500">จัดอันดับผู้เล่นแยกตามโหมด</p>
         </div>
 

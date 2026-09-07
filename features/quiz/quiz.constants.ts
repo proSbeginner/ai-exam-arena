@@ -33,5 +33,5 @@ export const QUIZ_MODE_OPTIONS: Array<{
 }> = [
   { value: 'primary', label: 'ปฐม', description: 'ฝึกพื้นฐานแบบเข้าใจง่าย' },
   { value: 'secondary', label: 'มัธยม', description: 'เพิ่มความท้าทายขึ้นอีกระดับ' },
-  { value: 'university', label: 'มหาลัย', description: 'โหมดเต็มรูปแบบสำหรับเตรียมสอบ' },
+  { value: 'university', label: 'มหาลัย 🔥', description: 'โหมดเต็มรูปแบบสำหรับเตรียมสอบ' },
 ];
