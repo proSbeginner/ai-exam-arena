@@ -1,9 +1,9 @@
 import type { AdminQuestionFormState } from './admin.types';
 
 export const ADMIN_REFRESH_DELAY_MS = 500;
+export const MAX_ADMIN_OPTIONS = 10;
 
 export const EMPTY_ADMIN_FORM: AdminQuestionFormState = {
-  mode: 'university',
   labels: [],
   labelInput: '',
   english: '',
@@ -11,6 +11,8 @@ export const EMPTY_ADMIN_FORM: AdminQuestionFormState = {
   options: [
     { id: 'option-a', english: '', thai_drama: '' },
     { id: 'option-b', english: '', thai_drama: '' },
+    { id: 'option-c', english: '', thai_drama: '' },
+    { id: 'option-d', english: '', thai_drama: '' },
   ],
   correctOptionId: 'option-a',
   funFact: '',

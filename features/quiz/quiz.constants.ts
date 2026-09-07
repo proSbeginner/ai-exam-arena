@@ -43,3 +43,9 @@ export const QUIZ_MODE_OPTIONS: Array<{
   { value: 'secondary', label: 'มัธยม', description: 'เพิ่มความท้าทายขึ้นอีกระดับ' },
   { value: 'university', label: 'มหาลัย 🔥', description: 'โหมดเต็มรูปแบบสำหรับเตรียมสอบ' },
 ];
+
+export const QUIZ_MODE_OPTION_LIMITS: Record<QuizMode, number> = {
+  primary: 2,
+  secondary: 3,
+  university: 4,
+};

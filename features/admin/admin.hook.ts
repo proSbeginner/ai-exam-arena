@@ -4,7 +4,7 @@ import { useMemo, useState, type SubmitEvent } from 'react';
 
 import type { ExamQuestion, QuizOption } from '@/features/quiz/quiz.types';
 import { validateAdminQuestion } from './admin.logic';
-import { ADMIN_REFRESH_DELAY_MS, EMPTY_ADMIN_FORM } from './admin.constants';
+import { ADMIN_REFRESH_DELAY_MS, EMPTY_ADMIN_FORM, MAX_ADMIN_OPTIONS } from './admin.constants';
 import type { AdminQuestionFormState } from './admin.types';
 import {
   createAdminQuestion,
@@ -27,7 +27,6 @@ function toInput(question: ExamQuestion): AdminQuestionFormState {
 function toPayload(form: AdminQuestionFormState) {
   const options = form.options.filter((option) => option.english.trim() || option.thai_drama.trim());
   return {
-    mode: form.mode,
     labels: form.labels,
     english: form.english,
     thai_drama: form.thai_drama,
@@ -73,6 +72,13 @@ export function useAdmin() {
       options: current.options.map((option, optionIndex) =>
         optionIndex === index ? { ...option, [key]: value } : option,
       ),
+    }));
+  };
+  const addOption = () => {
+    if (form.options.length >= MAX_ADMIN_OPTIONS) return;
+    setForm((current) => ({
+      ...current,
+      options: [...current.options, { id: `option-${current.options.length + 1}`, english: '', thai_drama: '' }],
     }));
   };
   const addLabel = () => {
@@ -134,6 +140,7 @@ export function useAdmin() {
 
   return {
     addLabel,
+    addOption,
     ADMIN_REFRESH_DELAY_MS,
     editQuestion,
     email,

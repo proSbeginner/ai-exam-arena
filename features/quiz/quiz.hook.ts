@@ -26,6 +26,7 @@ import {
   getNextQuestion,
   getPreviousQuestion,
   getRank,
+  isQuestionAvailableForMode,
   randomizeQuizQuestions,
 } from './quiz.logic';
 import { getQuizQuestions } from './services/quiz.api';
@@ -108,7 +109,7 @@ export function useQuiz() {
 
         const modeQuestions = quizSetup
           ? loadedQuestions.filter(
-              (question) => question.mode === quizSetup.mode && question.status === 'published',
+              (question) => isQuestionAvailableForMode(question, quizSetup.mode),
             )
           : [];
         const selectedQuestions = quizSetup?.questionLimit
@@ -125,7 +126,7 @@ export function useQuiz() {
           ? storedProgress.questionIds
               .map((questionId) => selectedQuestions.find((question) => question.id === questionId))
               .filter((question): question is ExamQuestion => Boolean(question))
-          : randomizeQuizQuestions(selectedQuestions);
+          : randomizeQuizQuestions(selectedQuestions, quizSetup?.mode);
 
         let attempt: Awaited<ReturnType<typeof getQuizAttempt>> = null;
         if (playerId && playerName && quizSetup) {
@@ -283,7 +284,7 @@ export function useQuiz() {
 
   const restartGame = useCallback(() => {
     const nextState = createInitialQuizState();
-    const randomizedQuestions = randomizeQuizQuestions(questions);
+    const randomizedQuestions = randomizeQuizQuestions(questions, quizSetup?.mode);
 
     setIsReviewing(false);
     clearQuizProgress();

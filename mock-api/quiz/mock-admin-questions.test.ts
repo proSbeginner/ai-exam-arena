@@ -13,7 +13,6 @@ const originalDelay = process.env.MOCK_API_DELAY_MS;
 let createdQuestionId: string | undefined;
 
 const input: AdminQuestionInput = {
-  mode: 'university',
   labels: ['TEST', 'ADMIN'],
   english: 'Which service stores objects?',
   thai_drama: 'เก็บของไว้ที่ไหนดีนะ?',

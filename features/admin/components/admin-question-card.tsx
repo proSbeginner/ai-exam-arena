@@ -12,7 +12,7 @@ export function AdminQuestionCard({ onEdit, onRemove, question }: AdminQuestionC
     <article className="rounded-2xl border border-purple-100 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-bold text-purple-500">{question.mode} · <span className={question.status === 'published' ? 'rounded-full bg-green-100 px-2 py-0.5 text-green-700' : 'text-gray-500'}>{question.status}</span></p>
+          <p className="text-xs font-bold text-purple-500"><span className={question.status === 'published' ? 'rounded-full bg-green-100 px-2 py-0.5 text-green-700' : 'text-gray-500'}>{question.status}</span></p>
           <AdminQuestionPreview question={question.english} />
         </div>
         <div className="flex gap-2">

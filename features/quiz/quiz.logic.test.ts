@@ -5,6 +5,7 @@ import {
   getNextQuestion,
   getPreviousQuestion,
   getRank,
+  isQuestionAvailableForMode,
   randomizeQuestionOptions,
   randomizeQuizQuestions,
 } from '@/features/quiz/quiz.logic';
@@ -73,6 +74,30 @@ describe('randomizeQuizQuestions', () => {
 
     expect(new Set(randomizedIds)).toEqual(new Set(originalIds));
     expect(randomizedIds).not.toEqual(originalIds);
+  });
+});
+
+describe('quiz mode option limits', () => {
+  it('requires enough options for the selected mode', () => {
+    expect(isQuestionAvailableForMode(questions[0], 'primary')).toBe(true);
+    expect(isQuestionAvailableForMode(questions[0], 'secondary')).toBe(true);
+    expect(isQuestionAvailableForMode(questions[0], 'university')).toBe(true);
+    expect(isQuestionAvailableForMode({ ...questions[0], options: questions[0].options.slice(0, 2) }, 'secondary')).toBe(false);
+  });
+
+  it('keeps the correct answer when reducing options for a mode', () => {
+    const question = {
+      ...questions[0],
+      options: [
+        ...questions[0].options,
+        { id: 'option-e', english: 'Another answer', thai_drama: '' },
+      ],
+    };
+
+    const randomized = randomizeQuizQuestions([question], 'secondary')[0];
+
+    expect(randomized.options).toHaveLength(3);
+    expect(randomized.options.some((option) => option.id === question.correctOptionId)).toBe(true);
   });
 });
 

@@ -1,7 +1,7 @@
 import type { SubmitEvent } from 'react';
 
 import type { AdminQuestionFormState } from '../admin.types';
-import type { QuizMode, QuizOption, QuestionStatus } from '@/features/quiz/quiz.types';
+import type { QuizOption, QuestionStatus } from '@/features/quiz/quiz.types';
 import { AdminField } from './admin-field';
 import { AdminLabelInput } from './admin-label-input';
 import { AdminOptionsEditor } from './admin-options-editor';
@@ -36,12 +36,7 @@ export function AdminQuestionForm({
         <button type="button" onClick={onClear} className="cursor-pointer text-sm font-bold text-purple-500">ล้างฟอร์ม</button>
       </div>
       {error && <p className="rounded-lg bg-red-50 p-2 text-sm text-red-500">{error}</p>}
-      <div className="grid grid-cols-2 gap-3">
-        <label className="text-sm font-bold text-gray-600">โหมด
-          <select value={form.mode} onChange={(event) => onChange('mode', event.target.value as QuizMode)} className="mt-1 w-full rounded-xl border border-gray-200 p-3">
-            <option value="primary">ปฐม</option><option value="secondary">มัธยม</option><option value="university">มหาลัย 🔥</option>
-          </select>
-        </label>
+      <div className="grid grid-cols-1 gap-3">
         <label className="text-sm font-bold text-gray-600">สถานะ
           <select value={form.status} onChange={(event) => onChange('status', event.target.value as QuestionStatus)} className="mt-1 w-full rounded-xl border border-gray-200 p-3">
             <option value="draft">Draft</option><option value="published">Published</option>

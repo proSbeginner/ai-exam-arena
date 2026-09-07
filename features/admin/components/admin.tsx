@@ -34,7 +34,7 @@ export function Admin() {
           isDuplicateLabel={admin.isDuplicateLabel}
           isLoading={admin.isLoading}
           onAddLabel={admin.addLabel}
-          onAddOption={() => admin.updateForm('options', [...admin.form.options, { id: `option-${admin.form.options.length + 1}`, english: '', thai_drama: '' }])}
+          onAddOption={admin.addOption}
           onChange={admin.updateForm}
           onChangeLabelInput={admin.updateLabelInput}
           onChangeOption={admin.updateOption}

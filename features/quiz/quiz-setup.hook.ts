@@ -7,6 +7,7 @@ import { APP_ROUTES } from '@/features/shared/routes';
 
 import { getQuizQuestions } from './services/quiz.api';
 import { QUIZ_MODE_OPTIONS } from './quiz.constants';
+import { isQuestionAvailableForMode } from './quiz.logic';
 import type { ExamQuestion, QuizMode, QuizSetup } from './quiz.types';
 
 export const QUIZ_SETUP_STORAGE_KEY = 'ai-exam-arena:quiz-setup';
@@ -112,7 +113,7 @@ export function useQuizSetup(): QuizSetupHook {
   }, []);
 
   const availableQuestionCount = useMemo(
-    () => questions.filter((question) => question.mode === selectedMode && question.status === 'published').length,
+    () => questions.filter((question) => isQuestionAvailableForMode(question, selectedMode)).length,
     [questions, selectedMode],
   );
 

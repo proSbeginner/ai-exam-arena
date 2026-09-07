@@ -1,6 +1,10 @@
-import { ATTEMPT_STATUS, PASSING_SCORE_PERCENTAGE, RANKS } from './quiz.constants';
+import { ATTEMPT_STATUS, PASSING_SCORE_PERCENTAGE, QUIZ_MODE_OPTION_LIMITS, RANKS } from './quiz.constants';
 import type { ExamQuestion } from './quiz.types';
-import type { AnswerResult, NextQuestionResult, QuizState } from './quiz.types';
+import type { AnswerResult, NextQuestionResult, QuizMode, QuizState } from './quiz.types';
+
+export function isQuestionAvailableForMode(question: ExamQuestion, mode: QuizMode): boolean {
+  return question.status === 'published' && question.options.length >= QUIZ_MODE_OPTION_LIMITS[mode];
+}
 
 export function getRank(score: number): (typeof RANKS)[number] {
   return RANKS.filter((rank) => score >= rank.min).at(-1) ?? RANKS[0];
@@ -44,7 +48,7 @@ export function randomizeQuestionOptions(questions: ExamQuestion[]): ExamQuestio
   });
 }
 
-export function randomizeQuizQuestions(questions: ExamQuestion[]): ExamQuestion[] {
+export function randomizeQuizQuestions(questions: ExamQuestion[], mode?: QuizMode): ExamQuestion[] {
   const originalIds = questions.map((question) => question.id);
   let randomizedQuestions = shuffleOptions(questions);
 
@@ -55,7 +59,23 @@ export function randomizeQuizQuestions(questions: ExamQuestion[]): ExamQuestion[
     randomizedQuestions = [randomizedQuestions[1], randomizedQuestions[0], ...randomizedQuestions.slice(2)];
   }
 
-  return randomizeQuestionOptions(randomizedQuestions);
+  return randomizedQuestions.map((question) => {
+    const targetOptionCount = !mode || mode === 'university'
+      ? question.options.length
+      : QUIZ_MODE_OPTION_LIMITS[mode];
+    if (question.options.length <= targetOptionCount) return randomizeQuestionOptions([question])[0];
+
+    const correctOption = question.options.find((option) => option.id === question.correctOptionId);
+    if (!correctOption) return randomizeQuestionOptions([question])[0];
+
+    const wrongOptions = shuffleOptions(
+      question.options.filter((option) => option.id !== question.correctOptionId),
+    );
+    return {
+      ...question,
+      options: shuffleOptions([correctOption, ...wrongOptions.slice(0, targetOptionCount - 1)]),
+    };
+  });
 }
 
 export function evaluateAnswer(

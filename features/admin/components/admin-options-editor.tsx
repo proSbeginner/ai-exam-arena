@@ -1,4 +1,5 @@
 import type { QuizOption } from '@/features/quiz/quiz.types';
+import { MAX_ADMIN_OPTIONS } from '../admin.constants';
 
 interface AdminOptionsEditorProps {
   options: QuizOption[];
@@ -17,6 +18,7 @@ export function AdminOptionsEditor({ options, correctOptionId, onAdd, onChange, 
         <div key={option.id} className="rounded-xl border border-purple-100 p-3">
           <label className="flex items-center gap-2 text-xs font-bold text-purple-600">
             <input type="radio" name="correctOption" checked={correctOptionId === option.id} onChange={() => onCorrectChange(option.id)} />
+            <span className="text-sm font-black text-pink-500">{String.fromCharCode(65 + index)}.</span>
             คำตอบที่ถูกต้อง
           </label>
           <textarea value={option.english} onChange={(event) => onChange(index, 'english', event.target.value)} placeholder={`Option ${index + 1} English *`} rows={3} className="mt-2 w-full resize-y rounded-lg border border-gray-200 p-2 text-sm" />
@@ -24,7 +26,9 @@ export function AdminOptionsEditor({ options, correctOptionId, onAdd, onChange, 
           {options.length > 2 && <button type="button" onClick={() => onRemove(index)} className="mt-2 cursor-pointer text-xs text-red-400">ลบตัวเลือก</button>}
         </div>
       ))}
-      <button type="button" onClick={onAdd} className="cursor-pointer text-sm font-bold text-purple-500">+ เพิ่มตัวเลือก</button>
+      <button type="button" onClick={onAdd} disabled={options.length >= MAX_ADMIN_OPTIONS} className="cursor-pointer text-sm font-bold text-purple-500 disabled:cursor-not-allowed disabled:text-gray-300">
+        {options.length >= MAX_ADMIN_OPTIONS ? 'ครบ 10 ตัวเลือก' : '+ เพิ่มตัวเลือก'}
+      </button>
     </div>
   );
 }
