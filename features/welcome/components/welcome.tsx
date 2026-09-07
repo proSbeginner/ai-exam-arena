@@ -108,7 +108,7 @@ export function Welcome({
             className="bg-white/70"
             autoComplete="off"
             error={playerNameError}
-            hint="ใช้ A–Z และ _ เท่านั้น"
+            hint="ใช้ A–Z ตัวเลข 0–9 และ _ เท่านั้น"
             showCounter
           />
           {isNewPlayer !== null && (

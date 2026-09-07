@@ -14,7 +14,7 @@ import {
 import { authenticatePlayer, checkPlayerName, registerPlayer, WelcomeApiError } from './services/welcome.api';
 import { PLAYER_NAME_MAX_LENGTH } from './welcome.constants';
 
-const PLAYER_NAME_PATTERN = /^[A-Z_]+$/;
+const PLAYER_NAME_PATTERN = /^[A-Z0-9_]+$/;
 const playerNameListeners = new Set<() => void>();
 
 export interface WelcomeHook {
@@ -56,7 +56,7 @@ export function validatePlayerName(value: string): PlayerNameValidation {
   if (!PLAYER_NAME_PATTERN.test(value)) {
     return {
       isValid: false,
-      message: 'ใช้ได้เฉพาะตัวอักษร A–Z และ _',
+      message: 'ใช้ได้เฉพาะตัวอักษร A–Z ตัวเลข 0–9 และ _',
     };
   }
 
