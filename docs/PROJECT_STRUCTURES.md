@@ -7,9 +7,14 @@ This document records the approved project structure for the AWS AI Cert quiz ap
 ```text
 features/quiz/
 ├── components/
+│   ├── quiz-active.tsx
+│   ├── quiz-header.tsx
+│   ├── quiz-result.tsx
 │   ├── quiz.tsx
 │   ├── quiz-loading-skeleton.tsx
-│   └── quiz-setup.tsx
+│   ├── quiz-notice.tsx
+│   ├── quiz-setup.tsx
+│   └── quiz-progress.tsx
 ├── services/
 │   └── quiz.api.ts
 ├── quiz.types.ts
