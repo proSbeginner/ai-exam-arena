@@ -13,7 +13,7 @@ export function QuizRestartDialog({ onCancel, onConfirm }: QuizRestartDialogProp
         className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl"
       >
         <h2 id="restart-dialog-title" className="text-lg font-bold text-gray-800">
-          เล่นอีกครั้งหรือไม่?
+          เล่นอีกครั้งหรือไม่ ?
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-gray-500">
           ความคืบหน้าของชุดปัจจุบันจะถูกทิ้ง และระบบจะสุ่มคำถามชุดใหม่ให้
