@@ -45,6 +45,7 @@ create table public.quiz_attempts (
   current_question_index integer not null default 0 check (current_question_index >= 0),
   score integer not null default 0 check (score >= 0),
   question_ids uuid[] not null default '{}',
+  state jsonb not null default '{}'::jsonb,
   started_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   completed_at timestamptz

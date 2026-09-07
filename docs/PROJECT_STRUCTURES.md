@@ -127,8 +127,7 @@ supabase/
 ├── client.ts
 └── migrations/
     ├── 0001_initial_schema.sql
-    ├── 0002_add_attempt_state.sql
-    └── 0003_grant_server_provider_access.sql
+    └── 0002_grant_server_provider_access.sql
 ```
 
 The database design is documented in [`docs/DATABASE_SCHEMA.md`](./DATABASE_SCHEMA.md). Supabase migrations are the source of truth for production database structure; mock providers remain available for local development and tests.
