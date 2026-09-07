@@ -1,5 +1,11 @@
 import type { QuizMode } from './quiz.types';
 
+export const ATTEMPT_STATUS = {
+  ACTIVE: 'active',
+  COMPLETED: 'completed',
+  ABANDONED: 'abandoned',
+} as const;
+
 export const RANKS = [
   { min: 0, title: 'AI Intern', emoji: '🌱' },
   { min: 3, title: 'Cloud Apprentice', emoji: '⚙️' },

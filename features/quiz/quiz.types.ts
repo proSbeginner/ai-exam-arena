@@ -1,7 +1,9 @@
+import { ATTEMPT_STATUS } from './quiz.constants';
+
 export type MoodState = 'idle' | 'correct' | 'wrong' | 'passed' | 'failed';
 export type QuizMode = 'primary' | 'secondary' | 'university';
 export type QuestionStatus = 'draft' | 'published';
-export type AttemptStatus = 'active' | 'completed' | 'abandoned';
+export type AttemptStatus = (typeof ATTEMPT_STATUS)[keyof typeof ATTEMPT_STATUS];
 
 export interface QuizOption {
   id: string;

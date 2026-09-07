@@ -7,6 +7,7 @@ import {
   SYMPATHY_MESSAGES,
 } from './quiz.content';
 import { CORRECT_IMAGES } from './quiz.assets';
+import { ATTEMPT_STATUS } from './quiz.constants';
 import type { ExamQuestion } from './quiz.types';
 import {
   getStoredQuizSetup,
@@ -142,7 +143,7 @@ export function useQuiz() {
       gameOver: next.gameOver,
       mood: next.mood,
       summaryVisible: next.gameOver,
-      attemptStatus: next.gameOver ? 'completed' : 'active',
+      attemptStatus: next.gameOver ? ATTEMPT_STATUS.COMPLETED : ATTEMPT_STATUS.ACTIVE,
     };
 
     setQuizState(nextState);
@@ -170,15 +171,22 @@ export function useQuiz() {
         questions[quizState.currentQIndex],
         selectedOptionId,
       );
+      const isCompleted = result.answeredMap.size >= questions.length;
+      const resultMood = isCompleted
+        ? result.score >= Math.ceil(questions.length / 2)
+          ? 'passed'
+          : 'failed'
+        : result.mood;
 
       const nextState: QuizState = {
         ...quizState,
         score: result.score,
         streak: result.streak,
-        mood: result.mood,
+        mood: resultMood,
         answeredMap: result.answeredMap,
-        summaryVisible: false,
-        attemptStatus: 'active',
+        gameOver: isCompleted,
+        summaryVisible: isCompleted,
+        attemptStatus: isCompleted ? ATTEMPT_STATUS.COMPLETED : ATTEMPT_STATUS.ACTIVE,
       };
 
       setQuizState(nextState);
@@ -214,7 +222,7 @@ export function useQuiz() {
     const nextState: QuizState = {
       ...quizState,
       summaryVisible: true,
-      attemptStatus: 'abandoned',
+      attemptStatus: ATTEMPT_STATUS.ABANDONED,
     };
 
     setQuizState(nextState);
@@ -225,13 +233,13 @@ export function useQuiz() {
     if (
       !quizState.summaryVisible ||
       quizState.gameOver ||
-      quizState.attemptStatus === 'completed'
+      quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED
     ) return;
 
     const nextState: QuizState = {
       ...quizState,
       summaryVisible: false,
-      attemptStatus: 'active',
+      attemptStatus: ATTEMPT_STATUS.ACTIVE,
     };
 
     setQuizState(nextState);

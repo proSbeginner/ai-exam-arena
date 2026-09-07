@@ -3,6 +3,7 @@
 import Image from 'next/image';
 
 import { MOOD_IMAGES } from '../quiz.assets';
+import { ATTEMPT_STATUS } from '../quiz.constants';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
 
@@ -27,7 +28,7 @@ export function QuizResult({
   quizState,
   restartGame,
 }: QuizResultProps) {
-  const isCompleted = quizState.gameOver || quizState.attemptStatus === 'completed';
+  const isCompleted = quizState.gameOver || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
   const passed = isCompleted && quizState.score >= Math.ceil(questions.length / 2);
   const percentage = questions.length > 0 ? Math.round((quizState.score / questions.length) * 100) : 0;
 

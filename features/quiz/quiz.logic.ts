@@ -1,4 +1,5 @@
 import { RANKS } from './quiz.constants';
+import { ATTEMPT_STATUS } from './quiz.constants';
 import type { ExamQuestion } from './quiz.types';
 import type { AnswerResult, NextQuestionResult, QuizState } from './quiz.types';
 
@@ -129,6 +130,6 @@ export function createInitialQuizState(): QuizState {
     answeredMap: new Map(),
     gameOver: false,
     summaryVisible: false,
-    attemptStatus: 'active',
+    attemptStatus: ATTEMPT_STATUS.ACTIVE,
   };
 }
