@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 
 import { getStoredPlayerId, subscribeToPlayerName } from '@/features/welcome/welcome.hook';
 import { QUIZ_MODE_OPTIONS } from '@/features/quiz/quiz.constants';
-import { saveQuizSetup } from '@/features/quiz/quiz-setup.hook';
+import { getStoredQuizSetup, saveQuizSetup, subscribeToQuizSetup } from '@/features/quiz/quiz-setup.hook';
 import {
   clearQuizProgress,
   saveQuizReviewAttemptId,
 } from '@/features/quiz/quiz-progress.storage';
-import { discardQuizAttempt } from '@/features/quiz/services/quiz-attempt.api';
+import { discardQuizAttempt, getQuizAttempt } from '@/features/quiz/services/quiz-attempt.api';
 import { ConfirmationDialog } from '@/features/shared/components/confirmation-dialog';
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import { APP_ROUTES } from '@/features/shared/routes';
@@ -18,10 +18,13 @@ import { APP_ROUTES } from '@/features/shared/routes';
 import { getPlayerRank } from '../leaderboard.logic';
 import { useLeaderboard } from '../leaderboard.hook';
 import { LEADERBOARD_ATTEMPT_STATUS } from '../leaderboard.constants';
+import { resolveContinuePlayerQuiz } from '../continue-player-quiz.logic';
 
 export function Leaderboard() {
   const router = useRouter();
-  const [mode, setMode] = useState<QuizMode>('university');
+  const [modeOverride, setModeOverride] = useState<QuizMode | null>(null);
+  const storedQuizSetup = useSyncExternalStore(subscribeToQuizSetup, getStoredQuizSetup, () => null);
+  const mode = modeOverride ?? storedQuizSetup?.mode ?? 'university';
   const playerId = useSyncExternalStore(subscribeToPlayerName, getStoredPlayerId, () => null);
   const { entries, error, isLoading } = useLeaderboard(mode, playerId);
   const leaderboardVersion = entries
@@ -31,22 +34,13 @@ export function Leaderboard() {
   const currentPlayerEntry = playerId ? entries.find((entry) => entry.playerId === playerId) : undefined;
   const [showRestartConfirmation, setShowRestartConfirmation] = useState(false);
 
-  const continuePlayerQuiz = () => {
-    if (!currentPlayerEntry) {
-      saveQuizSetup({ mode, questionLimit: null });
-      router.push(APP_ROUTES.quizSetup);
-      return;
-    }
+  const continuePlayerQuiz = async () => {
+    const action = await resolveContinuePlayerQuiz({ playerId, mode, currentPlayerEntry, getQuizAttempt });
+    if (!action) return;
 
-    const playerMode = currentPlayerEntry.mode || mode;
-    saveQuizSetup({
-      mode: playerMode,
-      questionLimit: currentPlayerEntry.questionCount,
-    });
-    if (currentPlayerEntry.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED && currentPlayerEntry.attemptId) {
-      saveQuizReviewAttemptId(currentPlayerEntry.attemptId);
-    }
-    router.push(APP_ROUTES.quiz);
+    saveQuizSetup(action.setup);
+    if (action.type === 'open-quiz' && action.reviewAttemptId) saveQuizReviewAttemptId(action.reviewAttemptId);
+    router.push(action.route);
   };
 
   const restartPlayerQuiz = async () => {
@@ -89,7 +83,7 @@ export function Leaderboard() {
             <button
               key={option.value}
               type="button"
-              onClick={() => setMode(option.value)}
+              onClick={() => setModeOverride(option.value)}
               className={`cursor-pointer rounded-xl border-2 px-3 py-2 text-sm font-bold transition-colors ${
                 mode === option.value
                   ? 'border-purple-500 bg-purple-50 text-purple-700'
@@ -143,7 +137,7 @@ export function Leaderboard() {
             <>
               <button
                 type="button"
-                onClick={continuePlayerQuiz}
+                onClick={() => void continuePlayerQuiz()}
                 className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white px-4 py-2.5 text-sm font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
               >
                 {currentPlayerEntry
