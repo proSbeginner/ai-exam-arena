@@ -15,7 +15,7 @@ export const questions: ExamQuestion[] = [
     ],
     correctOptionId: 'mock-question-001-option-002',
     funFact: 'Amazon Guardrails ใช้กรองทั้งคำต้องห้าม (hate speech) และข้อมูลส่วนตัว (PII) ในคราวเดียว! ป้องกันข้อมูลรั่วไหลก่อนถึงโมเดล 🛡️',
-    source: { name: 'AWS AI Cert Mock Bank', reference: 'internal-demo' },
+    source: { name: 'AI Exam Arena Mock Bank', reference: 'internal-demo' },
     status: 'published',
   },
   {
@@ -32,7 +32,7 @@ export const questions: ExamQuestion[] = [
     ],
     correctOptionId: 'mock-question-002-option-003',
     funFact: 'Lambda คิดเงินเป็นมิลลิวินาที! เรียกกี่ครั้งก็จ่ายเท่าที่ใช้ — ถ้าไม่ถูกเรียกเลย = ฟรี 💸',
-    source: { name: 'AWS AI Cert Mock Bank', reference: 'internal-demo' },
+    source: { name: 'AI Exam Arena Mock Bank', reference: 'internal-demo' },
     status: 'published',
   },
 ];

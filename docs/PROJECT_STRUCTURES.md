@@ -1,6 +1,6 @@
 # Project Structures
 
-This document records the approved project structure for the AWS AI Cert quiz application.
+This document records the approved project structure for the AI Exam Arena quiz application.
 
 ## Approved welcome feature structure
 

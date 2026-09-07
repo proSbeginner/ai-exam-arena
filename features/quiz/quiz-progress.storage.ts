@@ -1,7 +1,7 @@
 import type { QuizSetup, QuizState } from './quiz.types';
 
-export const QUIZ_PROGRESS_STORAGE_KEY = 'aws-ai-cert:quiz-progress';
-export const QUIZ_REVIEW_ATTEMPT_STORAGE_KEY = 'aws-ai-cert:quiz-review-attempt';
+export const QUIZ_PROGRESS_STORAGE_KEY = 'ai-exam-arena:quiz-progress';
+export const QUIZ_REVIEW_ATTEMPT_STORAGE_KEY = 'ai-exam-arena:quiz-review-attempt';
 
 interface StoredQuizProgress {
   playerName: string;

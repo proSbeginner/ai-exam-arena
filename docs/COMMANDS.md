@@ -1,6 +1,6 @@
 # Project Commands
 
-คำสั่งที่ใช้สำหรับรันและทดสอบ AWS AI Cert
+คำสั่งที่ใช้สำหรับรันและทดสอบ AI Exam Arena
 
 ## Production build
 
@@ -33,7 +33,7 @@ browser-act browser list
 
 ```bash
 browser-act browser create \
-  --name "AWS AI Cert Production Test" \
+  --name "AI Exam Arena Production Test" \
   --type chrome \
   --desc "Isolated browser for testing the local production quiz at 192.168.1.5:3000"
 ```
@@ -41,7 +41,7 @@ browser-act browser create \
 เปิด production quiz ใน session:
 
 ```bash
-browser-act --session aws-ai-cert-prod browser open \
+browser-act --session ai-exam-arena-prod browser open \
   <browser_id> \
   http://192.168.1.5:3000/welcome \
   --headed
@@ -50,19 +50,19 @@ browser-act --session aws-ai-cert-prod browser open \
 คำสั่งตรวจสอบและโต้ตอบพื้นฐาน:
 
 ```bash
-browser-act --session aws-ai-cert-prod wait stable
-browser-act --session aws-ai-cert-prod state
-browser-act --session aws-ai-cert-prod screenshot
-browser-act --session aws-ai-cert-prod click <index>
-browser-act --session aws-ai-cert-prod input <index> "text"
-browser-act --session aws-ai-cert-prod scroll down --amount 600
-browser-act --session aws-ai-cert-prod eval "document.title"
+browser-act --session ai-exam-arena-prod wait stable
+browser-act --session ai-exam-arena-prod state
+browser-act --session ai-exam-arena-prod screenshot
+browser-act --session ai-exam-arena-prod click <index>
+browser-act --session ai-exam-arena-prod input <index> "text"
+browser-act --session ai-exam-arena-prod scroll down --amount 600
+browser-act --session ai-exam-arena-prod eval "document.title"
 ```
 
 ปิด session หลังทดสอบเสร็จ:
 
 ```bash
-browser-act session close aws-ai-cert-prod
+browser-act session close ai-exam-arena-prod
 ```
 
 ## Production quiz smoke test

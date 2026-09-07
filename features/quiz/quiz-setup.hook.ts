@@ -9,7 +9,7 @@ import { getQuizQuestions } from './services/quiz.api';
 import { QUIZ_MODE_OPTIONS } from './quiz.constants';
 import type { ExamQuestion, QuizMode, QuizSetup } from './quiz.types';
 
-export const QUIZ_SETUP_STORAGE_KEY = 'aws-ai-cert:quiz-setup';
+export const QUIZ_SETUP_STORAGE_KEY = 'ai-exam-arena:quiz-setup';
 
 interface QuizSetupHook {
   availableQuestionCount: number;
