@@ -106,13 +106,7 @@ function useSwipe(onUp: () => void, onDown: () => void) {
     [onDown, onUp],
   );
 
-  const onTouchMove = useCallback((event: React.TouchEvent) => {
-    if (startYRef.current !== null) {
-      event.preventDefault();
-    }
-  }, []);
-
-  return { onTouchEnd, onTouchMove, onTouchStart };
+  return { onTouchEnd, onTouchStart };
 }
 
 export function Quiz({
@@ -204,7 +198,7 @@ export function Quiz({
   return (
     <div
       {...swipe}
-      className="flex min-h-screen touch-none flex-col items-center justify-between bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
+      className="flex min-h-screen touch-pan-y flex-col items-center justify-between bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
     >
       <ConfettiBurst burstKey={confettiKey} />
       <header className="flex w-full max-w-lg items-center justify-between py-4">
