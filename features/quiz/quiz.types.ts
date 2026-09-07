@@ -25,9 +25,7 @@ export interface ExamQuestion {
   thai_drama: string;
   options: QuizOption[];
   correctOptionId: string;
-  hint_keyword: string;
   funFact?: string;
-  chapter?: string;
   source?: QuestionSource;
   status: QuestionStatus;
 }

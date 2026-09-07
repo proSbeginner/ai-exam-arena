@@ -197,9 +197,6 @@ export function QuizActive({
               <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-blue-700">
                 ข้อ {quizState.currentQIndex + 1}/{questions.length}
               </span>
-              {currentQuestion.chapter && (
-                <span className="text-xs font-medium text-purple-400">{currentQuestion.chapter}</span>
-              )}
             </div>
             <span className="text-xs text-gray-400">
               {hasAnsweredCurrentQuestion ? '✓ ตอบแล้ว' : '⚡ ตอบเลย!'}
@@ -255,11 +252,6 @@ export function QuizActive({
             <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-relaxed text-amber-800 animate-bounce-in">
               <span className="font-bold">💡 รู้หรือไม่? </span>
               {currentQuestion.funFact}
-            </div>
-          ) : hasAnsweredCurrentQuestion ? (
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-600 animate-bounce-in">
-              <span className="font-bold">🔑 Hint: </span>
-              {currentQuestion.hint_keyword}
             </div>
           ) : null}
         </div>

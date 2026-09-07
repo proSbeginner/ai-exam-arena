@@ -10,9 +10,7 @@ export interface AdminQuestionFormState {
   thai_drama: string;
   options: QuizOption[];
   correctOptionId: string;
-  hint_keyword: string;
   funFact: string;
-  chapter: string;
   sourceName: string;
   sourceUrl: string;
   sourceReference: string;
