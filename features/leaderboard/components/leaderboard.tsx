@@ -33,6 +33,7 @@ export function Leaderboard() {
 
   const continuePlayerQuiz = () => {
     if (!currentPlayerEntry) {
+      saveQuizSetup({ mode, questionLimit: null });
       router.push(APP_ROUTES.quizSetup);
       return;
     }
@@ -145,7 +146,11 @@ export function Leaderboard() {
                 onClick={continuePlayerQuiz}
                 className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white px-4 py-2.5 text-sm font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
               >
-                {currentPlayerEntry?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED ? 'ทวนคำตอบ' : 'ทำต่อ'}
+                {currentPlayerEntry
+                  ? currentPlayerEntry.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
+                    ? 'ทวนคำตอบ'
+                    : 'ทำต่อ'
+                  : 'เลือกสนาม'}
               </button>
               {currentPlayerEntry && (
                 <button

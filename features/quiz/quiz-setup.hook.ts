@@ -91,8 +91,11 @@ export function subscribeToQuizSetup(listener: () => void): () => void {
 export function useQuizSetup(): QuizSetupHook {
   const router = useRouter();
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
-  const [selectedMode, setSelectedMode] = useState<QuizMode>('university');
-  const [questionLimit, setQuestionLimit] = useState('');
+  const [selectedMode, setSelectedMode] = useState<QuizMode>(() => getStoredQuizSetup()?.mode ?? 'university');
+  const [questionLimit, setQuestionLimit] = useState(() => {
+    const storedLimit = getStoredQuizSetup()?.questionLimit;
+    return storedLimit === null || storedLimit === undefined ? '' : String(storedLimit);
+  });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
