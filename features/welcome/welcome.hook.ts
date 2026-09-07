@@ -1,9 +1,11 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { APP_ROUTES } from '@/features/shared/routes';
+import { clearQuizSetup } from '@/features/quiz/quiz-setup.hook';
+import { clearQuizProgress, clearQuizReviewAttemptId } from '@/features/quiz/quiz-progress.storage';
 
 import {
   PLAYER_ID_STORAGE_KEY,
@@ -87,6 +89,14 @@ export function clearPlayerName(): void {
   notifyPlayerNameListeners();
 }
 
+export function resetPlayerSession(): void {
+  clearPlayerName();
+  window.sessionStorage.removeItem(PLAYER_ID_STORAGE_KEY);
+  clearQuizSetup();
+  clearQuizProgress();
+  clearQuizReviewAttemptId();
+}
+
 export function subscribeToPlayerName(listener: () => void): () => void {
   playerNameListeners.add(listener);
   window.addEventListener('storage', listener);
@@ -108,6 +118,10 @@ export function useWelcome(): WelcomeHook {
   const [pinError, setPinError] = useState<string | null>(null);
   const [pinConfirm, setPinConfirm] = useState('');
   const [pinConfirmError, setPinConfirmError] = useState<string | null>(null);
+
+  useEffect(() => {
+    resetPlayerSession();
+  }, []);
 
   const clearPinInputs = useCallback(() => {
     setPin('');

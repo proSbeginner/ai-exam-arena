@@ -22,3 +22,26 @@ describe('player-name rules', () => {
     expect(validatePlayerName('A'.repeat(21)).isValid).toBe(false);
   });
 });
+
+import { resetPlayerSession } from '@/features/welcome/welcome.hook';
+import { PLAYER_ID_STORAGE_KEY, PLAYER_NAME_STORAGE_KEY } from '@/features/welcome/welcome.types';
+import { QUIZ_SETUP_STORAGE_KEY } from '@/features/quiz/quiz-setup.hook';
+import { QUIZ_PROGRESS_STORAGE_KEY, QUIZ_REVIEW_ATTEMPT_STORAGE_KEY } from '@/features/quiz/quiz-progress.storage';
+
+describe('resetPlayerSession', () => {
+  it('clears player and quiz session data', () => {
+    window.sessionStorage.setItem(PLAYER_NAME_STORAGE_KEY, 'OLD_PLAYER');
+    window.sessionStorage.setItem(PLAYER_ID_STORAGE_KEY, 'player-1');
+    window.sessionStorage.setItem(QUIZ_SETUP_STORAGE_KEY, JSON.stringify({ mode: 'primary', questionLimit: 1 }));
+    window.sessionStorage.setItem(QUIZ_PROGRESS_STORAGE_KEY, '{}');
+    window.sessionStorage.setItem(QUIZ_REVIEW_ATTEMPT_STORAGE_KEY, 'attempt-1');
+
+    resetPlayerSession();
+
+    expect(window.sessionStorage.getItem(PLAYER_NAME_STORAGE_KEY)).toBeNull();
+    expect(window.sessionStorage.getItem(PLAYER_ID_STORAGE_KEY)).toBeNull();
+    expect(window.sessionStorage.getItem(QUIZ_SETUP_STORAGE_KEY)).toBeNull();
+    expect(window.sessionStorage.getItem(QUIZ_PROGRESS_STORAGE_KEY)).toBeNull();
+    expect(window.sessionStorage.getItem(QUIZ_REVIEW_ATTEMPT_STORAGE_KEY)).toBeNull();
+  });
+});

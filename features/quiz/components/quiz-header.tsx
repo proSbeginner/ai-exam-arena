@@ -1,5 +1,6 @@
 import { BrandTitle } from '@/features/shared/components/brand-title';
 import { LeaderboardLink } from '@/features/shared/components/leaderboard-link';
+import { PlayerRankBadge } from '@/features/shared/components/player-rank-badge';
 
 interface QuizHeaderProps {
   selectPlayer: () => void;
@@ -13,9 +14,7 @@ export function QuizHeader({ selectPlayer, currentRank }: QuizHeaderProps) {
         <h1 className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-xl font-bold text-transparent">
           <BrandTitle />
         </h1>
-        <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-bold text-purple-700">
-          {currentRank.emoji} {currentRank.title}
-        </span>
+        <PlayerRankBadge rank={currentRank} />
       </div>
       <div className="flex items-center gap-2">
         <LeaderboardLink inline variant="header" />

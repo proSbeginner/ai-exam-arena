@@ -15,7 +15,6 @@ import {
   subscribeToQuizSetup,
 } from './quiz-setup.hook';
 import {
-  resetPlayerSession,
   getStoredPlayerName,
   getStoredPlayerId,
   subscribeToPlayerName,
@@ -44,6 +43,7 @@ import {
   saveQuizProgress,
 } from './quiz-progress.storage';
 import type { QuizState } from './quiz.types';
+import { APP_ROUTES } from '@/features/shared/routes';
 import { restartQuizAttempt } from './quiz-restart';
 
 type QuestionLoadStatus = 'loading' | 'ready' | 'empty' | 'error';
@@ -349,8 +349,8 @@ export function useQuiz() {
   }, [persistProgress, quizState, syncAttempt]);
 
   const selectPlayer = useCallback(() => {
-    resetPlayerSession();
-  }, []);
+    router.push(APP_ROUTES.welcome);
+  }, [router]);
 
   const retryQuestionLoad = useCallback(() => {
     setQuestionLoadAttempt((current) => current + 1);
