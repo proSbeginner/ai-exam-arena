@@ -2,11 +2,11 @@ import { BrandTitle } from '@/features/shared/components/brand-title';
 import { LeaderboardLink } from '@/features/shared/components/leaderboard-link';
 
 interface QuizHeaderProps {
-  changePlayerName: () => void;
+  selectPlayer: () => void;
   currentRank: { emoji: string; title: string };
 }
 
-export function QuizHeader({ changePlayerName, currentRank }: QuizHeaderProps) {
+export function QuizHeader({ selectPlayer, currentRank }: QuizHeaderProps) {
   return (
     <header className="mx-auto flex w-full max-w-lg items-center justify-between py-4">
       <div className="flex items-center gap-2">
@@ -22,10 +22,10 @@ export function QuizHeader({ changePlayerName, currentRank }: QuizHeaderProps) {
         <span aria-hidden className="text-xs text-gray-300">|</span>
         <button
           type="button"
-          onClick={changePlayerName}
+          onClick={selectPlayer}
           className="cursor-pointer text-xs text-gray-400 transition-colors hover:text-pink-500"
         >
-          เปลี่ยนชื่อ 👋
+          เลือกผู้เล่น
         </button>
       </div>
     </header>

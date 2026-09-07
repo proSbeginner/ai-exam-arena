@@ -18,7 +18,7 @@ import { QuizStreakBadge } from './quiz-streak-badge';
 interface QuizActiveProps {
   answerQuestion: (selectedOptionId: string) => void;
   answeredCount: number;
-  changePlayerName: () => void;
+  selectPlayer: () => void;
   cheerIdx: number;
   confettiKey: number;
   correctImage: string;
@@ -119,7 +119,7 @@ function useSwipe(onUp: () => void, onDown: () => void) {
 export function QuizActive({
   answerQuestion,
   answeredCount,
-  changePlayerName,
+  selectPlayer,
   cheerIdx,
   confettiKey,
   correctImage,
@@ -166,7 +166,7 @@ export function QuizActive({
       </div>
 
       <div className="relative z-10 w-full">
-        <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
+        <QuizHeader selectPlayer={selectPlayer} currentRank={currentRank} />
       </div>
 
       <div className="relative z-10 flex w-full max-w-lg flex-col gap-6 pb-24">

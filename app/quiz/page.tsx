@@ -7,7 +7,7 @@ export default function QuizPage() {
   const {
     answerQuestion,
     answeredCount,
-    changePlayerName,
+    selectPlayer,
     cheerIdx,
     confettiKey,
     correctImage,
@@ -38,7 +38,7 @@ export default function QuizPage() {
     <Quiz
       answerQuestion={answerQuestion}
       answeredCount={answeredCount}
-      changePlayerName={changePlayerName}
+      selectPlayer={selectPlayer}
       cheerIdx={cheerIdx}
       confettiKey={confettiKey}
       correctImage={correctImage}

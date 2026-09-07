@@ -13,7 +13,7 @@ import { QuizResultSummary } from './quiz-result-summary';
 
 interface QuizResultProps {
   answeredCount: number;
-  changePlayerName: () => void;
+  selectPlayer: () => void;
   currentRank: { emoji: string; title: string };
   onResume: () => void;
   playerName: string;
@@ -24,7 +24,7 @@ interface QuizResultProps {
 
 export function QuizResult({
   answeredCount,
-  changePlayerName,
+  selectPlayer,
   currentRank,
   onResume,
   playerName,
@@ -53,7 +53,7 @@ export function QuizResult({
             className={`pointer-events-none absolute left-1/2 top-[-2rem] z-0 h-[36rem] w-[36rem] max-h-none max-w-none -translate-x-1/2 object-contain drop-shadow-xl ${passed ? 'animate-wiggle' : ''}`}
           />
           <div className="relative z-10">
-            <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
+            <QuizHeader selectPlayer={selectPlayer} currentRank={currentRank} />
           </div>
           <div className="relative z-10 h-40" aria-hidden />
           <QuizResultSummary

@@ -15,7 +15,7 @@ import {
   subscribeToQuizSetup,
 } from './quiz-setup.hook';
 import {
-  clearPlayerName,
+  resetPlayerSession,
   getStoredPlayerName,
   getStoredPlayerId,
   subscribeToPlayerName,
@@ -348,8 +348,8 @@ export function useQuiz() {
     }
   }, [persistProgress, quizState, syncAttempt]);
 
-  const changePlayerName = useCallback(() => {
-    clearPlayerName();
+  const selectPlayer = useCallback(() => {
+    resetPlayerSession();
   }, []);
 
   const retryQuestionLoad = useCallback(() => {
@@ -365,7 +365,7 @@ export function useQuiz() {
   return {
     answerQuestion,
     answeredCount,
-    changePlayerName,
+    selectPlayer,
     cheerIdx,
     confettiKey,
     correctImage,

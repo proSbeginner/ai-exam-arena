@@ -14,7 +14,7 @@ import { QuizResult } from './quiz-result';
 interface QuizProps {
   answerQuestion: (selectedOptionId: string) => void;
   answeredCount: number;
-  changePlayerName: () => void;
+  selectPlayer: () => void;
   cheerIdx: number;
   confettiKey: number;
   correctImage: string;
@@ -44,7 +44,7 @@ interface QuizProps {
 export function Quiz({
   answerQuestion,
   answeredCount,
-  changePlayerName,
+  selectPlayer,
   cheerIdx,
   confettiKey,
   correctImage,
@@ -118,8 +118,8 @@ export function Quiz({
       <QuizNotice
         heading="ยังไม่มีคำถามในชุดนี้"
         message="ผู้ดูแลระบบยังไม่ได้เผยแพร่คำถามสำหรับการฝึกฝน"
-        actionLabel="เปลี่ยนชื่อผู้เล่น"
-        onAction={changePlayerName}
+        actionLabel="เลือกผู้เล่น"
+        onAction={selectPlayer}
       />
     );
   }
@@ -128,7 +128,7 @@ export function Quiz({
     <QuizActive
       answerQuestion={answerQuestion}
       answeredCount={answeredCount}
-      changePlayerName={changePlayerName}
+      selectPlayer={selectPlayer}
       cheerIdx={cheerIdx}
       confettiKey={confettiKey}
       correctImage={correctImage}
@@ -149,7 +149,7 @@ export function Quiz({
   ) : (
     <QuizResult
       answeredCount={answeredCount}
-      changePlayerName={changePlayerName}
+      selectPlayer={selectPlayer}
       currentRank={currentRank}
       onResume={resumeQuiz}
       playerName={playerName}
