@@ -5,9 +5,10 @@ interface QuizNoticeProps {
   heading: string;
   message: string;
   onAction: () => void;
+  showLeaderboard?: boolean;
 }
 
-export function QuizNotice({ actionLabel, heading, message, onAction }: QuizNoticeProps) {
+export function QuizNotice({ actionLabel, heading, message, onAction, showLeaderboard = true }: QuizNoticeProps) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
       <section className="w-full max-w-md space-y-4 rounded-3xl bg-white p-8 text-center shadow-xl">
@@ -24,7 +25,7 @@ export function QuizNotice({ actionLabel, heading, message, onAction }: QuizNoti
           {actionLabel}
         </button>
       </section>
-      <LeaderboardLink />
+      {showLeaderboard && <LeaderboardLink />}
     </main>
   );
 }

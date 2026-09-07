@@ -104,6 +104,7 @@ export function Quiz({
         message={questionLoadError ?? 'กรุณาลองใหม่อีกครั้ง'}
         actionLabel="ลองใหม่"
         onAction={retryQuestionLoad}
+        showLeaderboard={false}
       />
     );
   }
@@ -115,6 +116,7 @@ export function Quiz({
         message="ผู้ดูแลระบบยังไม่ได้เผยแพร่คำถามสำหรับการฝึกฝน"
         actionLabel="เปลี่ยนชื่อผู้เล่น"
         onAction={changePlayerName}
+        showLeaderboard={false}
       />
     );
   }
