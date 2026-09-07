@@ -218,22 +218,15 @@ export function useQuiz() {
         questions[quizState.currentQIndex],
         selectedOptionId,
       );
-      const isCompleted = result.answeredMap.size >= questions.length;
-      const resultMood = isCompleted
-        ? result.score >= Math.ceil(questions.length / 2)
-          ? 'passed'
-          : 'failed'
-        : result.mood;
-
       const nextState: QuizState = {
         ...quizState,
         score: result.score,
         streak: result.streak,
-        mood: resultMood,
+        mood: result.mood,
         answeredMap: result.answeredMap,
-        gameOver: isCompleted,
-        summaryVisible: isCompleted,
-        attemptStatus: isCompleted ? ATTEMPT_STATUS.COMPLETED : ATTEMPT_STATUS.ACTIVE,
+        gameOver: false,
+        summaryVisible: false,
+        attemptStatus: ATTEMPT_STATUS.ACTIVE,
       };
 
       setQuizState(nextState);
