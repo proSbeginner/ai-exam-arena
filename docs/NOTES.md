@@ -71,3 +71,7 @@ app/layout.tsx
 ## Summary stamp sound effect
 
 ภายหลังให้เพิ่ม sound effect สั้น ๆ เช่นเสียง “ปึ้ง!” เมื่อ animation แบบตราประทับของ summary panel แสดงจบ โดยต้องตรวจสอบข้อจำกัดของ browser ที่อาจไม่อนุญาตให้เล่นเสียงอัตโนมัติโดยไม่มี user interaction
+
+## Chrome mobile mode scrolling
+
+พบว่า Chrome DevTools mobile mode อาจเลื่อนหรือ swipe หน้า quiz ไม่ได้หลังเลือกคำตอบ ขณะที่ browser บน mobile จริงทำงานปกติ จึงยังไม่ปรับแก้ต่อในตอนนี้ ให้ตรวจสอบอีกครั้งหลังรัน production build ก่อนตัดสินใจแก้ถาวร
