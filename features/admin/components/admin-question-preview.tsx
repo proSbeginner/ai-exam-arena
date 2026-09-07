@@ -14,7 +14,7 @@ export function AdminQuestionPreview({ question }: AdminQuestionPreviewProps) {
 
   return (
     <>
-      <h3 className={`font-bold text-gray-800 ${!isExpanded && canToggle ? 'line-clamp-3' : ''}`}>
+      <h3 className={`rounded-xl bg-purple-50/70 px-3 py-2 font-bold leading-relaxed text-gray-800 ${!isExpanded && canToggle ? 'line-clamp-3' : ''}`}>
         {question}
       </h3>
       {canToggle && (
