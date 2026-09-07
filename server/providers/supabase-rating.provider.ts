@@ -35,6 +35,12 @@ async function getRating(playerId: string, mode: QuizMode): Promise<PlayerRating
 
 async function applyAttemptRating(input: ApplyRatingInput): Promise<PlayerRating> {
   const current = await getRating(input.playerId, input.mode);
+  const events = await supabaseRequest<Array<{ attempt_id: string }>>('player_rating_events?on_conflict=attempt_id', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=ignore-duplicates,return=representation' },
+    body: JSON.stringify({ attempt_id: input.attemptId, player_id: input.playerId, mode: input.mode }),
+  });
+  if (events.length === 0) return current;
   const row = {
     player_id: input.playerId,
     mode: input.mode,

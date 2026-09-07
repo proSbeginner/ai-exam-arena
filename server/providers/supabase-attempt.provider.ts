@@ -96,6 +96,7 @@ async function discardSupabaseAttempt(attemptId: string): Promise<void> {
 
 export const supabaseAttemptProvider: AttemptProvider = {
   getAttempt: getSupabaseAttempt,
+  getAttemptById: getSupabaseAttemptById,
   createAttempt: createSupabaseAttempt,
   updateAttempt: updateSupabaseAttempt,
   submitAnswer: submitSupabaseAnswer,

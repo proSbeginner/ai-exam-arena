@@ -21,6 +21,12 @@ function serializeState(state: QuizState) {
   return { ...state, answeredMap };
 }
 
+export async function getMockAttemptById(attemptId: string) {
+  await simulateMockNetworkDelay();
+  throwIfMockServiceUnavailable();
+  return [...attempts.values()].find((attempt) => attempt.id === attemptId) ?? null;
+}
+
 export async function getMockAttempt(playerId: string, mode: QuizSetup['mode']) {
   await simulateMockNetworkDelay();
   throwIfMockServiceUnavailable();

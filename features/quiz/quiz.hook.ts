@@ -40,9 +40,11 @@ import {
   getStoredQuizProgress,
   saveQuizProgress,
 } from './quiz-progress.storage';
+import { restartQuizAttempt } from './quiz-restart';
 import type { QuizState } from './quiz.types';
 import { APP_ROUTES } from '@/features/shared/routes';
-import { restartQuizAttempt } from './quiz-restart';
+
+import { applyAttemptRating } from '@/features/rank/services/rating.api';
 
 type QuestionLoadStatus = 'loading' | 'ready' | 'empty' | 'error';
 
@@ -209,7 +211,8 @@ export function useQuiz() {
   }, [playerId, playerName, questionLoadAttempt, quizSetup]);
 
   const syncAttempt = useCallback((state: QuizState, id = attemptId) => {
-    if (id && !isReviewing) void updateQuizAttempt(id, state).catch(() => undefined);
+    if (id && !isReviewing) return updateQuizAttempt(id, state).catch(() => null);
+    return Promise.resolve(null);
   }, [attemptId, isReviewing]);
 
   const goToNext = useCallback(() => {
@@ -240,12 +243,14 @@ export function useQuiz() {
 
     setQuizState(nextState);
     persistProgress(nextState);
-    syncAttempt(nextState);
+    void syncAttempt(nextState).then(() => {
+      if (next.gameOver && attemptId && !isReviewing) void applyAttemptRating(attemptId).catch(() => undefined);
+    });
 
     if (!next.gameOver && next.currentQIndex !== quizState.currentQIndex) {
       setPageKey((current) => current + 1);
     }
-  }, [persistProgress, questions.length, quizState, syncAttempt]);
+  }, [attemptId, isReviewing, persistProgress, questions.length, quizState, syncAttempt]);
 
   const goToPrevious = useCallback(() => {
     if (quizState.currentQIndex === 0 || quizState.gameOver) return;
