@@ -162,14 +162,14 @@ export function QuizActive({
       <div className="relative z-10 flex w-full max-w-lg flex-col gap-6 pb-24">
         <div
           key={`mascot-${quizState.mood}-${quizState.currentQIndex}`}
-          className="relative z-10 flex h-48 w-48 items-center justify-center"
+          className="relative z-10 flex h-48 w-full items-center justify-center"
         >
           {quizState.streak > 1 && (
             <div className="absolute -left-3 -top-3 z-10 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1 text-xs font-bold text-white shadow-lg animate-bounce-in">
               🔥 x{quizState.streak}
             </div>
           )}
-          <div className="absolute left-[-10px] top-2 z-10 w-36 rounded-xl border-2 border-purple-200/70 bg-white/75 px-3 py-2 text-xs font-bold text-gray-700 shadow-md backdrop-blur-sm animate-bounce sm:left-[-30px]">
+          <div className="absolute left-0 top-2 z-10 w-36 rounded-xl border-2 border-purple-200/70 bg-white/75 px-3 py-2 text-xs font-bold text-gray-700 shadow-md backdrop-blur-sm animate-bounce">
             {quizState.mood === 'idle' && `พร้อมแล้วนะ ${playerName}~! 💖`}
             {quizState.mood === 'correct' && CHEER_MESSAGES[cheerIdx]}
             {quizState.mood === 'wrong' && SYMPATHY_MESSAGES[sympathyIdx]}

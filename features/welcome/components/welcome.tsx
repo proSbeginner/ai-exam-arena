@@ -35,32 +35,31 @@ export function Welcome({
         }}
       />
 
-      <div className="z-10 w-full max-w-md rounded-[2rem] border-2 border-pink-100 bg-white p-8 shadow-2xl transition-transform duration-300 hover:scale-105 md:p-10">
-        <h1 className="mb-2 text-center text-3xl font-black tracking-tight text-gray-800">
+      <div className="relative z-10 isolate w-full max-w-md rounded-[2rem] border-2 border-pink-100 bg-white/60 p-8 shadow-2xl backdrop-blur-sm transition-transform duration-300 hover:scale-105 md:p-10">
+        <Image
+          priority
+          loading="eager"
+          src="/images/idle.png"
+          alt=""
+          width={1408}
+          height={768}
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-[-2rem] z-0 h-[36rem] w-[36rem] max-h-none max-w-none -translate-x-1/2 object-contain drop-shadow-xl animate-floaty"
+        />
+        <h1 className="relative z-10 mb-2 text-center text-3xl font-black tracking-tight text-gray-800">
           AI EXAM ARENA
         </h1>
-        <p className="mb-8 text-center text-xs font-bold uppercase tracking-wider text-purple-500">
+        <p className="relative z-10 mb-8 text-center text-xs font-bold uppercase tracking-wider text-purple-500">
           Practice • Play • Pass
         </p>
 
-        <div className="mb-8 flex justify-center">
-          <div className="group relative cursor-pointer">
-            <Image
-              priority
-              loading="eager"
-              src="/images/idle.png"
-              alt="Mascot waiting to welcome the player"
-              width={1408}
-              height={768}
-              className="h-56 w-56 object-contain drop-shadow-xl transition-transform duration-500 group-hover:rotate-6 animate-floaty"
-            />
-            <div className="absolute -right-8 -top-4 rounded-xl border-2 border-purple-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-600 shadow-md animate-pulse">
-              สวัสดีค่ะ~! 👋
-            </div>
+        <div className="relative z-10 mb-8 flex h-56 justify-center">
+          <div className="absolute left-1 -top-4 rounded-xl border-2 border-purple-200/70 bg-white/75 px-3 py-1.5 text-xs font-bold text-gray-600 shadow-md backdrop-blur-sm animate-pulse">
+            สวัสดีค่ะ~! 👋
           </div>
         </div>
 
-        <form noValidate onSubmit={handleSubmit} className="space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="relative z-10 space-y-4">
           <TextInput
             id="player-name"
             name="playerName"
@@ -87,7 +86,7 @@ export function Welcome({
           </button>
         </form>
 
-        <p className="mt-8 text-center text-xs text-gray-400">Powered by your own creativity &amp; love 💖</p>
+        <p className="relative z-10 mt-8 text-center text-xs text-gray-400">Powered by your own creativity &amp; love 💖</p>
       </div>
     </div>
   );

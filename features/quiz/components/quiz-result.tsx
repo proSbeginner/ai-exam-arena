@@ -32,25 +32,31 @@ export function QuizResult({
   const percentage = questions.length > 0 ? Math.round((quizState.score / questions.length) * 100) : 0;
 
   return (
-    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans">
-      <div className="flex w-full max-w-lg items-center justify-center">
-        <div className="w-full space-y-4 rounded-3xl bg-white/90 p-8 text-center shadow-2xl backdrop-blur-xl animate-bounce-in">
-          <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
+    <main className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans">
+      <div className="relative z-10 flex w-full max-w-lg items-center justify-center">
+        <div className="relative isolate w-full space-y-4 rounded-3xl bg-white/60 p-8 text-center shadow-2xl backdrop-blur-xl animate-bounce-in">
           <Image
-        src={MOOD_IMAGES[quizState.mood]}
-        alt="Quiz result mascot"
-        width={1408}
-        height={768}
-        className={`mx-auto h-40 w-40 object-contain drop-shadow-xl ${passed ? 'animate-wiggle' : ''}`}
-      />
-      <h1 className="text-3xl font-extrabold text-gray-800">
-        {isCompleted ? (passed ? '🎉 PASSED!' : '😭 TRY AGAIN') : 'สรุปผลการทำข้อสอบ'}
-      </h1>
-      <p className="text-sm text-gray-500">{isCompleted ? 'คุณได้คะแนน' : 'หยุดทำไว้ก่อนหน้านี้'}</p>
-      <div className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-5xl font-black text-transparent">
-        {percentage}%
-      </div>
-      <div className="grid grid-cols-2 gap-3 text-sm">
+            src={MOOD_IMAGES[quizState.mood]}
+            alt=""
+            width={1408}
+            height={768}
+            aria-hidden
+            className={`pointer-events-none absolute left-1/2 top-[-2rem] z-0 h-[36rem] w-[36rem] max-h-none max-w-none -translate-x-1/2 object-contain drop-shadow-xl ${passed ? 'animate-wiggle' : ''}`}
+          />
+          <div className="relative z-10">
+            <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
+          </div>
+          <div className="relative z-10 h-40" aria-hidden />
+          <div className="relative z-10 space-y-1 rounded-2xl border-2 border-pink-400/70 bg-transparent backdrop-blur-sm">
+            <h1 className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-3xl font-extrabold text-transparent drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">
+              {isCompleted ? (passed ? '🎉 PASSED!' : '😭 TRY AGAIN') : 'สรุปผลการทำข้อสอบ'}
+            </h1>
+            <p className="text-sm font-medium text-purple-500 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">{isCompleted ? 'คุณได้คะแนน' : 'หยุดทำไว้ก่อนหน้านี้'}</p>
+            <div className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-5xl font-black text-transparent drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">
+              {percentage}%
+            </div>
+          </div>
+      <div className="relative z-10 grid grid-cols-2 gap-3 text-sm">
         <div className="rounded-xl bg-purple-50 p-3 text-purple-700">
           <span className="block text-xs text-purple-400">ทำไปแล้ว</span>
           <span className="font-bold">{answeredCount}/{questions.length} ข้อ</span>
@@ -60,14 +66,14 @@ export function QuizResult({
           <span className="font-bold">{quizState.score} ข้อ</span>
         </div>
       </div>
-      <p className="text-sm text-gray-600">
+      <p className="relative z-10 text-sm text-gray-600">
         {!isCompleted
           ? `${playerName} สามารถกลับมาทำต่อจากจุดเดิมได้`
           : passed
           ? `${playerName} เก่งมาก! พร้อมไปสอบจริงแล้ว~ ✨`
           : `${playerName} อย่าท้อใจนะ ลองทบทวนแล้วมาใหม่! 💪`}
       </p>
-      <div className="flex gap-3 pt-2">
+      <div className="relative z-10 flex gap-3 pt-2">
         {!isCompleted && (
           <button
             type="button"
