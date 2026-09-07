@@ -192,4 +192,5 @@ The map is keyed by `playerId` and quiz mode, and contains the attempt state, se
 - `server/database/` owns database row types and database-to-application transformers.
 - `supabase/` owns the Supabase REST client and migrations.
 - `mock-api/` owns mock providers and mock fixtures.
+- Unit tests live beside the module they verify using the `.test.ts` suffix. The top-level `tests/` directory is reserved for shared test setup and future integration or end-to-end tests.
 - The root `data/` directory should not be used for mixed feature data and will be removed after the approved migration.
