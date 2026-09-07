@@ -139,6 +139,7 @@ export function QuizActive({
       : quizState.mood === 'wrong'
         ? 'animate-shake'
         : 'animate-floaty';
+  const canShowSummary = answeredCount < questions.length && quizState.currentQIndex < questions.length - 1;
 
   return (
     <div
@@ -287,14 +288,16 @@ export function QuizActive({
           </button>
         </div>
 
-        {answeredCount < questions.length && quizState.currentQIndex < questions.length - 1 && (
-          <button
-            type="button"
-            onClick={onShowSummary}
-            className="mx-auto cursor-pointer text-sm font-medium text-gray-400 underline decoration-gray-300 underline-offset-4 transition-colors hover:text-purple-500"
-          >
-            สรุปผลตอนนี้
-          </button>
+        {canShowSummary && (
+          <div className="flex w-full justify-center">
+            <button
+              type="button"
+              onClick={onShowSummary}
+              className="cursor-pointer bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-sm font-bold text-transparent underline decoration-purple-300 underline-offset-4 transition-opacity hover:opacity-75"
+            >
+              สรุปผลตอนนี้
+            </button>
+          </div>
         )}
 
       </div>

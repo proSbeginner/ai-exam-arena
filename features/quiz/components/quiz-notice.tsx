@@ -1,3 +1,5 @@
+import { LeaderboardLink } from '@/features/shared/components/leaderboard-link';
+
 interface QuizNoticeProps {
   actionLabel: string;
   heading: string;
@@ -22,6 +24,7 @@ export function QuizNotice({ actionLabel, heading, message, onAction }: QuizNoti
           {actionLabel}
         </button>
       </section>
+      <LeaderboardLink />
     </main>
   );
 }

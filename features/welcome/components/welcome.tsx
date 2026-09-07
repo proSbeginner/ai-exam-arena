@@ -1,8 +1,11 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 
+import { BrandTitle } from '@/features/shared/components/brand-title';
 import { TextInput } from '@/features/shared/components/text-input';
+import { APP_ROUTES } from '@/features/shared/routes';
 import { PLAYER_NAME_MAX_LENGTH } from '../welcome.constants';
 
 interface WelcomeProps {
@@ -56,6 +59,19 @@ export function Welcome({
       />
 
       <div className="relative z-10 isolate w-full max-w-md rounded-[2rem] border-2 border-pink-100 bg-white/60 p-8 shadow-2xl backdrop-blur-sm transition-transform duration-300 hover:scale-105 md:p-10">
+        <Link
+          href={APP_ROUTES.leaderboard}
+          aria-label="Leaderboard"
+          className="group absolute right-5 top-5 z-20 cursor-pointer text-3xl drop-shadow-md transition-transform hover:scale-110"
+        >
+          🏆
+          <span
+            role="tooltip"
+            className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-800 px-2 py-1 !text-[10px] font-medium leading-none text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+          >
+            ดูอันดับ
+          </span>
+        </Link>
         <Image
           priority
           loading="eager"
@@ -66,8 +82,8 @@ export function Welcome({
           aria-hidden
           className="pointer-events-none absolute left-1/2 top-[-7rem] z-0 h-[52rem] w-[52rem] max-h-none max-w-none -translate-x-1/2 object-contain drop-shadow-xl animate-floaty"
         />
-        <h1 className="relative z-10 mb-2 text-center text-3xl font-black tracking-tight text-gray-800">
-          AI EXAM ARENA
+        <h1 className="relative z-10 mb-2 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-center text-3xl font-black tracking-tight text-transparent">
+          <BrandTitle />
         </h1>
         <p className="relative z-10 mb-8 text-center text-xs font-bold uppercase tracking-wider text-purple-500">
           Practice • Play • Pass

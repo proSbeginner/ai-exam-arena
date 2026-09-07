@@ -57,6 +57,8 @@ mock-api/quiz/
 ```text
 features/shared/
 ├── components/
+│   ├── brand-title.tsx
+│   ├── leaderboard-link.tsx
 │   ├── quiz-restart-dialog.tsx
 │   └── text-input.tsx
 └── routes.ts

@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useState } from 'react';
 
 import { MOOD_IMAGES } from '../quiz.assets';
@@ -11,7 +10,6 @@ import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
 import { QuizRestartDialog } from '@/features/shared/components/quiz-restart-dialog';
 import { QuizResultSummary } from './quiz-result-summary';
-import { APP_ROUTES } from '@/features/shared/routes';
 
 interface QuizResultProps {
   answeredCount: number;
@@ -85,12 +83,6 @@ export function QuizResult({
       </div>
         </div>
       </div>
-      <Link
-        href={APP_ROUTES.leaderboard}
-        className="relative z-10 mt-4 cursor-pointer text-sm font-bold text-purple-500 underline decoration-purple-200 underline-offset-4 transition-colors hover:text-pink-500"
-      >
-        ดูอันดับการแข่งขัน 🏆
-      </Link>
       {showRestartConfirmation && (
         <QuizRestartDialog
           onCancel={() => setShowRestartConfirmation(false)}
