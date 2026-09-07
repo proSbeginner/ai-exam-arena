@@ -6,7 +6,6 @@ export function transformQuestion(row: DatabaseQuestionRow): ExamQuestion {
 
   return {
     id: row.id,
-    mode: row.mode,
     labels: row.labels ?? [],
     english: row.english,
     thai_drama: row.thai_drama,

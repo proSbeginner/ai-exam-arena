@@ -7,7 +7,6 @@ import { supabaseQuery, supabaseRequest } from '@/supabase/client';
 
 function questionPayload(input: AdminQuestionInput) {
   return {
-    mode: input.mode,
     labels: input.labels,
     english: input.english,
     thai_drama: input.thai_drama,

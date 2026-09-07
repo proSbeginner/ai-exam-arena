@@ -1,6 +1,6 @@
 import type { SerializedQuizState } from '@/features/quiz/quiz-attempt.types';
 import type { LeaderboardAttemptStatus } from '@/features/leaderboard/leaderboard.types';
-import type { QuizMode, QuizState, ExamQuestion, QuestionStatus } from '@/features/quiz/quiz.types';
+import type { QuizMode, QuizState, QuestionStatus } from '@/features/quiz/quiz.types';
 
 export interface DatabaseQuestionOptionRow {
   id: string;
@@ -13,7 +13,6 @@ export interface DatabaseQuestionOptionRow {
 
 export interface DatabaseQuestionRow {
   id: string;
-  mode: ExamQuestion['mode'];
   labels: string[];
   english: string;
   thai_drama: string;

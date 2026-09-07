@@ -19,7 +19,6 @@ export interface QuestionSource {
 
 export interface ExamQuestion {
   id: string;
-  mode: QuizMode;
   labels: string[];
   english: string;
   thai_drama: string;

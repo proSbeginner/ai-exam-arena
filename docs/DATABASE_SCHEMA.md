@@ -8,7 +8,7 @@ This document is the initial Supabase Postgres design for the application. It is
 - Store PINs as hashes, never as plain text.
 - Allow one active attempt per player and mode.
 - Preserve every selected answer for resume, review, and leaderboard calculations.
-- Keep question options flexible so university questions can have more than four choices.
+- Keep question options flexible so university questions can have four or more choices.
 - Keep source attribution optional and currently store only a source name.
 
 ## Tables
@@ -34,7 +34,6 @@ Stores the question content and publishing state.
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | `uuid` | Primary key |
-| `mode` | `text` | `primary`, `secondary`, or `university` |
 | `labels` | `text[]` | Optional labels, normalized to uppercase |
 | `english` | `text` | Required |
 | `thai_drama` | `text` | Optional |
@@ -60,6 +59,14 @@ Stores a variable number of options for each question.
 
 The database does not limit the number of options. Admin validation still requires at least two options.
 
+The quiz mode is derived from the number of published options rather than stored on the question:
+
+| Quiz mode | Required options | Runtime behavior |
+| --- | ---: | --- |
+| `primary` | at least 2 | Randomly show 2 options, including the correct answer |
+| `secondary` | at least 3 | Randomly show 3 options, including the correct answer |
+| `university` | at least 4 | Show all available options |
+
 ### `quiz_attempts`
 
 Stores one quiz run for a player and mode.
@@ -68,7 +75,7 @@ Stores one quiz run for a player and mode.
 | --- | --- | --- |
 | `id` | `uuid` | Primary key |
 | `player_id` | `uuid` | Foreign key to `players.id` |
-| `mode` | `text` | Quiz mode |
+| `mode` | `text` | Selected quiz mode for this attempt |
 | `question_limit` | `integer` | Nullable when using all available questions |
 | `attempt_status` | `text` | `active`, `abandoned`, or `completed` |
 | `current_question_index` | `integer` | Resume position |

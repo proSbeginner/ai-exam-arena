@@ -171,7 +171,7 @@ quiz.hook
   → mock-api/quiz/questions.mock.ts
 ```
 
-The quiz setup page uses the same API flow to count published questions for the selected mode. It stores the selected mode and optional question limit in session storage before routing to the quiz page.
+The quiz setup page uses the same API flow to count published questions eligible for the selected mode based on option count. It stores the selected mode and optional question limit in session storage before routing to the quiz page. The selected mode belongs to the attempt, not to the question record.
 
 When `DATA_SOURCE=supabase`, the provider resolver will use the Supabase implementation instead of the mock provider.
 

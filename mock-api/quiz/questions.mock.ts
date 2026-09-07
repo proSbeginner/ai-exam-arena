@@ -3,7 +3,6 @@ import type { ExamQuestion } from '@/features/quiz/quiz.types';
 export const questions: ExamQuestion[] = [
   {
     id: 'mock-question-001',
-    mode: 'university',
     labels: ['BEDROCK', 'SECURITY'],
     english: 'Which feature should you enable in Amazon Bedrock to prevent sensitive data leakage?',
     thai_drama: "อือม์... มีใครบอกว่านำ 'ความลับส่วนตัว' ของพี่ไปปล่อยไว้ภายนอกเหรอ?! 😡🔒 ฉันไม่ยอมเด็ดขาด!",
@@ -20,7 +19,6 @@ export const questions: ExamQuestion[] = [
   },
   {
     id: 'mock-question-002',
-    mode: 'university',
     labels: ['SERVERLESS', 'COST'],
     english: 'What billing mechanism is used by AWS Lambda for function execution time?',
     thai_drama: 'ฮัลโหล?? พระเอกของฉันหายไปไหนหมด?? 💁‍♂️✨ จ่ายเฉพาะตอนที่มีตัวตนจริง! (เรียกว่า Pay-per-use ค่ะ)',

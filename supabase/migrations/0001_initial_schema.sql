@@ -13,7 +13,6 @@ create table public.players (
 
 create table public.questions (
   id uuid primary key default gen_random_uuid(),
-  mode text not null check (mode in ('primary', 'secondary', 'university')),
   labels text[] not null default '{}',
   english text not null,
   thai_drama text not null default '',
