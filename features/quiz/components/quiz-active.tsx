@@ -8,6 +8,7 @@ import { CHEER_MESSAGES, SYMPATHY_MESSAGES } from '../quiz.content';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
 import { QuizProgress } from './quiz-progress';
+import { HoldToAnswerButton } from './hold-to-answer-button';
 
 interface QuizActiveProps {
   answerQuestion: (selectedOptionId: string) => void;
@@ -21,6 +22,7 @@ interface QuizActiveProps {
   goToNext: () => void;
   goToPrevious: () => void;
   hasAnsweredCurrentQuestion: boolean;
+  onShowSummary: () => void;
   pageKey: number;
   playerName: string;
   questions: ExamQuestion[];
@@ -120,6 +122,7 @@ export function QuizActive({
   goToNext,
   goToPrevious,
   hasAnsweredCurrentQuestion,
+  onShowSummary,
   pageKey,
   playerName,
   questions,
@@ -191,17 +194,16 @@ export function QuizActive({
                 hasAnsweredCurrentQuestion && selectedAnswer === option.id && !isCorrectOption;
 
               return (
-                <button
+                <HoldToAnswerButton
                   key={index}
-                  type="button"
-                  onClick={() => answerQuestion(option.id)}
+                  onConfirm={() => answerQuestion(option.id)}
                   disabled={hasAnsweredCurrentQuestion}
                   className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left transition-all ${
                     hasAnsweredCurrentQuestion && isCorrectOption
                       ? 'border-green-400 bg-green-50'
                       : isWrongSelection
                         ? 'border-red-400 bg-red-50'
-                        : 'border-gray-100 hover:border-pink-300 hover:bg-pink-50'
+                        : 'border-gray-100 hover:bg-pink-50'
                   } ${hasAnsweredCurrentQuestion ? 'cursor-default' : 'group'}`}
                 >
                   <span>
@@ -222,7 +224,7 @@ export function QuizActive({
                   {hasAnsweredCurrentQuestion && isCorrectOption && <span className="text-lg font-bold text-green-500">✓</span>}
                   {isWrongSelection && <span className="text-lg font-bold text-red-500">✗</span>}
                   {!hasAnsweredCurrentQuestion && <span className="font-bold text-pink-400 opacity-0 transition-opacity group-hover:opacity-100">→</span>}
-                </button>
+                </HoldToAnswerButton>
               );
             })}
           </div>
@@ -263,6 +265,14 @@ export function QuizActive({
             <span aria-hidden>→</span>
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={onShowSummary}
+          className="mx-auto text-sm font-medium text-gray-400 underline decoration-gray-300 underline-offset-4 transition-colors hover:text-purple-500"
+        >
+          สรุปผลตอนนี้
+        </button>
       </div>
     </div>
   );

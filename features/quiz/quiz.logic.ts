@@ -82,5 +82,7 @@ export function createInitialQuizState(): QuizState {
     mood: 'idle',
     answeredMap: new Map(),
     gameOver: false,
+    summaryVisible: false,
+    attemptStatus: 'active',
   };
 }

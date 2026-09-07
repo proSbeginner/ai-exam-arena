@@ -65,6 +65,8 @@ export interface QuizState {
   mood: MoodState;
   answeredMap: Map<number, string>;
   gameOver: boolean;
+  summaryVisible: boolean;
+  attemptStatus: AttemptStatus;
 }
 
 export interface AnswerResult {

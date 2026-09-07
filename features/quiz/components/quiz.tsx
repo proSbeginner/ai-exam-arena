@@ -32,8 +32,10 @@ interface QuizProps {
   questions: ExamQuestion[];
   quizState: QuizState;
   restartGame: () => void;
+  resumeQuiz: () => void;
   retryQuestionLoad: () => void;
   selectedAnswer: string | undefined;
+  showSummary: () => void;
   sympathyIdx: number;
 }
 
@@ -58,8 +60,10 @@ export function Quiz({
   questions,
   quizState,
   restartGame,
+  resumeQuiz,
   retryQuestionLoad,
   selectedAnswer,
+  showSummary,
   sympathyIdx,
 }: QuizProps) {
   const router = useRouter();
@@ -126,6 +130,7 @@ export function Quiz({
       goToNext={goToNext}
       goToPrevious={goToPrevious}
       hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
+      onShowSummary={showSummary}
       pageKey={pageKey}
       playerName={playerName}
       questions={questions}
@@ -135,7 +140,9 @@ export function Quiz({
     />
   ) : (
     <QuizResult
+      answeredCount={answeredCount}
       changePlayerName={changePlayerName}
+      onResume={resumeQuiz}
       playerName={playerName}
       questions={questions}
       quizState={quizState}

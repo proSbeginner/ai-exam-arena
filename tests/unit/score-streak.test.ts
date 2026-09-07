@@ -19,6 +19,8 @@ function makeState(opts: Partial<QuizState> = {}): QuizState {
     mood: opts.mood ?? 'idle',
     answeredMap: opts.answeredMap ?? new Map(),
     gameOver: opts.gameOver ?? false,
+    summaryVisible: opts.summaryVisible ?? false,
+    attemptStatus: opts.attemptStatus ?? 'active',
   };
 }
 
@@ -201,6 +203,8 @@ describe('restartGame', () => {
       mood: 'idle',
       answeredMap: new Map(),
       gameOver: false,
+      summaryVisible: false,
+      attemptStatus: 'active',
     });
   });
 });

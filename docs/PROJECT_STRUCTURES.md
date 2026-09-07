@@ -9,6 +9,7 @@ features/quiz/
 ├── components/
 │   ├── quiz-active.tsx
 │   ├── quiz-header.tsx
+│   ├── hold-to-answer-button.tsx
 │   ├── quiz-result.tsx
 │   ├── quiz.tsx
 │   ├── quiz-loading-skeleton.tsx
@@ -23,7 +24,8 @@ features/quiz/
 ├── quiz.constants.ts
 ├── quiz.logic.ts
 ├── quiz.hook.ts
-└── quiz-setup.hook.ts
+├── quiz-setup.hook.ts
+└── quiz-progress.storage.ts
 
 mock-api/quiz/
 ├── mock-questions.ts

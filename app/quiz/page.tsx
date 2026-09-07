@@ -25,8 +25,10 @@ export default function QuizPage() {
     questions,
     quizState,
     restartGame,
+    resumeQuiz,
     retryQuestionLoad,
     selectedAnswer,
+    showSummary,
     sympathyIdx,
   } = useQuiz();
 
@@ -52,8 +54,10 @@ export default function QuizPage() {
       questions={questions}
       quizState={quizState}
       restartGame={restartGame}
+      resumeQuiz={resumeQuiz}
       retryQuestionLoad={retryQuestionLoad}
       selectedAnswer={selectedAnswer}
+      showSummary={showSummary}
       sympathyIdx={sympathyIdx}
     />
   );

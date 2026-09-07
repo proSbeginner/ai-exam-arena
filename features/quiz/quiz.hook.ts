@@ -26,6 +26,11 @@ import {
   getRank,
 } from './quiz.logic';
 import { getQuizQuestions } from './services/quiz.api';
+import {
+  clearQuizProgress,
+  getStoredQuizProgress,
+  saveQuizProgress,
+} from './quiz-progress.storage';
 import type { QuizState } from './quiz.types';
 
 type QuestionLoadStatus = 'loading' | 'ready' | 'empty' | 'error';
@@ -63,6 +68,14 @@ export function useQuiz() {
   const [confettiKey, setConfettiKey] = useState(0);
   const [pageKey, setPageKey] = useState(0);
 
+  const persistProgress = useCallback(
+    (state: QuizState, loadedQuestions = questions) => {
+      if (!playerName || !quizSetup || loadedQuestions.length === 0) return;
+      saveQuizProgress(playerName, quizSetup, loadedQuestions.map((question) => question.id), state);
+    },
+    [playerName, questions, quizSetup],
+  );
+
   useEffect(() => {
     let isCurrentRequest = true;
 
@@ -85,6 +98,15 @@ export function useQuiz() {
 
         setQuestions(selectedQuestions);
         setQuestionLoadStatus(selectedQuestions.length === 0 ? 'empty' : 'ready');
+
+        if (playerName && quizSetup) {
+          const restoredState = getStoredQuizProgress(
+            playerName,
+            quizSetup,
+            selectedQuestions.map((question) => question.id),
+          );
+          setQuizState(restoredState ?? createInitialQuizState());
+        }
       } catch {
         if (!isCurrentRequest) return;
 
@@ -98,29 +120,36 @@ export function useQuiz() {
     return () => {
       isCurrentRequest = false;
     };
-  }, [questionLoadAttempt, quizSetup]);
+  }, [playerName, questionLoadAttempt, quizSetup]);
 
   const goToNext = useCallback(() => {
     if (quizState.gameOver || questions.length === 0) return;
 
     const next = getNextQuestion(quizState, questions.length);
-    setQuizState((current) => ({
-      ...current,
+    const nextState: QuizState = {
+      ...quizState,
       currentQIndex: next.currentQIndex,
       gameOver: next.gameOver,
       mood: next.mood,
-    }));
+      summaryVisible: next.gameOver,
+      attemptStatus: next.gameOver ? 'completed' : 'active',
+    };
+
+    setQuizState(nextState);
+    persistProgress(nextState);
 
     if (!next.gameOver && next.currentQIndex !== quizState.currentQIndex) {
       setPageKey((current) => current + 1);
     }
-  }, [questions.length, quizState]);
+  }, [persistProgress, questions.length, quizState]);
 
   const goToPrevious = useCallback(() => {
     if (quizState.currentQIndex === 0 || quizState.gameOver) return;
-    setQuizState((current) => getPreviousQuestion(current));
+    const nextState = getPreviousQuestion(quizState);
+    setQuizState(nextState);
+    persistProgress(nextState);
     setPageKey((current) => current + 1);
-  }, [quizState.currentQIndex, quizState.gameOver]);
+  }, [persistProgress, quizState]);
 
   const answerQuestion = useCallback(
     (selectedOptionId: string) => {
@@ -132,13 +161,18 @@ export function useQuiz() {
         selectedOptionId,
       );
 
-      setQuizState((current) => ({
-        ...current,
+      const nextState: QuizState = {
+        ...quizState,
         score: result.score,
         streak: result.streak,
         mood: result.mood,
         answeredMap: result.answeredMap,
-      }));
+        summaryVisible: false,
+        attemptStatus: 'active',
+      };
+
+      setQuizState(nextState);
+      persistProgress(nextState);
       setCheerIdx(pickRandomIndex(CHEER_MESSAGES.length));
       setSympathyIdx(pickRandomIndex(SYMPATHY_MESSAGES.length));
 
@@ -150,14 +184,42 @@ export function useQuiz() {
         setConfettiKey((current) => current + 1);
       }
     },
-    [questions, quizState],
+    [persistProgress, questions, quizState],
   );
 
   const restartGame = useCallback(() => {
-    setQuizState(createInitialQuizState());
+    const nextState = createInitialQuizState();
+    clearQuizProgress();
+    setQuizState(nextState);
     setPageKey((current) => current + 1);
     setConfettiKey(0);
   }, []);
+
+  const showSummary = useCallback(() => {
+    if (quizState.gameOver) return;
+
+    const nextState: QuizState = {
+      ...quizState,
+      summaryVisible: true,
+      attemptStatus: 'abandoned',
+    };
+
+    setQuizState(nextState);
+    persistProgress(nextState);
+  }, [persistProgress, quizState]);
+
+  const resumeQuiz = useCallback(() => {
+    if (!quizState.summaryVisible || quizState.gameOver) return;
+
+    const nextState: QuizState = {
+      ...quizState,
+      summaryVisible: false,
+      attemptStatus: 'active',
+    };
+
+    setQuizState(nextState);
+    persistProgress(nextState);
+  }, [persistProgress, quizState]);
 
   const changePlayerName = useCallback(() => {
     clearPlayerName();
@@ -194,8 +256,10 @@ export function useQuiz() {
     questions,
     quizState,
     restartGame,
+    resumeQuiz,
     retryQuestionLoad,
     selectedAnswer,
+    showSummary,
     sympathyIdx,
   };
 }
