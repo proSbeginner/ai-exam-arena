@@ -6,6 +6,7 @@ import {
   createMockAttempt,
   discardMockAttempt,
   getMockAttempt,
+  submitMockAnswer,
   updateMockAttempt,
 } from '@/mock-api/quiz/mock-attempts';
 
@@ -35,22 +36,28 @@ describe('mock quiz attempts', () => {
     process.env.MOCK_API_DELAY_MS = '0';
     const playerId = `test-attempt-${Date.now()}`;
 
-    const created = await createMockAttempt(playerId, 'TEST_PLAYER', setup, ['q-1', 'q-2'], initialState);
-    expect(created).toMatchObject({ playerId, playerName: 'TEST_PLAYER', questionIds: ['q-1', 'q-2'] });
+    const created = await createMockAttempt(playerId, 'TEST_PLAYER', setup, ['mock-question-001', 'mock-question-002'], initialState);
+    expect(created).toMatchObject({ playerId, playerName: 'TEST_PLAYER', questionIds: ['mock-question-001', 'mock-question-002'] });
 
     await expect(getMockAttempt(playerId, setup.mode)).resolves.toMatchObject({ id: created.id });
 
     const answeredState: QuizState = {
       ...initialState,
       currentQIndex: 1,
-      score: 1,
+      score: 999,
       answeredMap: new Map([[0, 'option-a']]),
+      summaryVisible: true,
       attemptStatus: ATTEMPT_STATUS.ABANDONED,
     };
     const updated = await updateMockAttempt(created.id, answeredState);
 
-    expect(updated.state.answeredMap).toEqual({ '0': 'option-a' });
+    expect(updated.state.answeredMap).toEqual({});
+    expect(updated.state.score).toBe(0);
     expect(updated.state.attemptStatus).toBe(ATTEMPT_STATUS.ABANDONED);
+    const answered = await submitMockAnswer(created.id, 'mock-question-002', 'mock-question-002-option-003');
+    expect(answered.isCorrect).toBe(true);
+    expect(answered.attempt.state.answeredMap).toEqual({ '1': 'mock-question-002-option-003' });
+    expect(answered.attempt.state.score).toBe(1);
 
     await discardMockAttempt(created.id);
     await expect(getMockAttempt(playerId, setup.mode)).resolves.toBeNull();

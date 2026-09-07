@@ -1,9 +1,13 @@
 import type { QuizAttemptRecord } from '@/features/quiz/quiz-attempt.types';
 import type { QuizSetup, QuizState } from '@/features/quiz/quiz.types';
-import type { DatabaseAttemptRow } from '@/server/database/types';
+import { evaluateAnswer } from '@/features/quiz/quiz.logic';
+import type { DatabaseAttemptRow, DatabaseQuestionRow } from '@/server/database/types';
 import { serializeQuizState, transformAttempt } from '@/server/database/transformers/attempt.transform';
 import type { AttemptProvider } from '@/server/providers/attempt.provider';
+import { transformQuestion } from '@/server/database/transformers/question.transform';
 import { supabaseQuery, supabaseRequest } from '@/supabase/client';
+import { applyClientAttemptUpdate } from './attempt-state';
+import { InvalidAttemptAnswerError } from './attempt-errors';
 
 async function getSupabasePlayerName(playerId: string): Promise<string> {
   const query = supabaseQuery({ select: 'player_name', id: `eq.${playerId}`, limit: '1' });
@@ -37,19 +41,53 @@ async function createSupabaseAttempt(playerId: string, playerName: string, setup
 }
 
 async function updateSupabaseAttempt(attemptId: string, state: QuizState): Promise<QuizAttemptRecord> {
+  const existing = await getSupabaseAttemptById(attemptId);
+  if (!existing) throw new Error("Attempt not found.");
+  const trustedState = applyClientAttemptUpdate(existing.state, serializeQuizState(state), existing.questionIds.length);
   const attempts = await supabaseRequest<DatabaseAttemptRow[]>(`quiz_attempts?id=eq.${attemptId}`, {
     method: 'PATCH',
     headers: { Prefer: 'return=representation' },
     body: JSON.stringify({
-      attempt_status: state.attemptStatus,
-      current_question_index: state.currentQIndex,
-      score: state.score,
-      state: serializeQuizState(state),
-      completed_at: state.attemptStatus === 'completed' ? new Date().toISOString() : null,
+      attempt_status: trustedState.attemptStatus,
+      current_question_index: trustedState.currentQIndex,
+      score: trustedState.score,
+      state: trustedState,
+      completed_at: trustedState.attemptStatus === 'completed' ? new Date().toISOString() : null,
     }),
   });
   const attempt = attempts[0];
   return transformAttempt(attempt, await getSupabasePlayerName(attempt.player_id));
+}
+
+async function getSupabaseAttemptById(attemptId: string): Promise<QuizAttemptRecord | null> {
+  const query = supabaseQuery({ select: "*", id: `eq.${attemptId}`, limit: "1" });
+  const attempts = await supabaseRequest<DatabaseAttemptRow[]>(`quiz_attempts?${query}`);
+  const attempt = attempts[0];
+  return attempt ? transformAttempt(attempt, await getSupabasePlayerName(attempt.player_id)) : null;
+}
+
+async function submitSupabaseAnswer(attemptId: string, questionId: string, selectedOptionId: string) {
+  const attempt = await getSupabaseAttemptById(attemptId);
+  if (!attempt) throw new Error("Attempt not found.");
+  if (attempt.state.attemptStatus === "completed") throw new Error("Attempt is already completed.");
+  const query = supabaseQuery({ select: "*,question_options(*)", id: `eq.${questionId}`, limit: "1" });
+  const rows = await supabaseRequest<DatabaseQuestionRow[]>(`questions?${query}`);
+  const question = rows[0] ? transformQuestion(rows[0]) : null;
+  const questionIndex = attempt.questionIds.indexOf(questionId);
+  if (!question || questionIndex !== attempt.state.currentQIndex) throw new InvalidAttemptAnswerError("Invalid question.");
+  if (attempt.state.answeredMap[String(questionIndex)]) throw new InvalidAttemptAnswerError("Question has already been answered.");
+  if (!question.options.some((option) => option.id === selectedOptionId)) throw new InvalidAttemptAnswerError("Invalid answer.");
+  const state: QuizState = { ...attempt.state, answeredMap: new Map(Object.entries(attempt.state.answeredMap).map(([index, answer]) => [Number(index), answer])) };
+  const result = evaluateAnswer(state, question, selectedOptionId);
+  const nextState: QuizState = { ...state, score: result.score, streak: result.streak, mood: result.mood, answeredMap: result.answeredMap };
+  const updatedRows = await supabaseRequest<DatabaseAttemptRow[]>(`quiz_attempts?id=eq.${attemptId}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({ attempt_status: 'active', current_question_index: nextState.currentQIndex, score: nextState.score, state: serializeQuizState(nextState) }),
+  });
+  const updated = transformAttempt(updatedRows[0], attempt.playerName);
+  await supabaseRequest("quiz_answers", { method: "POST", body: JSON.stringify({ attempt_id: attemptId, question_id: questionId, selected_option_id: selectedOptionId, is_correct: selectedOptionId === question.correctOptionId }) });
+  return { attempt: updated, isCorrect: selectedOptionId === question.correctOptionId };
 }
 
 async function discardSupabaseAttempt(attemptId: string): Promise<void> {
@@ -60,5 +98,6 @@ export const supabaseAttemptProvider: AttemptProvider = {
   getAttempt: getSupabaseAttempt,
   createAttempt: createSupabaseAttempt,
   updateAttempt: updateSupabaseAttempt,
+  submitAnswer: submitSupabaseAnswer,
   discardAttempt: discardSupabaseAttempt,
 };

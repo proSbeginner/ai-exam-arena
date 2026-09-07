@@ -31,11 +31,9 @@ import {
   randomizeQuizQuestions,
 } from './quiz.logic';
 import { getQuizQuestions } from './services/quiz.api';
-import {
-  createQuizAttempt,
-  getQuizAttempt,
-  updateQuizAttempt,
-} from './services/quiz-attempt.api';
+import { createQuizAttempt, getQuizAttempt, updateQuizAttempt } from './services/quiz-attempt.api';
+
+import { submitQuizAnswer } from './services/quiz-answer.api';
 import {
   clearQuizReviewAttemptId,
   getStoredQuizReviewAttemptId,
@@ -267,6 +265,9 @@ export function useQuiz() {
         questions[quizState.currentQIndex],
         selectedOptionId,
       );
+      if (attemptId) {
+        void submitQuizAnswer(attemptId, questions[quizState.currentQIndex].id, selectedOptionId).catch(() => undefined);
+      }
       const nextState: QuizState = {
         ...quizState,
         score: result.score,
@@ -296,7 +297,7 @@ export function useQuiz() {
         setConfettiKey((current) => current + 1);
       }
     },
-    [persistProgress, questions, quizState, syncAttempt],
+    [attemptId, persistProgress, questions, quizState, syncAttempt],
   );
 
   const restartGame = useCallback(async () => {
