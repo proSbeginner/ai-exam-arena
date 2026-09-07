@@ -37,15 +37,6 @@ export function QuizResult({
   const isCompleted = quizState.gameOver || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
   const passed = isCompleted && quizState.score >= Math.ceil(questions.length / 2);
   const percentage = questions.length > 0 ? Math.round((quizState.score / questions.length) * 100) : 0;
-  const handleRestart = () => {
-    if (isCompleted) {
-      restartGame();
-      return;
-    }
-
-    setShowRestartConfirmation(true);
-  };
-
   return (
     <main
       data-testid="quiz-result"
@@ -76,18 +67,16 @@ export function QuizResult({
             score={quizState.score}
           />
       <div className="relative z-10 flex gap-3 pt-2">
-        {!isCompleted && (
-          <button
-            type="button"
-            onClick={onResume}
-            className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white py-3 font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
-          >
-            ทำต่อ
-          </button>
-        )}
         <button
           type="button"
-          onClick={handleRestart}
+          onClick={onResume}
+          className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white py-3 font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
+        >
+          {isCompleted ? 'ทวนคำตอบ' : 'ทำต่อ'}
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowRestartConfirmation(true)}
           className="flex-1 cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
         >
           เล่นอีกครั้ง 🚀

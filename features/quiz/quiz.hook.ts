@@ -74,6 +74,7 @@ export function useQuiz() {
     () => false,
   );
   const [quizState, setQuizState] = useState<QuizState>(createInitialQuizState);
+  const [isReviewing, setIsReviewing] = useState(false);
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [questionLoadStatus, setQuestionLoadStatus] = useState<QuestionLoadStatus>('loading');
@@ -138,6 +139,7 @@ export function useQuiz() {
         const reviewAttemptId = getStoredQuizReviewAttemptId();
         const shouldReviewAttempt = Boolean(matchingAttempt && matchingAttempt.id === reviewAttemptId);
         if (shouldReviewAttempt) clearQuizReviewAttemptId();
+        setIsReviewing(shouldReviewAttempt);
         const attemptQuestions = matchingAttempt
           ? matchingAttempt.questionIds
               .map((questionId) => selectedQuestions.find((question) => question.id === questionId))
@@ -157,13 +159,18 @@ export function useQuiz() {
             attemptStatus: shouldReviewAttempt ? ATTEMPT_STATUS.ACTIVE : matchingAttempt.state.attemptStatus,
             answeredMap: new Map(Object.entries(matchingAttempt.state.answeredMap).map(([index, answer]) => [Number(index), answer])),
           });
+        } else if (matchingAttempt) {
+          setQuizState({
+            ...matchingAttempt.state,
+            answeredMap: new Map(Object.entries(matchingAttempt.state.answeredMap).map(([index, answer]) => [Number(index), answer])),
+          });
         } else if (storedProgress) {
           setQuizState(storedProgress.state);
         } else if (playerName && quizSetup) {
           setQuizState(createInitialQuizState());
         }
 
-        if (playerId && playerName && quizSetup && (!matchingAttempt || (matchingAttempt.state.attemptStatus === ATTEMPT_STATUS.COMPLETED && !shouldReviewAttempt))) {
+        if (playerId && playerName && quizSetup && !matchingAttempt) {
           const newAttempt = await createQuizAttempt(playerId, playerName, quizSetup, attemptQuestions.map((question) => question.id), createInitialQuizState());
           setAttemptId(newAttempt.id);
           setQuizState(createInitialQuizState());
@@ -186,8 +193,8 @@ export function useQuiz() {
   }, [playerId, playerName, questionLoadAttempt, quizSetup]);
 
   const syncAttempt = useCallback((state: QuizState, id = attemptId) => {
-    if (id) void updateQuizAttempt(id, state).catch(() => undefined);
-  }, [attemptId]);
+    if (id && !isReviewing) void updateQuizAttempt(id, state).catch(() => undefined);
+  }, [attemptId, isReviewing]);
 
   const goToNext = useCallback(() => {
     if (quizState.gameOver || questions.length === 0) return;
@@ -278,6 +285,7 @@ export function useQuiz() {
     const nextState = createInitialQuizState();
     const randomizedQuestions = randomizeQuizQuestions(questions);
 
+    setIsReviewing(false);
     clearQuizProgress();
     if (attemptId) void discardQuizAttempt(attemptId).catch(() => undefined);
     setQuestions(randomizedQuestions);
@@ -306,21 +314,25 @@ export function useQuiz() {
   }, [persistProgress, quizState, syncAttempt]);
 
   const resumeQuiz = useCallback(() => {
-    if (
-      !quizState.summaryVisible ||
-      quizState.gameOver ||
-      quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED
-    ) return;
+    if (!quizState.summaryVisible) return;
+
+    const reviewingCompletedAttempt = quizState.gameOver || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
 
     const nextState: QuizState = {
       ...quizState,
+      currentQIndex: reviewingCompletedAttempt ? 0 : quizState.currentQIndex,
+      mood: 'idle',
+      gameOver: false,
       summaryVisible: false,
       attemptStatus: ATTEMPT_STATUS.ACTIVE,
     };
 
+    setIsReviewing(reviewingCompletedAttempt);
     setQuizState(nextState);
-    persistProgress(nextState);
-    syncAttempt(nextState);
+    if (!reviewingCompletedAttempt) {
+      persistProgress(nextState);
+      syncAttempt(nextState);
+    }
   }, [persistProgress, quizState, syncAttempt]);
 
   const changePlayerName = useCallback(() => {
