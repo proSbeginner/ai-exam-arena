@@ -75,9 +75,20 @@ function ConfettiBurst({ burstKey }: { burstKey: number }) {
 
 function useSwipe(onUp: () => void, onDown: () => void) {
   const startYRef = useRef<number | null>(null);
+  const canSwipeUpRef = useRef(false);
+  const canSwipeDownRef = useRef(false);
 
   const onTouchStart = useCallback((event: TouchEvent) => {
     startYRef.current = event.touches[0].clientY;
+
+    const documentHeight = document.documentElement.scrollHeight;
+    const viewportHeight = window.innerHeight;
+    const scrollTop = window.scrollY;
+    const hasScrollableContent = documentHeight > viewportHeight + 1;
+
+    canSwipeUpRef.current =
+      !hasScrollableContent || scrollTop + viewportHeight >= documentHeight - 1;
+    canSwipeDownRef.current = !hasScrollableContent || scrollTop <= 1;
   }, []);
 
   const onTouchEnd = useCallback(
@@ -88,8 +99,8 @@ function useSwipe(onUp: () => void, onDown: () => void) {
       startYRef.current = null;
       if (Math.abs(deltaY) < 60) return;
 
-      if (deltaY < 0) onUp();
-      else onDown();
+      if (deltaY < 0 && canSwipeUpRef.current) onUp();
+      if (deltaY > 0 && canSwipeDownRef.current) onDown();
     },
     [onDown, onUp],
   );
@@ -132,7 +143,7 @@ export function QuizActive({
       <ConfettiBurst burstKey={confettiKey} />
       <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
 
-      <div className="flex w-full max-w-lg flex-col gap-6 pb-8">
+      <div className="flex w-full max-w-lg flex-col gap-6 pb-24">
         <div key={`mascot-${quizState.mood}-${quizState.currentQIndex}`} className="relative flex flex-col items-center">
           {quizState.streak > 1 && (
             <div className="absolute -left-3 -top-3 z-10 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1 text-xs font-bold text-white shadow-lg animate-bounce-in">
