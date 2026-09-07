@@ -13,8 +13,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const player = await getPlayerProvider().createPlayer(body.playerName, body.pin);
-    return Response.json({ player }, { status: 201 });
+    const player = await getPlayerProvider().authenticatePlayer(body.playerName, body.pin);
+    return Response.json({ player });
   } catch (error) {
     if (error instanceof MockApiError) {
       return Response.json(

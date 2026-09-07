@@ -6,19 +6,27 @@ import { useRouter } from 'next/navigation';
 import { APP_ROUTES } from '@/features/shared/routes';
 
 import {
+  PLAYER_ID_STORAGE_KEY,
   PLAYER_NAME_STORAGE_KEY,
+  PLAYER_PIN_LENGTH,
   type PlayerNameValidation,
+  type WelcomeMode,
 } from './welcome.types';
-import { registerPlayer, WelcomeApiError } from './services/welcome.api';
+import { authenticatePlayer, registerPlayer, WelcomeApiError } from './services/welcome.api';
+import { PLAYER_NAME_MAX_LENGTH } from './welcome.constants';
 
-const MAX_PLAYER_NAME_LENGTH = 20;
 const PLAYER_NAME_PATTERN = /^[A-Z_]+$/;
 const playerNameListeners = new Set<() => void>();
 
 export interface WelcomeHook {
-  error: string | null;
+  playerNameError: string | null;
   isSubmitting: boolean;
+  mode: WelcomeMode;
+  pinError: string | null;
+  pin: string;
   playerName: string;
+  toggleMode: () => void;
+  updatePin: (value: string) => void;
   submitPlayerName: () => Promise<void>;
   updatePlayerName: (value: string) => void;
 }
@@ -36,10 +44,10 @@ export function validatePlayerName(value: string): PlayerNameValidation {
     return { isValid: false, message: 'กรุณาระบุชื่อผู้เล่น' };
   }
 
-  if (value.length > MAX_PLAYER_NAME_LENGTH) {
+  if (value.length > PLAYER_NAME_MAX_LENGTH) {
     return {
       isValid: false,
-      message: `ชื่อผู้เล่นยาวได้สูงสุด ${MAX_PLAYER_NAME_LENGTH} ตัวอักษร`,
+      message: `ชื่อผู้เล่นยาวได้สูงสุด ${PLAYER_NAME_MAX_LENGTH} ตัวอักษร`,
     };
   }
 
@@ -63,6 +71,10 @@ export function savePlayerName(playerName: string): void {
   notifyPlayerNameListeners();
 }
 
+export function savePlayerId(playerId: string): void {
+  window.sessionStorage.setItem(PLAYER_ID_STORAGE_KEY, playerId);
+}
+
 export function clearPlayerName(): void {
   window.sessionStorage.removeItem(PLAYER_NAME_STORAGE_KEY);
   notifyPlayerNameListeners();
@@ -81,15 +93,30 @@ export function subscribeToPlayerName(listener: () => void): () => void {
 export function useWelcome(): WelcomeHook {
   const router = useRouter();
   const [playerName, setPlayerName] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [playerNameError, setPlayerNameError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mode, setMode] = useState<WelcomeMode>('register');
+  const [pin, setPin] = useState('');
+  const [pinError, setPinError] = useState<string | null>(null);
 
   const updatePlayerName = useCallback((value: string) => {
     const normalizedPlayerName = normalizePlayerName(value);
     const validation = validatePlayerName(normalizedPlayerName);
 
     setPlayerName(normalizedPlayerName);
-    setError(normalizedPlayerName && !validation.isValid ? validation.message : null);
+    setPlayerNameError(normalizedPlayerName && !validation.isValid ? validation.message : null);
+  }, []);
+
+  const updatePin = useCallback((value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    setPin(value.slice(0, PLAYER_PIN_LENGTH));
+    setPinError(null);
+  }, []);
+
+  const toggleMode = useCallback(() => {
+    setMode((currentMode) => (currentMode === 'register' ? 'recover' : 'register'));
+    setPlayerNameError(null);
+    setPinError(null);
   }, []);
 
   const submitPlayerName = useCallback(async () => {
@@ -97,31 +124,66 @@ export function useWelcome(): WelcomeHook {
     const validation = validatePlayerName(normalizedPlayerName);
 
     if (!validation.isValid) {
-      setError(validation.message);
+      setPlayerNameError(validation.message);
       return;
     }
+
+    if (!/^\d{6}$/.test(pin)) {
+      setPinError(`กรุณาระบุ PIN เป็นตัวเลข ${PLAYER_PIN_LENGTH} หลัก`);
+      return;
+    }
+
+    setPlayerNameError(null);
+    setPinError(null);
 
     setIsSubmitting(true);
 
     try {
-      await registerPlayer(normalizedPlayerName);
-      savePlayerName(normalizedPlayerName);
+      let response;
+
+      try {
+        response = mode === 'register'
+          ? await registerPlayer(normalizedPlayerName, pin)
+          : await authenticatePlayer(normalizedPlayerName, pin);
+      } catch (registrationError) {
+        if (
+          mode === 'register' &&
+          registrationError instanceof WelcomeApiError &&
+          registrationError.code === 'PLAYER_NAME_TAKEN'
+        ) {
+          response = await authenticatePlayer(normalizedPlayerName, pin);
+        } else {
+          throw registrationError;
+        }
+      }
+
+      savePlayerName(response.player.playerName);
+      savePlayerId(response.player.id);
       router.replace(APP_ROUTES.quizSetup);
     } catch (submissionError) {
       if (submissionError instanceof WelcomeApiError && submissionError.code === 'PLAYER_NAME_TAKEN') {
-        setError('ชื่อผู้เล่นนี้มีผู้ใช้งานแล้ว กรุณาเลือกชื่ออื่น');
+        setPlayerNameError('ชื่อผู้เล่นนี้มีผู้ใช้งานแล้ว กรุณาเลือกชื่ออื่น');
+      } else if (submissionError instanceof WelcomeApiError && submissionError.code === 'PLAYER_LOCKED') {
+        setPinError('ใส่ PIN ผิดหลายครั้ง ระบบล็อกบัญชีไว้ กรุณาติดต่อ Admin');
+      } else if (submissionError instanceof WelcomeApiError && submissionError.code === 'INVALID_CREDENTIALS') {
+        setPinError('ชื่อผู้เล่นหรือ PIN ไม่ถูกต้อง');
       } else {
-        setError('ไม่สามารถเริ่มเกมได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง');
+        setPlayerNameError('ไม่สามารถเริ่มเกมได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง');
       }
     } finally {
       setIsSubmitting(false);
     }
-  }, [playerName, router]);
+  }, [mode, pin, playerName, router]);
 
   return {
-    error,
+    playerNameError,
     isSubmitting,
+    mode,
+    pinError,
+    pin,
     playerName,
+    toggleMode,
+    updatePin,
     submitPlayerName,
     updatePlayerName,
   };

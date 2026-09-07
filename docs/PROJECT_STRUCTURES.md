@@ -2,6 +2,22 @@
 
 This document records the approved project structure for the AWS AI Cert quiz application.
 
+## Approved welcome feature structure
+
+```text
+features/welcome/
+├── components/
+│   ├── entry-gate.tsx
+│   ├── welcome.tsx
+│   └── welcome-loading-skeleton.tsx
+├── services/
+│   └── welcome.api.ts
+├── welcome.constants.ts
+├── welcome.logic.ts
+├── welcome.types.ts
+└── welcome.hook.ts
+```
+
 ## Approved quiz feature structure
 
 ```text

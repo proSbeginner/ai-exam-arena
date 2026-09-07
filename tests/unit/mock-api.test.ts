@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  authenticateMockPlayer,
   createMockPlayer,
 } from '@/mock-api/welcome/mock-player';
 import { getMockQuizQuestions } from '@/mock-api/quiz/mock-questions';
@@ -22,8 +23,8 @@ describe('mock API scenarios', () => {
   it('returns a player and question bank in the happy path', async () => {
     setScenario('happy');
 
-    await expect(createMockPlayer('CLOUD_PLAYER')).resolves.toMatchObject({
-      id: 'mock-player-cloud_player',
+    await expect(createMockPlayer('CLOUD_PLAYER', '123456')).resolves.toMatchObject({
+      id: expect.any(String),
       playerName: 'CLOUD_PLAYER',
     });
     await expect(getMockQuizQuestions()).resolves.toHaveLength(2);
@@ -32,9 +33,32 @@ describe('mock API scenarios', () => {
   it('simulates a player name already in use', async () => {
     setScenario('player-name-taken');
 
-    await expect(createMockPlayer('CLOUD_PLAYER')).rejects.toMatchObject({
+    await expect(createMockPlayer('CLOUD_PLAYER', '123456')).rejects.toMatchObject({
       code: 'PLAYER_NAME_TAKEN',
       status: 409,
+    });
+  });
+
+  it('locks a player after 20 failed PIN attempts', async () => {
+    setScenario('happy');
+    const playerName = 'LOCK_TEST_PLAYER';
+
+    await createMockPlayer(playerName, '123456');
+
+    for (let attempt = 1; attempt < 20; attempt += 1) {
+      await expect(authenticateMockPlayer(playerName, '654321')).rejects.toMatchObject({
+        code: 'INVALID_CREDENTIALS',
+      });
+    }
+
+    await expect(authenticateMockPlayer(playerName, '654321')).rejects.toMatchObject({
+      code: 'PLAYER_LOCKED',
+      status: 423,
+    });
+
+    await expect(authenticateMockPlayer(playerName, '123456')).rejects.toMatchObject({
+      code: 'PLAYER_LOCKED',
+      status: 423,
     });
   });
 
