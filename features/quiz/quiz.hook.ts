@@ -44,6 +44,9 @@ import { restartQuizAttempt } from './quiz-restart';
 import type { QuizState } from './quiz.types';
 import { APP_ROUTES } from '@/features/shared/routes';
 
+import { getPlayerRating } from '@/features/rank/services/rating-read.api';
+import { getRankFromMmr } from '@/features/rank/rank.logic';
+import type { PlayerRank } from '@/features/rank/rank.types';
 import { applyAttemptRating } from '@/features/rank/services/rating.api';
 
 type QuestionLoadStatus = 'loading' | 'ready' | 'empty' | 'error';
@@ -93,7 +96,17 @@ export function useQuiz() {
   const [correctImage, setCorrectImage] = useState(CORRECT_IMAGES[0]);
   const [wrongImage, setWrongImage] = useState(WRONG_IMAGES[0]);
   const [confettiKey, setConfettiKey] = useState(0);
+  const [currentMmrRank, setCurrentMmrRank] = useState<PlayerRank | null>(null);
   const [pageKey, setPageKey] = useState(0);
+
+  useEffect(() => {
+    if (!playerId || !quizSetup) return;
+    let isCurrentRequest = true;
+    void getPlayerRating(playerId, quizSetup.mode).then((rating) => {
+      if (isCurrentRequest) setCurrentMmrRank(getRankFromMmr(rating.mmr));
+    }).catch(() => { if (isCurrentRequest) setCurrentMmrRank(null); });
+    return () => { isCurrentRequest = false; };
+  }, [playerId, quizSetup]);
 
   const persistProgress = useCallback(
     (state: QuizState, loadedQuestions = questions) => {
@@ -377,6 +390,7 @@ export function useQuiz() {
     correctImage,
     wrongImage,
     currentQuestion,
+    currentMmrRank,
     currentRank,
     goToNext,
     goToPrevious,

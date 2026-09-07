@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { MOOD_IMAGES } from '../quiz.assets';
 import { ATTEMPT_STATUS } from '../quiz.constants';
 import { hasPassedQuiz } from '../quiz.logic';
+import type { PlayerRank } from '@/features/rank/rank.types';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
 import { ConfirmationDialog } from '@/features/shared/components/confirmation-dialog';
@@ -14,6 +15,7 @@ import { QuizResultSummary } from './quiz-result-summary';
 interface QuizResultProps {
   answeredCount: number;
   selectPlayer: () => void;
+  currentMmrRank?: PlayerRank | null;
   currentRank: { emoji: string; title: string };
   onResume: () => void;
   playerName: string;
@@ -25,6 +27,7 @@ interface QuizResultProps {
 export function QuizResult({
   answeredCount,
   selectPlayer,
+  currentMmrRank,
   currentRank,
   onResume,
   playerName,
@@ -53,7 +56,7 @@ export function QuizResult({
             className={`pointer-events-none absolute left-1/2 top-[-2rem] z-0 h-[36rem] w-[36rem] max-h-none max-w-none -translate-x-1/2 object-contain drop-shadow-xl ${passed ? 'animate-wiggle' : ''}`}
           />
           <div className="relative z-10">
-            <QuizHeader selectPlayer={selectPlayer} currentRank={currentRank} />
+            <QuizHeader selectPlayer={selectPlayer} currentRank={currentRank} currentMmrRank={currentMmrRank} />
           </div>
           <div className="relative z-10 h-40" aria-hidden />
           <QuizResultSummary

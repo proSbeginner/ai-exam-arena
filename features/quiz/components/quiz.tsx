@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { APP_ROUTES } from '@/features/shared/routes';
 
+import type { PlayerRank } from '@/features/rank/rank.types';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizActive } from './quiz-active';
 import { QuizLoadingSkeleton } from './quiz-loading-skeleton';
@@ -20,6 +21,7 @@ interface QuizProps {
   correctImage: string;
   wrongImage: string;
   currentQuestion: ExamQuestion | undefined;
+  currentMmrRank?: PlayerRank | null;
   currentRank: { emoji: string; title: string };
   goToNext: () => void;
   goToPrevious: () => void;
@@ -50,6 +52,7 @@ export function Quiz({
   correctImage,
   wrongImage,
   currentQuestion,
+  currentMmrRank,
   currentRank,
   goToNext,
   goToPrevious,
@@ -134,7 +137,7 @@ export function Quiz({
       correctImage={correctImage}
       wrongImage={wrongImage}
       currentQuestion={currentQuestion}
-      currentRank={currentRank}
+      currentRank={currentRank} currentMmrRank={currentMmrRank}
       goToNext={goToNext}
       goToPrevious={goToPrevious}
       hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
@@ -150,7 +153,7 @@ export function Quiz({
     <QuizResult
       answeredCount={answeredCount}
       selectPlayer={selectPlayer}
-      currentRank={currentRank}
+      currentRank={currentRank} currentMmrRank={currentMmrRank}
       onResume={resumeQuiz}
       playerName={playerName}
       questions={questions}

@@ -13,6 +13,7 @@ export default function QuizPage() {
     correctImage,
     wrongImage,
     currentQuestion,
+    currentMmrRank,
     currentRank,
     goToNext,
     goToPrevious,
@@ -44,6 +45,7 @@ export default function QuizPage() {
       correctImage={correctImage}
       wrongImage={wrongImage}
       currentQuestion={currentQuestion}
+      currentMmrRank={currentMmrRank}
       currentRank={currentRank}
       goToNext={goToNext}
       goToPrevious={goToPrevious}

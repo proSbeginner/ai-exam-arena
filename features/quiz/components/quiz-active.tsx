@@ -5,6 +5,7 @@ import { useCallback, useRef, type CSSProperties, type TouchEvent } from 'react'
 
 import { getQuizMascotImage } from '../quiz.assets';
 import { QUIZ_MOOD } from '../quiz.constants';
+import type { PlayerRank } from '@/features/rank/rank.types';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
 import { QuizProgress } from './quiz-progress';
@@ -24,6 +25,7 @@ interface QuizActiveProps {
   correctImage: string;
   wrongImage: string;
   currentQuestion: ExamQuestion;
+  currentMmrRank?: PlayerRank | null;
   currentRank: { emoji: string; title: string };
   goToNext: () => void;
   goToPrevious: () => void;
@@ -125,6 +127,7 @@ export function QuizActive({
   correctImage,
   wrongImage,
   currentQuestion,
+  currentMmrRank,
   currentRank,
   goToNext,
   goToPrevious,
@@ -166,7 +169,7 @@ export function QuizActive({
       </div>
 
       <div className="relative z-10 w-full">
-        <QuizHeader selectPlayer={selectPlayer} currentRank={currentRank} />
+        <QuizHeader selectPlayer={selectPlayer} currentRank={currentRank} currentMmrRank={currentMmrRank} />
       </div>
 
       <div className="relative z-10 flex w-full max-w-lg flex-col gap-6 pb-24">
