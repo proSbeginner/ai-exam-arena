@@ -107,12 +107,15 @@ export function useQuiz() {
     let isCurrentRequest = true;
 
     const loadQuestions = async () => {
+      let failureMessage = 'ไม่สามารถโหลดคำถามได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง';
       setQuestionLoadStatus('loading');
       setQuestionLoadError(null);
 
       try {
         const loadedQuestions = await getQuizQuestions();
         if (!isCurrentRequest) return;
+
+        failureMessage = 'ไม่สามารถโหลดความคืบหน้าชุดข้อสอบได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง';
 
         const modeQuestions = quizSetup
           ? loadedQuestions.filter(
@@ -182,17 +185,21 @@ export function useQuiz() {
         }
 
         if (playerId && playerName && quizSetup && !matchingAttempt) {
+          failureMessage = 'ไม่สามารถสร้างชุดข้อสอบได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง';
           const newAttempt = await createQuizAttempt(playerId, playerName, quizSetup, attemptQuestions.map((question) => question.id), createInitialQuizState());
           setAttemptId(newAttempt.id);
           setQuizState(createInitialQuizState());
         }
 
         setQuestionLoadStatus(attemptQuestions.length === 0 ? 'empty' : 'ready');
-      } catch {
+      } catch (error) {
         if (!isCurrentRequest) return;
 
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[Quiz] failed to prepare quiz', error);
+        }
         setQuestionLoadStatus('error');
-        setQuestionLoadError('ไม่สามารถโหลดคำถามได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง');
+        setQuestionLoadError(failureMessage);
       }
     };
 
