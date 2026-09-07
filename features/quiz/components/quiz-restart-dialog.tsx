@@ -13,7 +13,7 @@ export function QuizRestartDialog({ onCancel, onConfirm }: QuizRestartDialogProp
         className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl"
       >
         <h2 id="restart-dialog-title" className="text-lg font-bold text-gray-800">
-          เริ่มรอบใหม่หรือไม่?
+          เล่นอีกครั้งหรือไม่?
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-gray-500">
           ความคืบหน้าของชุดปัจจุบันจะถูกทิ้ง และระบบจะสุ่มคำถามชุดใหม่ให้
@@ -31,7 +31,7 @@ export function QuizRestartDialog({ onCancel, onConfirm }: QuizRestartDialogProp
             onClick={onConfirm}
             className="flex-1 cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-2.5 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
           >
-            เริ่มใหม่
+            เล่นอีกครั้ง
           </button>
         </div>
       </div>

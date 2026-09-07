@@ -181,6 +181,19 @@ export function useQuiz() {
   const goToNext = useCallback(() => {
     if (quizState.gameOver || questions.length === 0) return;
 
+    if (quizState.currentQIndex === questions.length - 1 && quizState.answeredMap.size < questions.length) {
+      const nextState: QuizState = {
+        ...quizState,
+        summaryVisible: true,
+        attemptStatus: ATTEMPT_STATUS.ABANDONED,
+      };
+
+      setQuizState(nextState);
+      persistProgress(nextState);
+      syncAttempt(nextState);
+      return;
+    }
+
     const next = getNextQuestion(quizState, questions.length);
     const nextState: QuizState = {
       ...quizState,

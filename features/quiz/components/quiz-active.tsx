@@ -261,7 +261,7 @@ export function QuizActive({
           ) : null}
         </div>
 
-        <div className="hidden w-full max-w-lg items-center justify-between gap-4 md:flex">
+        <div className="flex w-full max-w-lg items-center justify-between gap-4">
           <button
             type="button"
             onClick={goToPrevious}
@@ -280,18 +280,21 @@ export function QuizActive({
             onClick={goToNext}
             className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
           >
-            {answeredCount >= questions.length ? 'ดูผลลัพธ์' : 'ข้อถัดไป'}
+            {quizState.currentQIndex === questions.length - 1 ? 'สรุปผลตอนนี้' : 'ข้อถัดไป'}
             <span aria-hidden>→</span>
           </button>
         </div>
 
-        <button
-          type="button"
-          onClick={onShowSummary}
-          className="mx-auto cursor-pointer text-sm font-medium text-gray-400 underline decoration-gray-300 underline-offset-4 transition-colors hover:text-purple-500"
-        >
-          สรุปผลตอนนี้
-        </button>
+        {answeredCount < questions.length && quizState.currentQIndex < questions.length - 1 && (
+          <button
+            type="button"
+            onClick={onShowSummary}
+            className="mx-auto cursor-pointer text-sm font-medium text-gray-400 underline decoration-gray-300 underline-offset-4 transition-colors hover:text-purple-500"
+          >
+            สรุปผลตอนนี้
+          </button>
+        )}
+
       </div>
     </div>
   );

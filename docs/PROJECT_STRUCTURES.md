@@ -57,6 +57,8 @@ mock-api/quiz/
 
 ```text
 features/leaderboard/
+├── components/
+│   └── leaderboard.tsx
 ├── services/
 │   └── leaderboard.api.ts
 ├── leaderboard.constants.ts
