@@ -129,6 +129,34 @@ The quiz setup page uses the same API flow to count published questions for the 
 
 When `DATA_SOURCE=supabase`, the provider resolver will use the Supabase implementation instead of the mock provider.
 
+## Mock attempt storage
+
+Quiz attempts are currently stored by `mock-api/quiz/mock-attempts.ts` in a server-memory `Map`:
+
+```ts
+const attempts = new Map<string, QuizAttemptRecord>();
+```
+
+ตัวอย่างโครงสร้างข้อมูลภายใน `Map`:
+
+```text
+Map (ตัวอย่าง)
+├── PLAYER_001:university
+│   ├── id
+│   ├── playerId
+│   ├── playerName
+│   ├── questionIds
+│   └── state
+│       ├── currentQIndex
+│       ├── answeredMap
+│       ├── score
+│       └── attemptStatus
+└── PLAYER_002:secondary
+    └── ...
+```
+
+The map is keyed by `playerId` and quiz mode, and contains the attempt state, selected question IDs, answers, score, and status. This lets the mock API behave like a database while the application is still under development. It is temporary: the data can be lost when the Next.js server restarts, reloads its module, or is redeployed. The production implementation will move this data to Supabase tables without changing the feature service contract.
+
 ## Structural rules
 
 - `app/` owns routing and page composition.
