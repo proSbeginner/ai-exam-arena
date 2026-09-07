@@ -58,8 +58,8 @@ mock-api/quiz/
 features/shared/
 ├── components/
 │   ├── brand-title.tsx
+│   ├── confirmation-dialog.tsx
 │   ├── leaderboard-link.tsx
-│   ├── quiz-restart-dialog.tsx
 │   └── text-input.tsx
 └── routes.ts
 ```

@@ -8,7 +8,7 @@ import { ATTEMPT_STATUS } from '../quiz.constants';
 import { hasPassedQuiz } from '../quiz.logic';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
-import { QuizRestartDialog } from '@/features/shared/components/quiz-restart-dialog';
+import { ConfirmationDialog } from '@/features/shared/components/confirmation-dialog';
 import { QuizResultSummary } from './quiz-result-summary';
 
 interface QuizResultProps {
@@ -84,7 +84,9 @@ export function QuizResult({
         </div>
       </div>
       {showRestartConfirmation && (
-        <QuizRestartDialog
+        <ConfirmationDialog
+          title="เล่นอีกครั้งหรือไม่ ?"
+          message="ความคืบหน้าของชุดปัจจุบันจะถูกทิ้ง และระบบจะสุ่มคำถามชุดใหม่ให้"
           onCancel={() => setShowRestartConfirmation(false)}
           onConfirm={() => {
             setShowRestartConfirmation(false);

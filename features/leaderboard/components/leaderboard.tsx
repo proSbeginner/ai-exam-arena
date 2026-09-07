@@ -11,7 +11,7 @@ import {
   saveQuizReviewAttemptId,
 } from '@/features/quiz/quiz-progress.storage';
 import { discardQuizAttempt } from '@/features/quiz/services/quiz-attempt.api';
-import { QuizRestartDialog } from '@/features/shared/components/quiz-restart-dialog';
+import { ConfirmationDialog } from '@/features/shared/components/confirmation-dialog';
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import { APP_ROUTES } from '@/features/shared/routes';
 
@@ -169,7 +169,9 @@ export function Leaderboard() {
         </div>
       </section>
       {showRestartConfirmation && (
-        <QuizRestartDialog
+        <ConfirmationDialog
+          title="เล่นอีกครั้งหรือไม่ ?"
+          message="ความคืบหน้าของชุดปัจจุบันจะถูกทิ้ง และระบบจะสุ่มคำถามชุดใหม่ให้"
           onCancel={() => setShowRestartConfirmation(false)}
           onConfirm={() => void restartPlayerQuiz()}
         />
