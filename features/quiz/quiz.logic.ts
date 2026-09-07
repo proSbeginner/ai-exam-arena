@@ -1,9 +1,21 @@
 import { ATTEMPT_STATUS, PASSING_SCORE_PERCENTAGE, QUIZ_MODE_OPTION_LIMITS, RANKS } from './quiz.constants';
+import type { QuizAttemptRecord } from './quiz-attempt.types';
 import type { ExamQuestion } from './quiz.types';
 import type { AnswerResult, NextQuestionResult, QuizMode, QuizState } from './quiz.types';
 
 export function isQuestionAvailableForMode(question: ExamQuestion, mode: QuizMode): boolean {
   return question.status === 'published' && question.options.length >= QUIZ_MODE_OPTION_LIMITS[mode];
+}
+
+export function canReuseQuizAttempt(
+  attempt: QuizAttemptRecord | null,
+  selectedQuestions: ExamQuestion[],
+): boolean {
+  if (!attempt) return false;
+  if (attempt.state.attemptStatus !== ATTEMPT_STATUS.COMPLETED) return true;
+
+  return attempt.questionIds.length === selectedQuestions.length
+    && attempt.questionIds.every((questionId) => selectedQuestions.some((question) => question.id === questionId));
 }
 
 export function getRank(score: number): (typeof RANKS)[number] {

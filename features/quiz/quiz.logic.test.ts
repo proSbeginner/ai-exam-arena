@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   createInitialQuizState,
+  canReuseQuizAttempt,
   evaluateAnswer,
   getNextQuestion,
   getPreviousQuestion,
@@ -98,6 +99,33 @@ describe('quiz mode option limits', () => {
 
     expect(randomized.options).toHaveLength(3);
     expect(randomized.options.some((option) => option.id === question.correctOptionId)).toBe(true);
+  });
+});
+
+describe('canReuseQuizAttempt', () => {
+  const activeAttempt = {
+    id: 'attempt-1',
+    playerId: 'player-1',
+    playerName: 'PLAYER',
+    setup: { mode: 'university' as const, questionLimit: 1 },
+    questionIds: ['question-1'],
+    state: { ...createInitialQuizState(), answeredMap: {} },
+    startedAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  };
+
+  it('reuses an active attempt even when the current setup has a different question count', () => {
+    expect(canReuseQuizAttempt(activeAttempt, [questions[0], questions[1]])).toBe(true);
+  });
+
+  it('only reuses a completed attempt when its question snapshot matches', () => {
+    const completedAttempt = {
+      ...activeAttempt,
+      state: { ...activeAttempt.state, attemptStatus: 'completed' as const },
+    };
+
+    expect(canReuseQuizAttempt(completedAttempt, [questions[0]])).toBe(false);
+    expect(canReuseQuizAttempt(completedAttempt, [{ ...questions[0], id: 'question-1' }])).toBe(true);
   });
 });
 
