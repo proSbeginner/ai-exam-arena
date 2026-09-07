@@ -11,6 +11,14 @@ export const ANSWER_MOOD = {
   WRONG: 'wrong',
 } as const;
 
+export const QUIZ_MOOD = {
+  IDLE: 'idle',
+  CORRECT: 'correct',
+  WRONG: 'wrong',
+  PASSED: 'passed',
+  FAILED: 'failed',
+} as const;
+
 const configuredPassingScore = Number(process.env.NEXT_PUBLIC_PASSING_SCORE_PERCENTAGE);
 
 export const PASSING_SCORE_PERCENTAGE = Number.isFinite(configuredPassingScore)

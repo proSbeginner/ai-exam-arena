@@ -3,12 +3,17 @@
 import Image from 'next/image';
 import { useCallback, useRef, type CSSProperties, type TouchEvent } from 'react';
 
-import { MOOD_IMAGES } from '../quiz.assets';
-import { CHEER_MESSAGES, FAILED_MESSAGE, PASSED_MESSAGE, SYMPATHY_MESSAGES } from '../quiz.content';
+import { getQuizMascotImage } from '../quiz.assets';
+import { QUIZ_MOOD } from '../quiz.constants';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
 import { QuizProgress } from './quiz-progress';
-import { HoldToAnswerButton } from './hold-to-answer-button';
+import { QuizAnswerOptions } from './quiz-answer-options';
+import { QuizQuestion } from './quiz-question';
+import { QuizQuestionDrama } from './quiz-question-drama';
+import { QuizFunFact } from './quiz-fun-fact';
+import { QuizMascotSpeechBubble } from './quiz-mascot-speech-bubble';
+import { QuizStreakBadge } from './quiz-streak-badge';
 
 interface QuizActiveProps {
   answerQuestion: (selectedOptionId: string) => void;
@@ -134,9 +139,9 @@ export function QuizActive({
 }: QuizActiveProps) {
   const swipe = useSwipe(goToNext, goToPrevious);
   const mascotAnimation =
-    quizState.mood === 'correct'
+    quizState.mood === QUIZ_MOOD.CORRECT
       ? 'animate-pop'
-      : quizState.mood === 'wrong'
+      : quizState.mood === QUIZ_MOOD.WRONG
         ? 'animate-shake'
         : 'animate-floaty';
   const canShowSummary = answeredCount < questions.length && quizState.currentQIndex < questions.length - 1;
@@ -150,13 +155,7 @@ export function QuizActive({
       <ConfettiBurst burstKey={confettiKey} />
       <div className="pointer-events-none absolute inset-x-0 top-[-2rem] z-0 flex justify-center">
         <Image
-          src={
-            quizState.mood === 'correct'
-              ? correctImage
-              : quizState.mood === 'wrong'
-                ? wrongImage
-                : MOOD_IMAGES[quizState.mood]
-          }
+          src={getQuizMascotImage(quizState.mood, correctImage, wrongImage)}
           alt=""
           width={1408}
           height={768}
@@ -176,17 +175,14 @@ export function QuizActive({
           className="relative z-10 flex h-48 w-full items-center justify-center"
         >
           {quizState.streak > 1 && (
-            <div className="absolute -left-3 -top-3 z-10 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1 text-xs font-bold text-white shadow-lg animate-bounce-in">
-              🔥 x{quizState.streak}
-            </div>
+            <QuizStreakBadge streak={quizState.streak} />
           )}
-          <div className="absolute left-0 top-2 z-10 w-36 rounded-xl border-2 border-purple-200/70 bg-white/75 px-3 py-2 text-xs font-bold text-gray-700 shadow-md backdrop-blur-sm animate-bounce">
-            {quizState.mood === 'idle' && `พร้อมแล้วนะ ${playerName}~! 💖`}
-            {quizState.mood === 'correct' && CHEER_MESSAGES[cheerIdx]}
-            {quizState.mood === 'wrong' && SYMPATHY_MESSAGES[sympathyIdx]}
-            {quizState.mood === 'passed' && PASSED_MESSAGE}
-            {quizState.mood === 'failed' && FAILED_MESSAGE}
-          </div>
+          <QuizMascotSpeechBubble
+            cheerIdx={cheerIdx}
+            mood={quizState.mood}
+            playerName={playerName}
+            sympathyIdx={sympathyIdx}
+          />
         </div>
 
         <QuizProgress answeredCount={answeredCount} totalQuestions={questions.length} />
@@ -202,57 +198,17 @@ export function QuizActive({
               {hasAnsweredCurrentQuestion ? '✓ ตอบแล้ว' : '⚡ ตอบเลย!'}
             </span>
           </div>
-          <h2 className="text-base font-bold leading-relaxed text-gray-800">{currentQuestion.english}</h2>
-          <p className="rounded-xl border border-purple-200 bg-purple-50 p-3 text-sm italic text-purple-600">
-            &ldquo;{currentQuestion.thai_drama}&rdquo;
-          </p>
-          <div className="space-y-3 pt-2">
-            {currentQuestion.options.map((option, index) => {
-              const isCorrectOption = option.id === currentQuestion.correctOptionId;
-              const isWrongSelection =
-                hasAnsweredCurrentQuestion && selectedAnswer === option.id && !isCorrectOption;
-
-              return (
-                <HoldToAnswerButton
-                  key={index}
-                  onConfirm={() => answerQuestion(option.id)}
-                  disabled={hasAnsweredCurrentQuestion}
-                  testId={`answer-option-${option.id}`}
-                  className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left transition-all ${
-                    hasAnsweredCurrentQuestion && isCorrectOption
-                      ? 'border-green-400 bg-green-50'
-                      : isWrongSelection
-                        ? 'border-red-400 bg-red-50'
-                        : 'border-gray-100 hover:bg-pink-50'
-                  } ${hasAnsweredCurrentQuestion ? 'cursor-default' : 'group'}`}
-                >
-                  <span>
-                    <span className="mr-2 font-bold text-pink-500">{String.fromCharCode(65 + index)}.</span>
-                    <span
-                      className={`font-medium ${
-                        hasAnsweredCurrentQuestion && isCorrectOption
-                          ? 'text-green-700'
-                          : isWrongSelection
-                            ? 'text-red-700'
-                            : 'text-gray-700 group-hover:text-pink-600'
-                      }`}
-                    >
-                      <span className="block">{option.english}</span>
-                      <span className="mt-1 block text-xs text-gray-400">{option.thai_drama}</span>
-                    </span>
-                  </span>
-                  {hasAnsweredCurrentQuestion && isCorrectOption && <span className="text-lg font-bold text-green-500">✓</span>}
-                  {isWrongSelection && <span className="text-lg font-bold text-red-500">✗</span>}
-                </HoldToAnswerButton>
-              );
-            })}
-          </div>
+          <QuizQuestion>{currentQuestion.english}</QuizQuestion>
+          <QuizQuestionDrama>{currentQuestion.thai_drama}</QuizQuestionDrama>
+          <QuizAnswerOptions
+            answerQuestion={answerQuestion}
+            currentQuestion={currentQuestion}
+            hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
+            selectedAnswer={selectedAnswer}
+          />
 
           {hasAnsweredCurrentQuestion && currentQuestion.funFact ? (
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-relaxed text-amber-800 animate-bounce-in">
-              <span className="font-bold">💡 รู้หรือไม่? </span>
-              {currentQuestion.funFact}
-            </div>
+            <QuizFunFact>{currentQuestion.funFact}</QuizFunFact>
           ) : null}
         </div>
 
