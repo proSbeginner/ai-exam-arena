@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getPlayerRank, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
+import { filterLeaderboardEntries, getPlayerRank, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
 import type { LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
 
 const entry = (overrides: Partial<LeaderboardEntry>): LeaderboardEntry => ({
@@ -17,6 +17,15 @@ const entry = (overrides: Partial<LeaderboardEntry>): LeaderboardEntry => ({
 });
 
 describe('leaderboard logic', () => {
+  it('excludes attempts with no answered questions', () => {
+    const filtered = filterLeaderboardEntries([
+      entry({ playerId: 'empty', answeredCount: 0, correctCount: 0, accuracy: 0 }),
+      entry({ playerId: 'started', answeredCount: 1 }),
+    ]);
+
+    expect(filtered.map((item) => item.playerId)).toEqual(['started']);
+  });
+
   it('puts completed attempts before abandoned attempts', () => {
     const sorted = sortLeaderboard([
       entry({ playerId: 'abandoned', attemptStatus: 'abandoned', answeredCount: 100 }),

@@ -4,6 +4,10 @@ function completionPriority(status: LeaderboardEntry['attemptStatus']): number {
   return status === 'completed' ? 0 : 1;
 }
 
+export function filterLeaderboardEntries(entries: LeaderboardEntry[]): LeaderboardEntry[] {
+  return entries.filter((entry) => entry.answeredCount > 0);
+}
+
 export function sortLeaderboard(entries: LeaderboardEntry[]): LeaderboardEntry[] {
   return [...entries].sort((left, right) => {
     return (

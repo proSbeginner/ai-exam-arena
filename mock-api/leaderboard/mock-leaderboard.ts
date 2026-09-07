@@ -1,6 +1,6 @@
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import type { LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
-import { sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
+import { filterLeaderboardEntries, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
 import { getMockAttempt } from '@/mock-api/quiz/mock-attempts';
 import {
   getMockScenario,
@@ -226,7 +226,7 @@ export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Pro
 
   if (getMockScenario() === 'empty-questions') return [];
 
-  const modeEntries = entries.filter((entry) => entry.mode === mode);
+  const modeEntries = filterLeaderboardEntries(entries.filter((entry) => entry.mode === mode));
   const playerAttempt = playerId ? await getMockAttempt(playerId, mode) : null;
 
   if (!playerAttempt || playerAttempt.state.attemptStatus === 'active') {
@@ -248,5 +248,7 @@ export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Pro
     completedAt: playerAttempt.completedAt ?? playerAttempt.updatedAt,
   };
 
-  return sortLeaderboard([...modeEntries, currentPlayerEntry]);
+  return sortLeaderboard(
+    answeredCount > 0 ? [...modeEntries, currentPlayerEntry] : modeEntries,
+  );
 }
