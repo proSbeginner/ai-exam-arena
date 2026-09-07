@@ -98,3 +98,32 @@ Leaderboard แสดงข้อมูลแยกตาม `mode` ของ at
 - เมื่อไปหน้า setup จาก Leaderboard ระบบจะส่ง mode ของ tab ปัจจุบันเป็นค่าเริ่มต้น เช่น อยู่ tab `มัธยม` ก็เปิด setup ที่ `มัธยม` ไว้ก่อน ผู้เล่นยังเปลี่ยน mode หรือจำนวนข้อได้
 
 `/quiz/setup` จึงเป็นหน้าสำหรับเริ่ม mode ใหม่หรือตั้งค่ารอบใหม่ ไม่ใช่ปลายทางปกติของ `ทำต่อ` หรือ `ทวนคำตอบ`
+
+## Rank, MMR และการป้องกันการโกง
+
+ระบบเก็บ rating แยกต่อผู้เล่นและ mode โดยใช้ MMR เป็นค่ากลาง และแปลงเป็น Rank ตามช่วงดังนี้:
+
+- Herald: 0–299
+- Guardian: 300–599
+- Crusader: 600–899
+- Archon: 900–1199
+- Legend: 1200–1499
+- Ancient: 1500–1799
+- Divine: 1800–2099
+- Immortal: 2100 ขึ้นไป
+
+หนึ่ง tier มี 5 ดาว ดาวละ 60 MMR ยกเว้น Immortal ที่แสดงเฉพาะชื่อ Rank
+
+สูตรการเปลี่ยน MMR ต่อ attempt:
+
+```text
+accuracy = correctCount / questionCount
+randomBaseline = average(1 / optionCount ของแต่ละข้อ)
+performance = (accuracy - randomBaseline) / (1 - randomBaseline)
+confidence = min(answeredCount / 20, 1)
+ratingChange = round(300 * performance * confidence)
+```
+
+การเปลี่ยนแปลงถูกจำกัดไม่เกิน ±300 MMR ต่อ attempt และ MMR ต่ำสุดคือ 0 โดยคำนวณแยกตาม mode เช่น `primary`, `secondary` และ `university`
+
+เพื่อป้องกันการโกง client ส่งเพียง `attemptId` ไปยัง server เท่านั้น Server จะอ่าน attempt และคำตอบที่ตรวจสอบแล้วจากฐานข้อมูล คำนวณ rating เอง และใช้ `player_rating_events` ป้องกัน attempt เดิมถูกคิด MMR ซ้ำ
