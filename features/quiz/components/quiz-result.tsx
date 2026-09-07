@@ -32,8 +32,8 @@ export function QuizResult({
   const percentage = questions.length > 0 ? Math.round((quizState.score / questions.length) * 100) : 0;
 
   return (
-    <main className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans">
-      <div className="mx-auto flex w-full max-w-lg items-center justify-center py-4">
+    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans">
+      <div className="flex w-full max-w-lg items-center justify-center">
         <div className="w-full space-y-4 rounded-3xl bg-white/90 p-8 text-center shadow-2xl backdrop-blur-xl animate-bounce-in">
           <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
           <Image

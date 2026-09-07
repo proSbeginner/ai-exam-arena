@@ -61,7 +61,7 @@ export function HoldToAnswerButton({
   return (
     <button
       type="button"
-      className={`relative cursor-pointer overflow-hidden disabled:cursor-not-allowed ${className}`}
+      className={`relative cursor-pointer overflow-visible disabled:cursor-not-allowed ${className}`}
       disabled={disabled}
       onPointerCancel={clearHold}
       onPointerDown={startHold}
@@ -72,8 +72,8 @@ export function HoldToAnswerButton({
       {children}
       {progress > 0 && buttonSize.width > 0 && (
         <svg
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          viewBox={`0 0 ${buttonSize.width} ${buttonSize.height}`}
+          className="pointer-events-none absolute -inset-1 h-[calc(100%+0.5rem)] w-[calc(100%+0.5rem)]"
+          viewBox={`0 0 ${buttonSize.width + 2} ${buttonSize.height + 2}`}
           preserveAspectRatio="none"
           aria-hidden
         >
@@ -87,8 +87,8 @@ export function HoldToAnswerButton({
           <rect
             x="2"
             y="2"
-            width={Math.max(buttonSize.width - 4, 0)}
-            height={Math.max(buttonSize.height - 4, 0)}
+            width={Math.max(buttonSize.width - 2, 0)}
+            height={Math.max(buttonSize.height - 2, 0)}
             rx="14"
             ry="14"
             fill="none"

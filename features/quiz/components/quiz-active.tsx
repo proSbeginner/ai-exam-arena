@@ -223,7 +223,6 @@ export function QuizActive({
                   </span>
                   {hasAnsweredCurrentQuestion && isCorrectOption && <span className="text-lg font-bold text-green-500">✓</span>}
                   {isWrongSelection && <span className="text-lg font-bold text-red-500">✗</span>}
-                  {!hasAnsweredCurrentQuestion && <span className="font-bold text-pink-400 opacity-0 transition-opacity group-hover:opacity-100">→</span>}
                 </HoldToAnswerButton>
               );
             })}
