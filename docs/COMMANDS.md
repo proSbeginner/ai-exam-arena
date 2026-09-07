@@ -149,3 +149,7 @@ curl -X PATCH "http://localhost:3000/api/admin/questions/<questionId>" \
 ```
 
 หมายเหตุ: `PATCH` ต้องส่งข้อมูลคำถามครบชุดตาม payload ไม่ใช่ส่งเฉพาะ `thai_drama` อย่างเดียว เพราะระบบจะอัปเดตตัวเลือกทั้งหมดของคำถามนั้นใหม่ด้วย
+
+## Reset Supabase schema
+
+เมื่อต้องการล้างข้อมูลของแอปทั้งหมดเพื่อเตรียมฐานข้อมูลใหม่ ให้ใช้คำสั่งจาก `supabase/reset.sql` แล้วรัน schema ใหม่ตามลำดับใน `supabase/migrations/` โดยเริ่มจาก `0001_initial_schema.sql` และตามด้วย migration ถัดไปทั้งหมด

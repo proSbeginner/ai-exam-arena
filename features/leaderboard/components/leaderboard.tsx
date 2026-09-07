@@ -100,11 +100,11 @@ export function Leaderboard() {
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-purple-100">
           <div className="grid grid-cols-[3rem_1fr_7rem_5rem_5rem] gap-2 bg-purple-50 px-4 py-3 text-xs font-bold text-purple-500 sm:grid-cols-[4rem_1fr_9rem_7rem_7rem]">
-            <span>#</span>
-            <span>ผู้เล่น</span>
-            <span>Ranking</span>
-            <span className="text-right">ทำไป / ทั้งหมด</span>
-            <span className="text-right">ถูก / %</span>
+            <span>Rank</span>
+            <span>Player</span>
+            <span>Tier</span>
+            <span className="text-right">Answered</span>
+            <span className="text-right">Score</span>
           </div>
 
           {isLoading && <p className="px-4 py-10 text-center text-sm text-gray-400">กำลังโหลดอันดับ...</p>}
