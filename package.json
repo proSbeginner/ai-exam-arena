@@ -5,8 +5,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:mock": "DATA_SOURCE=mock next dev",
+    "dev:supabase": "DATA_SOURCE=supabase next dev",
     "build": "next build",
+    "build:mock": "DATA_SOURCE=mock next build",
+    "build:supabase": "DATA_SOURCE=supabase next build",
     "start": "next start",
+    "start:mock": "DATA_SOURCE=mock next start",
+    "start:supabase": "DATA_SOURCE=supabase next start",
     "lint": "eslint",
     "test": "vitest",
     "test:run": "vitest run"
