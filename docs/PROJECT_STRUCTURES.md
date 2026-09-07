@@ -60,6 +60,7 @@ features/shared/
 │   ├── brand-title.tsx
 │   ├── confirmation-dialog.tsx
 │   ├── leaderboard-link.tsx
+│   ├── info-dialog.tsx
 │   └── text-input.tsx
 └── routes.ts
 ```

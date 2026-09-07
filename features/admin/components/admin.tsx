@@ -5,6 +5,7 @@ import { useAdmin } from '../admin.hook';
 import { AdminAccessGate } from './admin-access-gate';
 import { AdminQuestionForm } from './admin-question-form';
 import { AdminQuestionList } from './admin-question-list';
+import { InfoDialog } from '@/features/shared/components/info-dialog';
 
 export function Admin() {
   const admin = useAdmin();
@@ -65,6 +66,13 @@ export function Admin() {
           onRemove={(id) => void admin.remove(id)}
           questions={admin.questions}
         />
+        {admin.saveSuccessMode && (
+          <InfoDialog
+            title={admin.saveSuccessMode === 'created' ? 'เพิ่มคำถามสำเร็จ' : 'แก้ไขคำถามสำเร็จ'}
+            message="คำถามถูกบันทึกลงในคลังคำถามแล้ว"
+            onClose={admin.closeSaveSuccessDialog}
+          />
+        )}
       </section>
     </main>
   );

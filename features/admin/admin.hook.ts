@@ -46,6 +46,7 @@ export function useAdmin() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [saveSuccessMode, setSaveSuccessMode] = useState<'created' | 'updated' | null>(null);
 
   const loadQuestions = async (delayMs = 0) => {
     setIsLoading(true);
@@ -115,16 +116,20 @@ export function useAdmin() {
     setIsLoading(true);
     setError(null);
     try {
+      const wasEditing = Boolean(editingId);
       const payload = toPayload(form);
       if (editingId) await updateAdminQuestion(email, editingId, payload);
       else await createAdminQuestion(email, payload);
       resetForm();
       await loadQuestions();
+      setSaveSuccessMode(wasEditing ? 'updated' : 'created');
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'ไม่สามารถบันทึกคำถามได้');
       setIsLoading(false);
     }
   };
+
+  const closeSaveSuccessDialog = () => setSaveSuccessMode(null);
 
   const remove = async (id: string) => {
     if (!window.confirm('ยืนยันการลบคำถามนี้หรือไม่?')) return;
@@ -141,6 +146,7 @@ export function useAdmin() {
   return {
     addLabel,
     addOption,
+    closeSaveSuccessDialog,
     ADMIN_REFRESH_DELAY_MS,
     editQuestion,
     email,
@@ -150,6 +156,7 @@ export function useAdmin() {
     formError,
     isAuthorized,
     isDuplicateLabel,
+    saveSuccessMode,
     isLoading,
     loadQuestions,
     questions,
