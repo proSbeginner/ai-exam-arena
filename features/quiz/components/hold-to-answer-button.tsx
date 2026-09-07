@@ -61,7 +61,7 @@ export function HoldToAnswerButton({
   return (
     <button
       type="button"
-      className={`relative cursor-pointer overflow-visible disabled:cursor-not-allowed ${className}`}
+      className={`relative cursor-pointer select-none overflow-visible disabled:cursor-not-allowed ${className}`}
       disabled={disabled}
       onPointerCancel={clearHold}
       onPointerDown={startHold}
