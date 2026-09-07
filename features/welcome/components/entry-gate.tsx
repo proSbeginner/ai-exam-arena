@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 import { APP_ROUTES } from '@/features/shared/routes';
 import {
@@ -12,7 +11,6 @@ import { QuizLoadingSkeleton } from '../../quiz/components/quiz-loading-skeleton
 import { WelcomeLoadingSkeleton } from './welcome-loading-skeleton';
 
 export function EntryGate() {
-  const router = useRouter();
   const [playerName, setPlayerName] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
@@ -29,9 +27,9 @@ export function EntryGate() {
 
   useEffect(() => {
     if (isPlayerReady) {
-      router.replace(playerName ? APP_ROUTES.quizSetup : APP_ROUTES.welcome);
+      window.location.replace(playerName ? APP_ROUTES.quizSetup : APP_ROUTES.welcome);
     }
-  }, [isPlayerReady, playerName, router]);
+  }, [isPlayerReady, playerName]);
 
   return playerName ? <QuizLoadingSkeleton /> : <WelcomeLoadingSkeleton />;
 }
