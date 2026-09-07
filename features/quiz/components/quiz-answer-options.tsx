@@ -47,7 +47,7 @@ export function QuizAnswerOptions({
                 }`}
               >
                 <span>{option.english}</span>
-                <span className="mt-1 block text-xs text-gray-400">{option.thai_drama}</span>
+                {option.thai_drama.trim() && <span className="mt-1 block text-xs text-gray-400">{option.thai_drama}</span>}
               </span>
             </span>
             {hasAnsweredCurrentQuestion && isCorrectOption && <span className="text-lg font-bold text-green-500">✓</span>}
