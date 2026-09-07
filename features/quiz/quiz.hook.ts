@@ -16,6 +16,7 @@ import {
 import {
   clearPlayerName,
   getStoredPlayerName,
+  getStoredPlayerId,
   subscribeToPlayerName,
 } from '@/features/welcome/welcome.hook';
 
@@ -28,6 +29,12 @@ import {
   randomizeQuizQuestions,
 } from './quiz.logic';
 import { getQuizQuestions } from './services/quiz.api';
+import {
+  createQuizAttempt,
+  discardQuizAttempt,
+  getQuizAttempt,
+  updateQuizAttempt,
+} from './services/quiz-attempt.api';
 import {
   clearQuizProgress,
   getStoredQuizProgress,
@@ -49,6 +56,11 @@ export function useQuiz() {
     getStoredPlayerName,
     () => null,
   );
+  const playerId = useSyncExternalStore(
+    subscribeToPlayerName,
+    getStoredPlayerId,
+    () => null,
+  );
   const quizSetup = useSyncExternalStore(
     subscribeToQuizSetup,
     getStoredQuizSetup,
@@ -61,6 +73,7 @@ export function useQuiz() {
   );
   const [quizState, setQuizState] = useState<QuizState>(createInitialQuizState);
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
+  const [attemptId, setAttemptId] = useState<string | null>(null);
   const [questionLoadStatus, setQuestionLoadStatus] = useState<QuestionLoadStatus>('loading');
   const [questionLoadError, setQuestionLoadError] = useState<string | null>(null);
   const [questionLoadAttempt, setQuestionLoadAttempt] = useState(0);
@@ -111,12 +124,39 @@ export function useQuiz() {
               .filter((question): question is ExamQuestion => Boolean(question))
           : randomizeQuizQuestions(selectedQuestions);
 
-        setQuestions(randomizedQuestions);
-        setQuestionLoadStatus(randomizedQuestions.length === 0 ? 'empty' : 'ready');
+        let attempt: Awaited<ReturnType<typeof getQuizAttempt>> = null;
+        if (playerId && playerName && quizSetup) {
+          attempt = await getQuizAttempt(playerId, quizSetup.mode);
+        }
 
-        if (storedProgress) {
+        const matchingAttempt = attempt && attempt.questionIds.length === selectedQuestions.length
+          && attempt.questionIds.every((questionId) => selectedQuestions.some((question) => question.id === questionId))
+          ? attempt
+          : null;
+        const attemptQuestions = matchingAttempt
+          ? matchingAttempt.questionIds
+              .map((questionId) => selectedQuestions.find((question) => question.id === questionId))
+              .filter((question): question is ExamQuestion => Boolean(question))
+          : randomizedQuestions;
+
+        setQuestions(attemptQuestions);
+        setAttemptId(matchingAttempt?.id ?? null);
+        setQuestionLoadStatus(attemptQuestions.length === 0 ? 'empty' : 'ready');
+
+        if (matchingAttempt && matchingAttempt.state.attemptStatus !== ATTEMPT_STATUS.COMPLETED) {
+          setQuizState({
+            ...matchingAttempt.state,
+            answeredMap: new Map(Object.entries(matchingAttempt.state.answeredMap).map(([index, answer]) => [Number(index), answer])),
+          });
+        } else if (storedProgress) {
           setQuizState(storedProgress.state);
         } else if (playerName && quizSetup) {
+          setQuizState(createInitialQuizState());
+        }
+
+        if (playerId && playerName && quizSetup && (!matchingAttempt || matchingAttempt.state.attemptStatus === ATTEMPT_STATUS.COMPLETED)) {
+          const newAttempt = await createQuizAttempt(playerId, playerName, quizSetup, attemptQuestions.map((question) => question.id), createInitialQuizState());
+          setAttemptId(newAttempt.id);
           setQuizState(createInitialQuizState());
         }
       } catch {
@@ -132,7 +172,11 @@ export function useQuiz() {
     return () => {
       isCurrentRequest = false;
     };
-  }, [playerName, questionLoadAttempt, quizSetup]);
+  }, [playerId, playerName, questionLoadAttempt, quizSetup]);
+
+  const syncAttempt = useCallback((state: QuizState, id = attemptId) => {
+    if (id) void updateQuizAttempt(id, state).catch(() => undefined);
+  }, [attemptId]);
 
   const goToNext = useCallback(() => {
     if (quizState.gameOver || questions.length === 0) return;
@@ -149,19 +193,21 @@ export function useQuiz() {
 
     setQuizState(nextState);
     persistProgress(nextState);
+    syncAttempt(nextState);
 
     if (!next.gameOver && next.currentQIndex !== quizState.currentQIndex) {
       setPageKey((current) => current + 1);
     }
-  }, [persistProgress, questions.length, quizState]);
+  }, [persistProgress, questions.length, quizState, syncAttempt]);
 
   const goToPrevious = useCallback(() => {
     if (quizState.currentQIndex === 0 || quizState.gameOver) return;
     const nextState = getPreviousQuestion(quizState);
     setQuizState(nextState);
     persistProgress(nextState);
+    syncAttempt(nextState);
     setPageKey((current) => current + 1);
-  }, [persistProgress, quizState]);
+  }, [persistProgress, quizState, syncAttempt]);
 
   const answerQuestion = useCallback(
     (selectedOptionId: string) => {
@@ -192,6 +238,7 @@ export function useQuiz() {
 
       setQuizState(nextState);
       persistProgress(nextState);
+      syncAttempt(nextState);
       setCheerIdx(pickRandomIndex(CHEER_MESSAGES.length));
       setSympathyIdx(pickRandomIndex(SYMPATHY_MESSAGES.length));
 
@@ -207,7 +254,7 @@ export function useQuiz() {
         setConfettiKey((current) => current + 1);
       }
     },
-    [persistProgress, questions, quizState],
+    [persistProgress, questions, quizState, syncAttempt],
   );
 
   const restartGame = useCallback(() => {
@@ -215,11 +262,17 @@ export function useQuiz() {
     const randomizedQuestions = randomizeQuizQuestions(questions);
 
     clearQuizProgress();
+    if (attemptId) void discardQuizAttempt(attemptId).catch(() => undefined);
     setQuestions(randomizedQuestions);
     setQuizState(nextState);
+    if (playerId && playerName && quizSetup) {
+      void createQuizAttempt(playerId, playerName, quizSetup, randomizedQuestions.map((question) => question.id), nextState)
+        .then((attempt) => setAttemptId(attempt.id))
+        .catch(() => undefined);
+    }
     setPageKey((current) => current + 1);
     setConfettiKey(0);
-  }, [questions]);
+  }, [attemptId, playerId, playerName, questions, quizSetup]);
 
   const showSummary = useCallback(() => {
     if (quizState.gameOver) return;
@@ -232,7 +285,8 @@ export function useQuiz() {
 
     setQuizState(nextState);
     persistProgress(nextState);
-  }, [persistProgress, quizState]);
+    syncAttempt(nextState);
+  }, [persistProgress, quizState, syncAttempt]);
 
   const resumeQuiz = useCallback(() => {
     if (
@@ -249,7 +303,8 @@ export function useQuiz() {
 
     setQuizState(nextState);
     persistProgress(nextState);
-  }, [persistProgress, quizState]);
+    syncAttempt(nextState);
+  }, [persistProgress, quizState, syncAttempt]);
 
   const changePlayerName = useCallback(() => {
     clearPlayerName();

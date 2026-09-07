@@ -27,13 +27,17 @@ features/quiz/
 │   ├── quiz-header.tsx
 │   ├── hold-to-answer-button.tsx
 │   ├── quiz-result.tsx
+│   ├── quiz-result-summary.tsx
+│   ├── quiz-restart-dialog.tsx
 │   ├── quiz.tsx
 │   ├── quiz-loading-skeleton.tsx
 │   ├── quiz-notice.tsx
 │   ├── quiz-setup.tsx
 │   └── quiz-progress.tsx
 ├── services/
-│   └── quiz.api.ts
+│   ├── quiz.api.ts
+│   └── quiz-attempt.api.ts
+├── quiz-attempt.types.ts
 ├── quiz.types.ts
 ├── quiz.content.ts
 ├── quiz.assets.ts
@@ -44,6 +48,7 @@ features/quiz/
 └── quiz-progress.storage.ts
 
 mock-api/quiz/
+├── mock-attempts.ts
 ├── mock-questions.ts
 └── questions.mock.ts
 ```

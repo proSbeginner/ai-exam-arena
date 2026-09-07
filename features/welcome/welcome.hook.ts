@@ -68,6 +68,11 @@ export function getStoredPlayerName(): string | null {
   return window.sessionStorage.getItem(PLAYER_NAME_STORAGE_KEY);
 }
 
+export function getStoredPlayerId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return window.sessionStorage.getItem(PLAYER_ID_STORAGE_KEY);
+}
+
 export function savePlayerName(playerName: string): void {
   window.sessionStorage.setItem(PLAYER_NAME_STORAGE_KEY, playerName);
   notifyPlayerNameListeners();

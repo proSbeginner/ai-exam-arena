@@ -1,11 +1,14 @@
 'use client';
 
 import Image from 'next/image';
+import { useState } from 'react';
 
 import { MOOD_IMAGES } from '../quiz.assets';
 import { ATTEMPT_STATUS } from '../quiz.constants';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
+import { QuizRestartDialog } from './quiz-restart-dialog';
+import { QuizResultSummary } from './quiz-result-summary';
 
 interface QuizResultProps {
   answeredCount: number;
@@ -28,9 +31,18 @@ export function QuizResult({
   quizState,
   restartGame,
 }: QuizResultProps) {
+  const [showRestartConfirmation, setShowRestartConfirmation] = useState(false);
   const isCompleted = quizState.gameOver || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
   const passed = isCompleted && quizState.score >= Math.ceil(questions.length / 2);
   const percentage = questions.length > 0 ? Math.round((quizState.score / questions.length) * 100) : 0;
+  const handleRestart = () => {
+    if (isCompleted) {
+      restartGame();
+      return;
+    }
+
+    setShowRestartConfirmation(true);
+  };
 
   return (
     <main
@@ -52,35 +64,15 @@ export function QuizResult({
             <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
           </div>
           <div className="relative z-10 h-40" aria-hidden />
-          <div
-            data-testid="quiz-summary-stamp"
-            className="relative z-10 space-y-1 rounded-2xl border-2 border-pink-400/70 bg-transparent backdrop-blur-sm animate-stamp-in"
-          >
-            <h1 className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-3xl font-extrabold text-transparent drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">
-              {isCompleted ? (passed ? '🎉 PASSED!' : '😭 TRY AGAIN') : 'สรุปผลการทำข้อสอบ'}
-            </h1>
-            <p className="text-sm font-medium text-purple-500 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">{isCompleted ? 'คุณได้คะแนน' : 'หยุดทำไว้ก่อนหน้านี้'}</p>
-            <div className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-5xl font-black text-transparent drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">
-              {percentage}%
-            </div>
-          </div>
-      <div className="relative z-10 grid grid-cols-2 gap-3 text-sm">
-        <div className="rounded-xl bg-purple-50 p-3 text-purple-700">
-          <span className="block text-xs text-purple-400">ทำไปแล้ว</span>
-          <span className="font-bold">{answeredCount}/{questions.length} ข้อ</span>
-        </div>
-        <div className="rounded-xl bg-green-50 p-3 text-green-700">
-          <span className="block text-xs text-green-400">ตอบถูก</span>
-          <span className="font-bold">{quizState.score} ข้อ</span>
-        </div>
-      </div>
-      <p className="relative z-10 text-sm text-gray-600">
-        {!isCompleted
-          ? `${playerName} สามารถกลับมาทำต่อจากจุดเดิมได้`
-          : passed
-          ? `${playerName} เก่งมาก! พร้อมไปสอบจริงแล้ว~ ✨`
-          : `${playerName} อย่าท้อใจนะ ลองทบทวนแล้วมาใหม่! 💪`}
-      </p>
+          <QuizResultSummary
+            answeredCount={answeredCount}
+            isCompleted={isCompleted}
+            passed={passed}
+            percentage={percentage}
+            playerName={playerName}
+            questionCount={questions.length}
+            score={quizState.score}
+          />
       <div className="relative z-10 flex gap-3 pt-2">
         {!isCompleted && (
           <button
@@ -93,7 +85,7 @@ export function QuizResult({
         )}
         <button
           type="button"
-          onClick={restartGame}
+          onClick={handleRestart}
           className="flex-1 cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
         >
           เล่นอีกครั้ง 🚀
@@ -101,6 +93,15 @@ export function QuizResult({
       </div>
         </div>
       </div>
+      {showRestartConfirmation && (
+        <QuizRestartDialog
+          onCancel={() => setShowRestartConfirmation(false)}
+          onConfirm={() => {
+            setShowRestartConfirmation(false);
+            restartGame();
+          }}
+        />
+      )}
     </main>
   );
 }
