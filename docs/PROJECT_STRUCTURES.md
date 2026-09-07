@@ -88,7 +88,17 @@ mock-api/leaderboard/
 ```text
 features/admin/
 ├── components/
-│   └── admin.tsx
+│   ├── admin.tsx
+│   ├── admin-access-gate.tsx
+│   ├── admin-field.tsx
+│   ├── admin-label-input.tsx
+│   ├── admin-options-editor.tsx
+│   ├── admin-question-card.tsx
+│   ├── admin-question-form.tsx
+│   ├── admin-question-list.tsx
+│   └── admin-question-preview.tsx
+├── admin.constants.ts
+├── admin.hook.ts
 ├── services/
 │   └── admin.api.ts
 ├── admin.logic.ts
