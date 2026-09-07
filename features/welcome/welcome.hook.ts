@@ -15,7 +15,7 @@ const MAX_PLAYER_NAME_LENGTH = 20;
 const PLAYER_NAME_PATTERN = /^[A-Z_]+$/;
 const playerNameListeners = new Set<() => void>();
 
-export interface WelcomeStore {
+export interface WelcomeHook {
   error: string | null;
   isSubmitting: boolean;
   playerName: string;
@@ -78,7 +78,7 @@ export function subscribeToPlayerName(listener: () => void): () => void {
   };
 }
 
-export function useWelcomeStore(): WelcomeStore {
+export function useWelcome(): WelcomeHook {
   const router = useRouter();
   const [playerName, setPlayerName] = useState('');
   const [error, setError] = useState<string | null>(null);

@@ -7,7 +7,7 @@ import { APP_ROUTES } from '@/features/shared/routes';
 import {
   getStoredPlayerName,
   subscribeToPlayerName,
-} from '../welcome.store';
+} from '../welcome.hook';
 import { QuizLoadingSkeleton } from '../../quiz/components/quiz-loading-skeleton';
 import { WelcomeLoadingSkeleton } from './welcome-loading-skeleton';
 

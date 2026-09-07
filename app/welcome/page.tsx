@@ -1,7 +1,7 @@
 'use client';
 
 import { Welcome } from '@/features/welcome/components/welcome';
-import { useWelcomeStore } from '@/features/welcome/welcome.store';
+import { useWelcome } from '@/features/welcome/welcome.hook';
 
 export default function WelcomePage() {
   const {
@@ -10,7 +10,7 @@ export default function WelcomePage() {
     playerName,
     submitPlayerName,
     updatePlayerName,
-  } = useWelcomeStore();
+  } = useWelcome();
 
   return (
     <Welcome

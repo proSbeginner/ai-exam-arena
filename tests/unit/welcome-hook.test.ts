@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   normalizePlayerName,
   validatePlayerName,
-} from '@/features/welcome/welcome.store';
+} from '@/features/welcome/welcome.hook';
 
 describe('player-name rules', () => {
   it('normalizes whitespace and lowercase input to uppercase', () => {

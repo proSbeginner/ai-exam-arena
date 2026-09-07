@@ -1,8 +1,8 @@
 'use client';
 
 import { QuizSetup } from '@/features/quiz/components/quiz-setup';
-import { useQuizSetupStore } from '@/features/quiz/quiz-setup.store';
+import { useQuizSetup } from '@/features/quiz/quiz-setup.hook';
 
 export default function QuizSetupPage() {
-  return <QuizSetup {...useQuizSetupStore()} />;
+  return <QuizSetup {...useQuizSetup()} />;
 }

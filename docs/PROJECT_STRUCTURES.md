@@ -17,8 +17,8 @@ features/quiz/
 ├── quiz.assets.ts
 ├── quiz.constants.ts
 ├── quiz.logic.ts
-├── quiz.store.ts
-└── quiz-setup.store.ts
+├── quiz.hook.ts
+└── quiz-setup.hook.ts
 
 mock-api/quiz/
 ├── mock-questions.ts
@@ -44,7 +44,7 @@ mock-api/quiz/
 ## Request flow
 
 ```text
-quiz.store
+quiz.hook
   → features/quiz/services/quiz.api.ts
   → /api/quiz/questions
   → server/providers/quiz.provider.ts

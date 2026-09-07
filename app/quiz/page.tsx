@@ -1,7 +1,7 @@
 'use client';
 
 import { Quiz } from '@/features/quiz/components/quiz';
-import { useQuizStore } from '@/features/quiz/quiz.store';
+import { useQuiz } from '@/features/quiz/quiz.hook';
 
 export default function QuizPage() {
   const {
@@ -28,7 +28,7 @@ export default function QuizPage() {
     retryQuestionLoad,
     selectedAnswer,
     sympathyIdx,
-  } = useQuizStore();
+  } = useQuiz();
 
   return (
     <Quiz

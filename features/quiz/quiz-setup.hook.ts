@@ -11,7 +11,7 @@ import type { ExamQuestion, QuizMode, QuizSetup } from './quiz.types';
 
 export const QUIZ_SETUP_STORAGE_KEY = 'aws-ai-cert:quiz-setup';
 
-interface QuizSetupStore {
+interface QuizSetupHook {
   availableQuestionCount: number;
   error: string | null;
   isLoading: boolean;
@@ -82,7 +82,7 @@ export function subscribeToQuizSetup(listener: () => void): () => void {
   };
 }
 
-export function useQuizSetupStore(): QuizSetupStore {
+export function useQuizSetup(): QuizSetupHook {
   const router = useRouter();
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
   const [selectedMode, setSelectedMode] = useState<QuizMode>('university');

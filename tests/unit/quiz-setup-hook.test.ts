@@ -4,7 +4,7 @@ import {
   clearQuizSetup,
   getStoredQuizSetup,
   saveQuizSetup,
-} from '@/features/quiz/quiz-setup.store';
+} from '@/features/quiz/quiz-setup.hook';
 
 describe('quiz setup storage snapshot', () => {
   beforeEach(() => {

@@ -11,12 +11,12 @@ import type { ExamQuestion } from './quiz.types';
 import {
   getStoredQuizSetup,
   subscribeToQuizSetup,
-} from './quiz-setup.store';
+} from './quiz-setup.hook';
 import {
   clearPlayerName,
   getStoredPlayerName,
   subscribeToPlayerName,
-} from '@/features/welcome/welcome.store';
+} from '@/features/welcome/welcome.hook';
 
 import {
   createInitialQuizState,
@@ -36,7 +36,7 @@ function pickRandomIndex(length: number): number {
   return randomValues[0] % length;
 }
 
-export function useQuizStore() {
+export function useQuiz() {
   const playerName = useSyncExternalStore(
     subscribeToPlayerName,
     getStoredPlayerName,
@@ -200,4 +200,4 @@ export function useQuizStore() {
   };
 }
 
-export type QuizStore = ReturnType<typeof useQuizStore>;
+export type QuizHook = ReturnType<typeof useQuiz>;
