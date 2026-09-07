@@ -13,3 +13,6 @@ export const SYMPATHY_MESSAGES = [
   'อย่าเพิ่งท้อ! ผิดคือการเรียนรู้ 📚',
   'แง่ว... ข้อนี้หลายคนพลาดเหมือนกัน 🤗',
 ];
+
+export const PASSED_MESSAGE = 'เย้! ผ่านแล้ว เก่งมากเลยนะ 🎉';
+export const FAILED_MESSAGE = 'เกือบแล้วนะ ลองทบทวนแล้วกลับมาใหม่ได้เลย 💪';

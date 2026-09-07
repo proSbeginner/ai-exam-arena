@@ -5,6 +5,13 @@ interface AttemptResponse {
   attempt: QuizAttemptRecord | null;
 }
 
+export function serializeQuizState(state: QuizState) {
+  return {
+    ...state,
+    answeredMap: Object.fromEntries(state.answeredMap),
+  };
+}
+
 async function parseResponse(response: Response): Promise<AttemptResponse> {
   if (!response.ok) {
     const payload = (await response.json()) as { error?: { message?: string } };
@@ -28,7 +35,7 @@ export async function createQuizAttempt(
   const response = await fetch('/api/quiz/attempts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playerId, playerName, setup, questionIds, state }),
+    body: JSON.stringify({ playerId, playerName, setup, questionIds, state: serializeQuizState(state) }),
   });
   return (await parseResponse(response)).attempt as QuizAttemptRecord;
 }
@@ -37,7 +44,7 @@ export async function updateQuizAttempt(attemptId: string, state: QuizState): Pr
   const response = await fetch(`/api/quiz/attempts/${attemptId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ state }),
+    body: JSON.stringify({ state: serializeQuizState(state) }),
   });
   return (await parseResponse(response)).attempt as QuizAttemptRecord;
 }

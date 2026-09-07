@@ -7,8 +7,10 @@ interface LeaderboardResponse {
   mode: QuizMode;
 }
 
-export async function getLeaderboard(mode: QuizMode): Promise<LeaderboardEntry[]> {
-  const response = await fetch(`/api/leaderboard?mode=${mode}`, { cache: 'no-store' });
+export async function getLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardEntry[]> {
+  const params = new URLSearchParams({ mode });
+  if (playerId) params.set('playerId', playerId);
+  const response = await fetch(`/api/leaderboard?${params.toString()}`, { cache: 'no-store' });
 
   if (!response.ok) {
     throw new Error('ไม่สามารถโหลด leaderboard ได้ในขณะนี้');

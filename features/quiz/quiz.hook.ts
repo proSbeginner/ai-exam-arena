@@ -37,6 +37,8 @@ import {
 } from './services/quiz-attempt.api';
 import {
   clearQuizProgress,
+  clearQuizReviewAttemptId,
+  getStoredQuizReviewAttemptId,
   getStoredQuizProgress,
   saveQuizProgress,
 } from './quiz-progress.storage';
@@ -133,6 +135,9 @@ export function useQuiz() {
           && attempt.questionIds.every((questionId) => selectedQuestions.some((question) => question.id === questionId))
           ? attempt
           : null;
+        const reviewAttemptId = getStoredQuizReviewAttemptId();
+        const shouldReviewAttempt = Boolean(matchingAttempt && matchingAttempt.id === reviewAttemptId);
+        if (shouldReviewAttempt) clearQuizReviewAttemptId();
         const attemptQuestions = matchingAttempt
           ? matchingAttempt.questionIds
               .map((questionId) => selectedQuestions.find((question) => question.id === questionId))
@@ -141,11 +146,15 @@ export function useQuiz() {
 
         setQuestions(attemptQuestions);
         setAttemptId(matchingAttempt?.id ?? null);
-        setQuestionLoadStatus(attemptQuestions.length === 0 ? 'empty' : 'ready');
 
-        if (matchingAttempt && matchingAttempt.state.attemptStatus !== ATTEMPT_STATUS.COMPLETED) {
+        if (matchingAttempt && (matchingAttempt.state.attemptStatus !== ATTEMPT_STATUS.COMPLETED || shouldReviewAttempt)) {
           setQuizState({
             ...matchingAttempt.state,
+            currentQIndex: shouldReviewAttempt ? 0 : matchingAttempt.state.currentQIndex,
+            mood: shouldReviewAttempt ? 'idle' : matchingAttempt.state.mood,
+            gameOver: shouldReviewAttempt ? false : matchingAttempt.state.gameOver,
+            summaryVisible: shouldReviewAttempt ? false : matchingAttempt.state.summaryVisible,
+            attemptStatus: shouldReviewAttempt ? ATTEMPT_STATUS.ACTIVE : matchingAttempt.state.attemptStatus,
             answeredMap: new Map(Object.entries(matchingAttempt.state.answeredMap).map(([index, answer]) => [Number(index), answer])),
           });
         } else if (storedProgress) {
@@ -154,11 +163,13 @@ export function useQuiz() {
           setQuizState(createInitialQuizState());
         }
 
-        if (playerId && playerName && quizSetup && (!matchingAttempt || matchingAttempt.state.attemptStatus === ATTEMPT_STATUS.COMPLETED)) {
+        if (playerId && playerName && quizSetup && (!matchingAttempt || (matchingAttempt.state.attemptStatus === ATTEMPT_STATUS.COMPLETED && !shouldReviewAttempt))) {
           const newAttempt = await createQuizAttempt(playerId, playerName, quizSetup, attemptQuestions.map((question) => question.id), createInitialQuizState());
           setAttemptId(newAttempt.id);
           setQuizState(createInitialQuizState());
         }
+
+        setQuestionLoadStatus(attemptQuestions.length === 0 ? 'empty' : 'ready');
       } catch {
         if (!isCurrentRequest) return;
 

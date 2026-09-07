@@ -8,7 +8,7 @@ import { MOOD_IMAGES } from '../quiz.assets';
 import { ATTEMPT_STATUS } from '../quiz.constants';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
-import { QuizRestartDialog } from './quiz-restart-dialog';
+import { QuizRestartDialog } from '@/features/shared/components/quiz-restart-dialog';
 import { QuizResultSummary } from './quiz-result-summary';
 import { APP_ROUTES } from '@/features/shared/routes';
 

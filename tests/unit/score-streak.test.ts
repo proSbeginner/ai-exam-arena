@@ -219,6 +219,17 @@ describe('goToPrev', () => {
   });
 });
 
+describe('getNextQuestion navigation', () => {
+  it('moves to the next question before showing the summary when answers are complete', () => {
+    const state = makeState({ currentQIndex: 0, answeredMap: new Map([[0, 'option-a'], [1, 'option-b']]) });
+
+    expect(getNextQuestion(state, 2)).toMatchObject({
+      currentQIndex: 1,
+      gameOver: false,
+    });
+  });
+});
+
 describe('restartGame', () => {
   it('resets everything to initial state', () => {
     const reset = createInitialQuizState();

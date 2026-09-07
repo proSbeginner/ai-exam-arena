@@ -5,10 +5,12 @@ import type { LeaderboardEntry } from '@/features/leaderboard/leaderboard.types'
 import { DataSourceConfigError, getDataSource } from './data-source';
 
 export interface LeaderboardProvider {
-  getLeaderboard(mode: QuizMode): Promise<LeaderboardEntry[]>;
+  getLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardEntry[]>;
 }
 
-async function getSupabaseLeaderboard(): Promise<LeaderboardEntry[]> {
+async function getSupabaseLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardEntry[]> {
+  void mode;
+  void playerId;
   throw new DataSourceConfigError(
     'The Supabase leaderboard provider is not configured yet.',
     'SUPABASE_PROVIDER_NOT_READY',

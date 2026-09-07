@@ -93,19 +93,19 @@ export function getNextQuestion(
   state: QuizState,
   questionCount: number,
 ): NextQuestionResult {
-  if (state.answeredMap.size >= questionCount) {
-    return {
-      currentQIndex: state.currentQIndex,
-      gameOver: true,
-      mood: state.score >= Math.ceil(questionCount / 2) ? 'passed' : 'failed',
-    };
-  }
-
   if (state.currentQIndex < questionCount - 1) {
     return {
       currentQIndex: state.currentQIndex + 1,
       gameOver: false,
       mood: 'idle',
+    };
+  }
+
+  if (state.answeredMap.size >= questionCount) {
+    return {
+      currentQIndex: state.currentQIndex,
+      gameOver: true,
+      mood: state.score >= Math.ceil(questionCount / 2) ? 'passed' : 'failed',
     };
   }
 

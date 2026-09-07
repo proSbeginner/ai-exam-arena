@@ -8,6 +8,7 @@ const entry = (overrides: Partial<LeaderboardEntry>): LeaderboardEntry => ({
   playerName: 'PLAYER',
   mode: 'university',
   answeredCount: 1,
+  questionCount: 1,
   correctCount: 1,
   accuracy: 100,
   attemptStatus: 'completed',

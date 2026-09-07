@@ -28,7 +28,6 @@ features/quiz/
 │   ├── hold-to-answer-button.tsx
 │   ├── quiz-result.tsx
 │   ├── quiz-result-summary.tsx
-│   ├── quiz-restart-dialog.tsx
 │   ├── quiz.tsx
 │   ├── quiz-loading-skeleton.tsx
 │   ├── quiz-notice.tsx
@@ -52,6 +51,18 @@ mock-api/quiz/
 ├── mock-questions.ts
 └── questions.mock.ts
 ```
+
+## Approved shared component structure
+
+```text
+features/shared/
+├── components/
+│   ├── quiz-restart-dialog.tsx
+│   └── text-input.tsx
+└── routes.ts
+```
+
+Shared components are UI primitives used by more than one feature. Feature-specific state and actions remain in the owning feature and are passed into shared components as props.
 
 ## Approved leaderboard feature structure
 

@@ -1,6 +1,7 @@
 import type { QuizSetup, QuizState } from './quiz.types';
 
 export const QUIZ_PROGRESS_STORAGE_KEY = 'aws-ai-cert:quiz-progress';
+export const QUIZ_REVIEW_ATTEMPT_STORAGE_KEY = 'aws-ai-cert:quiz-review-attempt';
 
 interface StoredQuizProgress {
   playerName: string;
@@ -86,4 +87,17 @@ export function saveQuizProgress(
 
 export function clearQuizProgress(): void {
   window.sessionStorage.removeItem(QUIZ_PROGRESS_STORAGE_KEY);
+}
+
+export function saveQuizReviewAttemptId(attemptId: string): void {
+  window.sessionStorage.setItem(QUIZ_REVIEW_ATTEMPT_STORAGE_KEY, attemptId);
+}
+
+export function getStoredQuizReviewAttemptId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return window.sessionStorage.getItem(QUIZ_REVIEW_ATTEMPT_STORAGE_KEY);
+}
+
+export function clearQuizReviewAttemptId(): void {
+  window.sessionStorage.removeItem(QUIZ_REVIEW_ATTEMPT_STORAGE_KEY);
 }

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useCallback, useRef, type CSSProperties, type TouchEvent } from 'react';
 
 import { MOOD_IMAGES } from '../quiz.assets';
-import { CHEER_MESSAGES, SYMPATHY_MESSAGES } from '../quiz.content';
+import { CHEER_MESSAGES, FAILED_MESSAGE, PASSED_MESSAGE, SYMPATHY_MESSAGES } from '../quiz.content';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
 import { QuizProgress } from './quiz-progress';
@@ -183,6 +183,8 @@ export function QuizActive({
             {quizState.mood === 'idle' && `พร้อมแล้วนะ ${playerName}~! 💖`}
             {quizState.mood === 'correct' && CHEER_MESSAGES[cheerIdx]}
             {quizState.mood === 'wrong' && SYMPATHY_MESSAGES[sympathyIdx]}
+            {quizState.mood === 'passed' && PASSED_MESSAGE}
+            {quizState.mood === 'failed' && FAILED_MESSAGE}
           </div>
         </div>
 

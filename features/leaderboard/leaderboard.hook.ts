@@ -7,7 +7,7 @@ import type { QuizMode } from '@/features/quiz/quiz.types';
 import { getLeaderboard } from './services/leaderboard.api';
 import type { LeaderboardEntry } from './leaderboard.types';
 
-export function useLeaderboard(mode: QuizMode) {
+export function useLeaderboard(mode: QuizMode, playerId: string | null) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +15,7 @@ export function useLeaderboard(mode: QuizMode) {
   useEffect(() => {
     let isCurrentRequest = true;
 
-    void getLeaderboard(mode)
+    void getLeaderboard(mode, playerId ?? undefined)
       .then((nextEntries) => {
         if (isCurrentRequest) setEntries(nextEntries);
       })
@@ -29,7 +29,7 @@ export function useLeaderboard(mode: QuizMode) {
     return () => {
       isCurrentRequest = false;
     };
-  }, [mode]);
+  }, [mode, playerId]);
 
   return { entries, error, isLoading };
 }

@@ -7,6 +7,7 @@ const modes = new Set<QuizMode>(['primary', 'secondary', 'university']);
 
 export async function GET(request: Request) {
   const mode = new URL(request.url).searchParams.get('mode') as QuizMode | null;
+  const playerId = new URL(request.url).searchParams.get('playerId') ?? undefined;
 
   if (!mode || !modes.has(mode)) {
     return Response.json(
@@ -16,7 +17,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const leaderboard = await getLeaderboardProvider().getLeaderboard(mode);
+    const leaderboard = await getLeaderboardProvider().getLeaderboard(mode, playerId);
     return Response.json({ leaderboard, mode });
   } catch (error) {
     if (error instanceof MockApiError) {
