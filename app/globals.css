@@ -87,11 +87,6 @@ body {
   100% { transform: translate(var(--dx, 0px), 110vh) rotate(var(--rot, 720deg)); opacity: 0; }
 }
 
-@keyframes shine {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
 .animate-pop { animation: pop 0.45s ease-out both; }
 .animate-shake { animation: shake 0.5s ease-in-out both; }
 .animate-floaty { animation: floaty 3s ease-in-out infinite; }
@@ -123,15 +118,4 @@ body {
   height: 16px;
   border-radius: 3px;
   animation: confetti-fall linear both;
-}
-
-.story-shine {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.8) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  background-size: 200% auto;
-  animation: shine 1.8s linear infinite;
 }
