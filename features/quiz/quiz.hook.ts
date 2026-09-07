@@ -209,7 +209,11 @@ export function useQuiz() {
   }, [persistProgress, quizState]);
 
   const resumeQuiz = useCallback(() => {
-    if (!quizState.summaryVisible || quizState.gameOver) return;
+    if (
+      !quizState.summaryVisible ||
+      quizState.gameOver ||
+      quizState.attemptStatus === 'completed'
+    ) return;
 
     const nextState: QuizState = {
       ...quizState,
