@@ -24,6 +24,8 @@ interface QuizSetupStore {
 }
 
 const listeners = new Set<() => void>();
+let cachedQuizSetup: QuizSetup | null = null;
+let cachedQuizSetupStorageValue: string | null | undefined;
 
 function notifyListeners(): void {
   listeners.forEach((listener) => listener());
@@ -33,7 +35,14 @@ export function getStoredQuizSetup(): QuizSetup | null {
   if (typeof window === 'undefined') return null;
 
   const storedSetup = window.sessionStorage.getItem(QUIZ_SETUP_STORAGE_KEY);
-  if (!storedSetup) return null;
+  if (storedSetup === cachedQuizSetupStorageValue) return cachedQuizSetup;
+
+  cachedQuizSetupStorageValue = storedSetup;
+
+  if (!storedSetup) {
+    cachedQuizSetup = null;
+    return cachedQuizSetup;
+  }
 
   try {
     const parsedSetup = JSON.parse(storedSetup) as Partial<QuizSetup>;
@@ -41,13 +50,16 @@ export function getStoredQuizSetup(): QuizSetup | null {
       (parsedSetup.mode === 'primary' || parsedSetup.mode === 'secondary' || parsedSetup.mode === 'university') &&
       (parsedSetup.questionLimit === null || typeof parsedSetup.questionLimit === 'number')
     ) {
-      return parsedSetup as QuizSetup;
+      cachedQuizSetup = parsedSetup as QuizSetup;
+      return cachedQuizSetup;
     }
   } catch {
-    return null;
+    cachedQuizSetup = null;
+    return cachedQuizSetup;
   }
 
-  return null;
+  cachedQuizSetup = null;
+  return cachedQuizSetup;
 }
 
 export function saveQuizSetup(setup: QuizSetup): void {
