@@ -100,7 +100,6 @@ export function Quiz({
     return <QuizLoadingSkeleton />;
   }
 
-  questionLoadStatus = 'error';
   if (questionLoadStatus === 'error') {
     return (
       <QuizNotice
