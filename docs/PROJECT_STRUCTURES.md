@@ -83,6 +83,21 @@ mock-api/leaderboard/
 └── mock-leaderboard.ts
 ```
 
+## Approved admin feature structure
+
+```text
+features/admin/
+├── components/
+│   └── admin.tsx
+├── services/
+│   └── admin.api.ts
+├── admin.logic.ts
+└── admin.types.ts
+
+mock-api/quiz/
+└── mock-admin-questions.ts
+```
+
 ## Data ownership
 
 | Current export | Target location | Responsibility |

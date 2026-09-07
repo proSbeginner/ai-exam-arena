@@ -1,0 +1,81 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+
+import { TextInput } from '@/features/shared/components/text-input';
+import type { ExamQuestion, QuizMode, QuizOption, QuestionStatus } from '@/features/quiz/quiz.types';
+import type { AdminQuestionFormState } from '../admin.types';
+import { validateAdminQuestion } from '../admin.logic';
+import {
+  createAdminQuestion,
+  deleteAdminQuestion,
+  getAdminQuestions,
+  getStoredAdminEmail,
+  saveAdminEmail,
+  updateAdminQuestion,
+} from '../services/admin.api';
+
+const emptyForm: AdminQuestionFormState = {
+  mode: 'university', topic: '', english: '', thai_drama: '',
+  options: [{ id: 'option-a', english: '', thai_drama: '' }, { id: 'option-b', english: '', thai_drama: '' }],
+  correctOptionId: 'option-a', hint_keyword: '', funFact: '', chapter: '',
+  sourceName: '', sourceUrl: '', sourceReference: '', status: 'draft',
+};
+
+function AdminField({ label, required = false, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="mb-1 text-sm font-bold text-gray-600">
+        {label}{required && <span className="ml-1 text-pink-500" aria-hidden>*</span>}
+      </p>
+      {children}
+    </div>
+  );
+}
+
+function toInput(question: ExamQuestion): AdminQuestionFormState {
+  return { ...emptyForm, ...question, funFact: question.funFact ?? '', chapter: question.chapter ?? '', sourceName: question.source?.name ?? '', sourceUrl: question.source?.url ?? '', sourceReference: question.source?.reference ?? '' };
+}
+
+function toPayload(form: AdminQuestionFormState) {
+  const options = form.options.filter((option) => option.english.trim() || option.thai_drama.trim());
+  return { mode: form.mode, topic: form.topic, english: form.english, thai_drama: form.thai_drama, options, correctOptionId: form.correctOptionId, hint_keyword: form.hint_keyword, funFact: form.funFact || undefined, chapter: form.chapter || undefined, status: form.status, source: form.sourceName ? { name: form.sourceName, url: form.sourceUrl || undefined, reference: form.sourceReference || undefined } : undefined };
+}
+
+export function Admin() {
+  const [email, setEmail] = useState(getStoredAdminEmail());
+  const [questions, setQuestions] = useState<ExamQuestion[]>([]);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  const loadQuestions = async () => {
+    setIsLoading(true); setError(null);
+    try { setQuestions(await getAdminQuestions(email)); setIsAuthorized(true); saveAdminEmail(email); }
+    catch (loadError) { setIsAuthorized(false); setError(loadError instanceof Error ? loadError.message : 'ไม่สามารถโหลดคำถามได้'); }
+    finally { setIsLoading(false); }
+  };
+
+  const formError = useMemo(() => validateAdminQuestion(toPayload(form)), [form]);
+  const updateForm = <K extends keyof AdminQuestionFormState>(key: K, value: AdminQuestionFormState[K]) => setForm((current) => ({ ...current, [key]: value }));
+  const updateOption = (index: number, key: keyof QuizOption, value: string) => setForm((current) => ({ ...current, options: current.options.map((option, optionIndex) => optionIndex === index ? { ...option, [key]: value } : option) }));
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault(); if (formError) { setError(formError); return; }
+    setIsLoading(true); setError(null);
+    try {
+      const payload = toPayload(form);
+      if (editingId) await updateAdminQuestion(email, editingId, payload);
+      else await createAdminQuestion(email, payload);
+      setForm(emptyForm); setEditingId(null); await loadQuestions();
+    } catch (submitError) { setError(submitError instanceof Error ? submitError.message : 'ไม่สามารถบันทึกคำถามได้'); setIsLoading(false); }
+  };
+
+  const remove = async (id: string) => { if (!window.confirm('ยืนยันการลบคำถามนี้หรือไม่?')) return; setIsLoading(true); try { await deleteAdminQuestion(email, id); await loadQuestions(); } catch (removeError) { setError(removeError instanceof Error ? removeError.message : 'ไม่สามารถลบคำถามได้'); setIsLoading(false); } };
+
+  if (!isAuthorized) return <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-4"><form onSubmit={(event) => { event.preventDefault(); void loadQuestions(); }} className="w-full max-w-md space-y-5 rounded-3xl bg-white p-8 shadow-xl"><h1 className="text-2xl font-black text-gray-800">Admin Question Bank</h1><p className="text-sm text-gray-500">กรุณาระบุ Admin email</p><TextInput id="admin-email" name="adminEmail" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="ADMIN_EMAIL" error={error} /><button type="submit" disabled={isLoading} className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white disabled:opacity-50">{isLoading ? 'กำลังตรวจสอบ...' : 'เข้าสู่ Admin'}</button></form></main>;
+
+  return <main className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-4 sm:p-8"><section className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[1fr_1.15fr]"><form onSubmit={submit} className="space-y-4 rounded-3xl bg-white p-6 shadow-xl"><div className="flex items-center justify-between"><h1 className="text-2xl font-black text-gray-800">เพิ่มคำถาม</h1><button type="button" onClick={() => { setForm(emptyForm); setEditingId(null); }} className="cursor-pointer text-sm font-bold text-purple-500">ล้างฟอร์ม</button></div>{error && <p className="rounded-lg bg-red-50 p-2 text-sm text-red-500">{error}</p>}<div className="grid grid-cols-2 gap-3"><label className="text-sm font-bold text-gray-600">โหมด<select value={form.mode} onChange={(event) => updateForm('mode', event.target.value as QuizMode)} className="mt-1 w-full rounded-xl border border-gray-200 p-3"><option value="primary">ปฐม</option><option value="secondary">มัธยม</option><option value="university">มหาลัย 🔥</option></select></label><label className="text-sm font-bold text-gray-600">สถานะ<select value={form.status} onChange={(event) => updateForm('status', event.target.value as QuestionStatus)} className="mt-1 w-full rounded-xl border border-gray-200 p-3"><option value="draft">Draft</option><option value="published">Published</option></select></label></div><AdminField label="Topic" required><TextInput id="admin-topic" name="topic" value={form.topic} onChange={(event) => updateForm('topic', event.target.value)} placeholder="Topic" /></AdminField><AdminField label="Question (English)" required><TextInput id="admin-english" name="english" value={form.english} onChange={(event) => updateForm('english', event.target.value)} placeholder="Question (English)" /></AdminField><AdminField label="แปลไทยสไตล์จีซู"><TextInput id="admin-thai" name="thaiDrama" value={form.thai_drama} onChange={(event) => updateForm('thai_drama', event.target.value)} placeholder="แปลไทยสไตล์จีซู" /></AdminField><div className="space-y-3"><p className="text-sm font-bold text-gray-600">ตัวเลือก <span className="font-normal text-gray-400">(English บังคับ / ไทยไม่บังคับ)</span></p>{form.options.map((option, index) => <div key={option.id} className="rounded-xl border border-purple-100 p-3"><label className="flex items-center gap-2 text-xs font-bold text-purple-600"><input type="radio" name="correctOption" checked={form.correctOptionId === option.id} onChange={() => updateForm('correctOptionId', option.id)} /> คำตอบที่ถูกต้อง</label><input value={option.english} onChange={(event) => updateOption(index, 'english', event.target.value)} placeholder={`Option ${index + 1} English *`} className="mt-2 w-full rounded-lg border border-gray-200 p-2 text-sm" /><input value={option.thai_drama} onChange={(event) => updateOption(index, 'thai_drama', event.target.value)} placeholder={`Option ${index + 1} ไทย (ไม่บังคับ)`} className="mt-2 w-full rounded-lg border border-gray-200 p-2 text-sm" />{form.options.length > 2 && <button type="button" onClick={() => setForm((current) => ({ ...current, options: current.options.filter((_, optionIndex) => optionIndex !== index) }))} className="mt-2 cursor-pointer text-xs text-red-400">ลบตัวเลือก</button>}</div>)}<button type="button" onClick={() => setForm((current) => ({ ...current, options: [...current.options, { id: `option-${current.options.length + 1}`, english: '', thai_drama: '' }] }))} className="cursor-pointer text-sm font-bold text-purple-500">+ เพิ่มตัวเลือก</button></div><AdminField label="Hint keyword"><TextInput id="admin-hint" name="hint" value={form.hint_keyword} onChange={(event) => updateForm('hint_keyword', event.target.value)} placeholder="Hint keyword" /></AdminField><AdminField label="แหล่งอ้างอิง"><TextInput id="admin-source" name="source" value={form.sourceName} onChange={(event) => updateForm('sourceName', event.target.value)} placeholder="แหล่งอ้างอิง" /></AdminField><button type="submit" disabled={isLoading} className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white disabled:opacity-50">{editingId ? 'บันทึกการแก้ไข' : 'เพิ่มคำถาม'}</button></form><section className="rounded-3xl bg-white p-6 shadow-xl"><div className="mb-4 flex items-center justify-between"><h2 className="text-2xl font-black text-gray-800">คลังคำถาม ({questions.length})</h2><button type="button" onClick={() => void loadQuestions()} className="cursor-pointer text-sm font-bold text-purple-500">รีเฟรช</button></div><div className="max-h-[75vh] space-y-3 overflow-y-auto">{questions.map((question) => <article key={question.id} className="rounded-2xl border border-purple-100 p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold text-purple-500">{question.mode} · {question.status}</p><h3 className="font-bold text-gray-800">{question.english}</h3></div><div className="flex gap-2"><button type="button" onClick={() => { setEditingId(question.id); setForm(toInput(question)); }} className="cursor-pointer text-xs font-bold text-purple-500">แก้ไข</button><button type="button" onClick={() => void remove(question.id)} className="cursor-pointer text-xs font-bold text-red-400">ลบ</button></div></div><p className="mt-2 text-xs text-gray-500">{question.topic} · {question.options.length} ตัวเลือก</p></article>)}</div></section></section></main>;
+}
