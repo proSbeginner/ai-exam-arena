@@ -98,6 +98,32 @@ mock-api/quiz/
 └── mock-admin-questions.ts
 ```
 
+## Approved database structure
+
+```text
+server/
+├── database/
+│   ├── types.ts
+│   └── transformers/
+│       ├── question.transform.ts
+│       ├── attempt.transform.ts
+│       ├── player.transform.ts
+│       └── leaderboard.transform.ts
+└── providers/
+    └── ...
+
+supabase/
+├── client.ts
+└── migrations/
+    ├── 0001_initial_schema.sql
+    ├── 0002_add_attempt_state.sql
+    └── 0003_grant_server_provider_access.sql
+```
+
+The database design is documented in [`docs/DATABASE_SCHEMA.md`](./DATABASE_SCHEMA.md). Supabase migrations are the source of truth for production database structure; mock providers remain available for local development and tests.
+
+`server/database/types.ts` describes database-shaped rows. Transformers convert those rows into the application models used by features, so feature code does not depend on Supabase column names or nested relation shapes. Provider files are responsible for choosing a data source and making requests; they do not own cross-provider model conversion.
+
 ## Data ownership
 
 | Current export | Target location | Responsibility |
@@ -163,5 +189,7 @@ The map is keyed by `playerId` and quiz mode, and contains the attempt state, se
 - `features/` owns feature-specific UI, state, domain logic, types, and content.
 - `services/` owns calls to external APIs.
 - `server/providers/` selects the data source for API routes.
+- `server/database/` owns database row types and database-to-application transformers.
+- `supabase/` owns the Supabase REST client and migrations.
 - `mock-api/` owns mock providers and mock fixtures.
 - The root `data/` directory should not be used for mixed feature data and will be removed after the approved migration.
