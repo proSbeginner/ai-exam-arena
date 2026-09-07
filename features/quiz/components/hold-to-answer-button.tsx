@@ -9,6 +9,7 @@ interface HoldToAnswerButtonProps {
   className: string;
   disabled?: boolean;
   onConfirm: () => void;
+  testId?: string;
 }
 
 export function HoldToAnswerButton({
@@ -16,6 +17,7 @@ export function HoldToAnswerButton({
   className,
   disabled = false,
   onConfirm,
+  testId,
 }: HoldToAnswerButtonProps) {
   const gradientId = `hold-answer-rainbow-${useId().replace(/:/g, '')}`;
   const [progress, setProgress] = useState(0);
@@ -62,6 +64,8 @@ export function HoldToAnswerButton({
     <button
       type="button"
       className={`relative cursor-pointer select-none overflow-visible disabled:cursor-not-allowed ${className}`}
+      data-hold-duration-ms={HOLD_DURATION_MS}
+      data-testid={testId}
       disabled={disabled}
       onPointerCancel={clearHold}
       onPointerDown={startHold}

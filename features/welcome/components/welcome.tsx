@@ -25,7 +25,10 @@ export function Welcome({
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-50 px-4">
+    <div
+      data-testid="welcome-screen"
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-50 px-4"
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-5"

@@ -33,7 +33,10 @@ export function QuizResult({
   const percentage = questions.length > 0 ? Math.round((quizState.score / questions.length) * 100) : 0;
 
   return (
-    <main className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans">
+    <main
+      data-testid="quiz-result"
+      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
+    >
       <div className="relative z-10 flex w-full max-w-lg items-center justify-center">
         <div className="relative isolate w-full space-y-4 rounded-3xl bg-white/60 p-8 text-center shadow-2xl backdrop-blur-xl animate-bounce-in">
           <Image
@@ -49,7 +52,10 @@ export function QuizResult({
             <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
           </div>
           <div className="relative z-10 h-40" aria-hidden />
-          <div className="relative z-10 space-y-1 rounded-2xl border-2 border-pink-400/70 bg-transparent backdrop-blur-sm animate-stamp-in">
+          <div
+            data-testid="quiz-summary-stamp"
+            className="relative z-10 space-y-1 rounded-2xl border-2 border-pink-400/70 bg-transparent backdrop-blur-sm animate-stamp-in"
+          >
             <h1 className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-3xl font-extrabold text-transparent drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">
               {isCompleted ? (passed ? '🎉 PASSED!' : '😭 TRY AGAIN') : 'สรุปผลการทำข้อสอบ'}
             </h1>

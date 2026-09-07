@@ -141,6 +141,7 @@ export function QuizActive({
   return (
     <div
       {...swipe}
+      data-testid="quiz-active"
       className="relative flex min-h-screen touch-pan-y flex-col items-center justify-between overflow-x-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
     >
       <ConfettiBurst burstKey={confettiKey} />
@@ -208,6 +209,7 @@ export function QuizActive({
                   key={index}
                   onConfirm={() => answerQuestion(option.id)}
                   disabled={hasAnsweredCurrentQuestion}
+                  testId={`answer-option-${option.id}`}
                   className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left transition-all ${
                     hasAnsweredCurrentQuestion && isCorrectOption
                       ? 'border-green-400 bg-green-50'
