@@ -69,6 +69,7 @@ export function Welcome({
             value={playerName}
             onChange={(event) => updatePlayerName(event.target.value)}
             placeholder="PLAYER_NAME"
+            className="bg-white/70"
             autoComplete="off"
             error={error}
             hint="ใช้ A–Z และ _ เท่านั้น"
