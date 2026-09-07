@@ -5,6 +5,8 @@ import {
   getNextQuestion,
   getPreviousQuestion,
   getRank,
+  randomizeQuestionOptions,
+  randomizeQuizQuestions,
 } from '@/features/quiz/quiz.logic';
 import { RANKS } from '@/features/quiz/quiz.constants';
 import type { QuizState } from '@/features/quiz/quiz.types';
@@ -47,6 +49,30 @@ describe('getRank', () => {
   ])('score %d → %s (%s)', (score, expected) => {
     const rank = getRank(score);
     expect(rank).toEqual(expected);
+  });
+});
+
+describe('randomizeQuestionOptions', () => {
+  it('keeps every option and changes the original order', () => {
+    const randomized = randomizeQuestionOptions([questions[0]])[0];
+    const originalIds = questions[0].options.map((option) => option.id);
+    const randomizedIds = randomized.options.map((option) => option.id);
+
+    expect(randomizedIds).toHaveLength(originalIds.length);
+    expect(new Set(randomizedIds)).toEqual(new Set(originalIds));
+    expect(randomizedIds).not.toEqual(originalIds);
+    expect(randomized.correctOptionId).toBe(questions[0].correctOptionId);
+  });
+});
+
+describe('randomizeQuizQuestions', () => {
+  it('changes question order while keeping every question', () => {
+    const randomized = randomizeQuizQuestions(questions);
+    const originalIds = questions.map((question) => question.id);
+    const randomizedIds = randomized.map((question) => question.id);
+
+    expect(new Set(randomizedIds)).toEqual(new Set(originalIds));
+    expect(randomizedIds).not.toEqual(originalIds);
   });
 });
 

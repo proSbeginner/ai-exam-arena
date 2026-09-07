@@ -18,19 +18,24 @@ interface StoredQuizProgress {
   };
 }
 
+export interface QuizProgressSnapshot {
+  questionIds: string[];
+  state: QuizState;
+}
+
 function isSameSetup(first: QuizSetup, second: QuizSetup): boolean {
   return first.mode === second.mode && first.questionLimit === second.questionLimit;
 }
 
 function isSameQuestionSet(first: string[], second: string[]): boolean {
-  return first.length === second.length && first.every((questionId, index) => questionId === second[index]);
+  return first.length === second.length && first.every((questionId) => second.includes(questionId));
 }
 
 export function getStoredQuizProgress(
   playerName: string,
   setup: QuizSetup,
   questionIds: string[],
-): QuizState | null {
+): QuizProgressSnapshot | null {
   if (typeof window === 'undefined') return null;
 
   const storedProgress = window.sessionStorage.getItem(QUIZ_PROGRESS_STORAGE_KEY);
@@ -47,10 +52,13 @@ export function getStoredQuizProgress(
     }
 
     return {
-      ...parsedProgress.state,
-      answeredMap: new Map(
-        Object.entries(parsedProgress.state.answeredMap).map(([index, answer]) => [Number(index), answer]),
-      ),
+      questionIds: parsedProgress.questionIds,
+      state: {
+        ...parsedProgress.state,
+        answeredMap: new Map(
+          Object.entries(parsedProgress.state.answeredMap).map(([index, answer]) => [Number(index), answer]),
+        ),
+      },
     };
   } catch {
     return null;

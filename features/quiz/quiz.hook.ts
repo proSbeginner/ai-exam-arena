@@ -24,6 +24,7 @@ import {
   getNextQuestion,
   getPreviousQuestion,
   getRank,
+  randomizeQuizQuestions,
 } from './quiz.logic';
 import { getQuizQuestions } from './services/quiz.api';
 import {
@@ -95,17 +96,26 @@ export function useQuiz() {
         const selectedQuestions = quizSetup?.questionLimit
           ? modeQuestions.slice(0, quizSetup.questionLimit)
           : modeQuestions;
+        const storedProgress = playerName && quizSetup
+          ? getStoredQuizProgress(
+              playerName,
+              quizSetup,
+              selectedQuestions.map((question) => question.id),
+            )
+          : null;
+        const randomizedQuestions = storedProgress
+          ? storedProgress.questionIds
+              .map((questionId) => selectedQuestions.find((question) => question.id === questionId))
+              .filter((question): question is ExamQuestion => Boolean(question))
+          : randomizeQuizQuestions(selectedQuestions);
 
-        setQuestions(selectedQuestions);
-        setQuestionLoadStatus(selectedQuestions.length === 0 ? 'empty' : 'ready');
+        setQuestions(randomizedQuestions);
+        setQuestionLoadStatus(randomizedQuestions.length === 0 ? 'empty' : 'ready');
 
-        if (playerName && quizSetup) {
-          const restoredState = getStoredQuizProgress(
-            playerName,
-            quizSetup,
-            selectedQuestions.map((question) => question.id),
-          );
-          setQuizState(restoredState ?? createInitialQuizState());
+        if (storedProgress) {
+          setQuizState(storedProgress.state);
+        } else if (playerName && quizSetup) {
+          setQuizState(createInitialQuizState());
         }
       } catch {
         if (!isCurrentRequest) return;
@@ -189,11 +199,14 @@ export function useQuiz() {
 
   const restartGame = useCallback(() => {
     const nextState = createInitialQuizState();
+    const randomizedQuestions = randomizeQuizQuestions(questions);
+
     clearQuizProgress();
+    setQuestions(randomizedQuestions);
     setQuizState(nextState);
     setPageKey((current) => current + 1);
     setConfettiKey(0);
-  }, []);
+  }, [questions]);
 
   const showSummary = useCallback(() => {
     if (quizState.gameOver) return;

@@ -29,7 +29,10 @@ describe('quiz progress storage', () => {
   it('restores the saved quiz state for the same player and setup', () => {
     saveQuizProgress('PLAYER', setup, questionIds, state);
 
-    expect(getStoredQuizProgress('PLAYER', setup, questionIds)).toEqual(state);
+    expect(getStoredQuizProgress('PLAYER', setup, questionIds)).toEqual({
+      questionIds,
+      state,
+    });
   });
 
   it('does not restore progress for a different quiz setup', () => {
