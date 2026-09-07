@@ -77,3 +77,75 @@ browser-act session close ai-exam-arena-prod
 5. ตรวจสอบการ scroll หลังตอบ
 6. เปลี่ยนข้อและทำให้ครบ
 7. ตรวจสอบหน้า summary และคะแนน
+
+## Admin question API สำหรับสร้าง Thai drama
+
+ใช้ API ชุดนี้สำหรับอ่านคำถาม/ตัวเลือกทั้งหมด แล้วส่งคำแปลกลับไปอัปเดตตาม `questionId`
+
+ทุก request ต้องส่ง header ของ Admin:
+
+```http
+x-admin-email: <ADMIN_EMAIL>
+```
+
+### อ่านคำถามและตัวเลือกทั้งหมด
+
+```http
+GET /api/admin/questions
+```
+
+ตัวอย่างด้วย `curl`:
+
+```bash
+curl http://localhost:3000/api/admin/questions \
+  -H "x-admin-email: $ADMIN_EMAIL"
+```
+
+ผลลัพธ์อยู่ใน `questions[]` และแต่ละรายการมี `id`, `english`, `thai_drama`, `options`, `correctOptionId`, `funFact`, `source` และ `status`
+
+### อัปเดตคำถามตาม ID
+
+```http
+PATCH /api/admin/questions/<questionId>
+```
+
+ค่า `<questionId>` ให้ใช้จาก `questions[].id` ที่ได้จาก `GET` ห้ามสร้าง ID ใหม่เอง
+
+ตัวอย่าง payload สำหรับอัปเดต Thai drama:
+
+```json
+{
+  "labels": ["LAMBDA", "COST"],
+  "english": "คำถามภาษาอังกฤษเดิม",
+  "thai_drama": "คำแปลไทยสไตล์จีซู",
+  "options": [
+    {
+      "id": "A",
+      "english": "ตัวเลือกภาษาอังกฤษเดิม",
+      "thai_drama": "คำแปลตัวเลือกสไตล์จีซู"
+    },
+    {
+      "id": "B",
+      "english": "ตัวเลือกภาษาอังกฤษเดิม",
+      "thai_drama": ""
+    }
+  ],
+  "correctOptionId": "A",
+  "funFact": "เกร็ดความรู้เดิม",
+  "source": {
+    "name": "แหล่งอ้างอิงเดิม"
+  },
+  "status": "published"
+}
+```
+
+ตัวอย่างด้วย `curl`:
+
+```bash
+curl -X PATCH "http://localhost:3000/api/admin/questions/<questionId>" \
+  -H "Content-Type: application/json" \
+  -H "x-admin-email: $ADMIN_EMAIL" \
+  -d @updated-question.json
+```
+
+หมายเหตุ: `PATCH` ต้องส่งข้อมูลคำถามครบชุดตาม payload ไม่ใช่ส่งเฉพาะ `thai_drama` อย่างเดียว เพราะระบบจะอัปเดตตัวเลือกทั้งหมดของคำถามนั้นใหม่ด้วย
