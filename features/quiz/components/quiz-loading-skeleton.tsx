@@ -1,5 +1,3 @@
-import { LeaderboardLink } from '@/features/shared/components/leaderboard-link';
-
 export function QuizLoadingSkeleton() {
   return (
     <main
@@ -23,7 +21,6 @@ export function QuizLoadingSkeleton() {
         </div>
       </div>
       <p className="sr-only" role="status">กำลังโหลด</p>
-      <LeaderboardLink />
     </main>
   );
 }

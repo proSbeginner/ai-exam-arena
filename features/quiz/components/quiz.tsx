@@ -100,6 +100,7 @@ export function Quiz({
     return <QuizLoadingSkeleton />;
   }
 
+  questionLoadStatus = 'error';
   if (questionLoadStatus === 'error') {
     return (
       <QuizNotice
@@ -107,7 +108,8 @@ export function Quiz({
         message={questionLoadError ?? 'กรุณาลองใหม่อีกครั้ง'}
         actionLabel="ลองใหม่"
         onAction={retryQuestionLoad}
-        showLeaderboard={false}
+        onSecondaryAction={() => router.push(APP_ROUTES.welcome)}
+        secondaryActionLabel="กลับหน้า Welcome"
       />
     );
   }
@@ -119,7 +121,6 @@ export function Quiz({
         message="ผู้ดูแลระบบยังไม่ได้เผยแพร่คำถามสำหรับการฝึกฝน"
         actionLabel="เปลี่ยนชื่อผู้เล่น"
         onAction={changePlayerName}
-        showLeaderboard={false}
       />
     );
   }
