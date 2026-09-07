@@ -17,7 +17,7 @@ const emptyForm: AdminQuestionFormState = {
   mode: 'university', labels: [], labelInput: '', english: '', thai_drama: '',
   options: [{ id: 'option-a', english: '', thai_drama: '' }, { id: 'option-b', english: '', thai_drama: '' }],
   correctOptionId: 'option-a', funFact: '',
-  sourceName: '', sourceUrl: '', sourceReference: '', status: 'draft',
+  sourceName: '', status: 'draft',
 };
 
 function AdminField({ label, required = false, children }: { label: string; required?: boolean; children: React.ReactNode }) {
@@ -32,12 +32,12 @@ function AdminField({ label, required = false, children }: { label: string; requ
 }
 
 function toInput(question: ExamQuestion): AdminQuestionFormState {
-  return { ...emptyForm, ...question, labels: question.labels ?? [], labelInput: '', funFact: question.funFact ?? '', sourceName: question.source?.name ?? '', sourceUrl: question.source?.url ?? '', sourceReference: question.source?.reference ?? '' };
+  return { ...emptyForm, ...question, labels: question.labels ?? [], labelInput: '', funFact: question.funFact ?? '', sourceName: question.source?.name ?? '' };
 }
 
 function toPayload(form: AdminQuestionFormState) {
   const options = form.options.filter((option) => option.english.trim() || option.thai_drama.trim());
-  return { mode: form.mode, labels: form.labels, english: form.english, thai_drama: form.thai_drama, options, correctOptionId: form.correctOptionId, funFact: form.funFact || undefined, status: form.status, source: form.sourceName ? { name: form.sourceName, url: form.sourceUrl || undefined, reference: form.sourceReference || undefined } : undefined };
+  return { mode: form.mode, labels: form.labels, english: form.english, thai_drama: form.thai_drama, options, correctOptionId: form.correctOptionId, funFact: form.funFact || undefined, status: form.status, source: form.sourceName ? { name: form.sourceName } : undefined };
 }
 
 export function Admin() {

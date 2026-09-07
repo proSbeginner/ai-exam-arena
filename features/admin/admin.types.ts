@@ -12,7 +12,5 @@ export interface AdminQuestionFormState {
   correctOptionId: string;
   funFact: string;
   sourceName: string;
-  sourceUrl: string;
-  sourceReference: string;
   status: QuestionStatus;
 }
