@@ -4,10 +4,12 @@ import Image from 'next/image';
 
 import { MOOD_IMAGES } from '../quiz.assets';
 import type { ExamQuestion, QuizState } from '../quiz.types';
+import { QuizHeader } from './quiz-header';
 
 interface QuizResultProps {
   answeredCount: number;
   changePlayerName: () => void;
+  currentRank: { emoji: string; title: string };
   onResume: () => void;
   playerName: string;
   questions: ExamQuestion[];
@@ -18,6 +20,7 @@ interface QuizResultProps {
 export function QuizResult({
   answeredCount,
   changePlayerName,
+  currentRank,
   onResume,
   playerName,
   questions,
@@ -29,9 +32,11 @@ export function QuizResult({
   const percentage = questions.length > 0 ? Math.round((quizState.score / questions.length) * 100) : 0;
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans">
-      <div className="w-full max-w-lg space-y-4 rounded-3xl bg-white/90 p-8 text-center shadow-2xl backdrop-blur-xl animate-bounce-in">
-      <Image
+    <main className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans">
+      <div className="mx-auto flex w-full max-w-lg items-center justify-center py-4">
+        <div className="w-full space-y-4 rounded-3xl bg-white/90 p-8 text-center shadow-2xl backdrop-blur-xl animate-bounce-in">
+          <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
+          <Image
         src={MOOD_IMAGES[quizState.mood]}
         alt="Quiz result mascot"
         width={1408}
@@ -67,7 +72,7 @@ export function QuizResult({
           <button
             type="button"
             onClick={onResume}
-            className="flex-1 rounded-xl border-2 border-purple-200 bg-white py-3 font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
+            className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white py-3 font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
           >
             ทำต่อ
           </button>
@@ -75,18 +80,12 @@ export function QuizResult({
         <button
           type="button"
           onClick={restartGame}
-          className="flex-1 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
+          className="flex-1 cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
         >
           เล่นอีกครั้ง 🚀
         </button>
       </div>
-      <button
-        type="button"
-        onClick={changePlayerName}
-        className="mt-2 block w-full text-xs text-gray-400 underline hover:text-pink-500"
-      >
-        เปลี่ยนชื่อเล่น
-      </button>
+        </div>
       </div>
     </main>
   );

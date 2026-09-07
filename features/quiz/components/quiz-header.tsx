@@ -17,7 +17,7 @@ export function QuizHeader({ changePlayerName, currentRank }: QuizHeaderProps) {
       <button
         type="button"
         onClick={changePlayerName}
-        className="text-xs text-gray-400 transition-colors hover:text-pink-500"
+        className="cursor-pointer text-xs text-gray-400 transition-colors hover:text-pink-500"
       >
         เปลี่ยนชื่อ 👋
       </button>

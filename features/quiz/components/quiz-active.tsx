@@ -250,7 +250,7 @@ export function QuizActive({
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold transition-all active:scale-95 ${
               quizState.currentQIndex === 0
                 ? 'cursor-not-allowed bg-gray-100 text-gray-300'
-                : 'border-2 border-purple-200 bg-white text-purple-600 shadow-sm hover:border-purple-400 hover:bg-purple-50'
+                : 'cursor-pointer border-2 border-purple-200 bg-white text-purple-600 shadow-sm hover:border-purple-400 hover:bg-purple-50'
             }`}
           >
             <span aria-hidden>←</span>
@@ -259,7 +259,7 @@ export function QuizActive({
           <button
             type="button"
             onClick={goToNext}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
           >
             {answeredCount >= questions.length ? 'ดูผลลัพธ์' : 'ข้อถัดไป'}
             <span aria-hidden>→</span>
@@ -269,7 +269,7 @@ export function QuizActive({
         <button
           type="button"
           onClick={onShowSummary}
-          className="mx-auto text-sm font-medium text-gray-400 underline decoration-gray-300 underline-offset-4 transition-colors hover:text-purple-500"
+          className="mx-auto cursor-pointer text-sm font-medium text-gray-400 underline decoration-gray-300 underline-offset-4 transition-colors hover:text-purple-500"
         >
           สรุปผลตอนนี้
         </button>

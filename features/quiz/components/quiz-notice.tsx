@@ -17,7 +17,7 @@ export function QuizNotice({ actionLabel, heading, message, onAction }: QuizNoti
         <button
           type="button"
           onClick={onAction}
-          className="w-full rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white shadow-lg transition-all active:scale-95"
+          className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white shadow-lg transition-all active:scale-95"
         >
           {actionLabel}
         </button>

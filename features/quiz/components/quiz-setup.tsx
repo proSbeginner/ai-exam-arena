@@ -42,7 +42,7 @@ export function QuizSetup({
               key={mode.value}
               type="button"
               onClick={() => updateMode(mode.value)}
-              className={`rounded-2xl border-2 p-4 text-left transition-all ${
+              className={`cursor-pointer rounded-2xl border-2 p-4 text-left transition-all ${
                 selectedMode === mode.value
                   ? 'border-purple-500 bg-purple-50 shadow-md'
                   : 'border-gray-100 bg-white hover:border-purple-200 hover:bg-purple-50'
@@ -72,7 +72,7 @@ export function QuizSetup({
           type="button"
           onClick={startQuiz}
           disabled={isLoading}
-          className="w-full rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3.5 text-lg font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3.5 text-lg font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? 'กำลังโหลดคำถาม...' : 'เริ่มทำข้อสอบ'}
         </button>

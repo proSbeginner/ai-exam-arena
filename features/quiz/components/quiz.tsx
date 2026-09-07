@@ -117,7 +117,7 @@ export function Quiz({
     );
   }
 
-  return !quizState.gameOver ? (
+  return !quizState.summaryVisible ? (
     <QuizActive
       answerQuestion={answerQuestion}
       answeredCount={answeredCount}
@@ -142,6 +142,7 @@ export function Quiz({
     <QuizResult
       answeredCount={answeredCount}
       changePlayerName={changePlayerName}
+      currentRank={currentRank}
       onResume={resumeQuiz}
       playerName={playerName}
       questions={questions}
