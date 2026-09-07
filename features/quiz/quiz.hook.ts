@@ -151,8 +151,11 @@ export function useQuiz() {
               .map((questionId) => selectedQuestions.find((question) => question.id === questionId))
               .filter((question): question is ExamQuestion => Boolean(question))
           : randomizedQuestions;
+        const preparedQuestions = matchingAttempt && quizSetup
+          ? attemptQuestions.map((question) => randomizeQuizQuestions([question], quizSetup.mode)[0])
+          : attemptQuestions;
 
-        setQuestions(attemptQuestions);
+        setQuestions(preparedQuestions);
         setAttemptId(matchingAttempt?.id ?? null);
 
         if (matchingAttempt && (matchingAttempt.state.attemptStatus !== ATTEMPT_STATUS.COMPLETED || shouldReviewAttempt)) {
