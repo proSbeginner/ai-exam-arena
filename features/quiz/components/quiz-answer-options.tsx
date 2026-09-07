@@ -46,8 +46,8 @@ export function QuizAnswerOptions({
                       : 'text-gray-700 group-hover:text-pink-600'
                 }`}
               >
-                <span>{option.english}</span>
-                {option.thai_drama.trim() && <span className="mt-1 block text-xs text-gray-400">{option.thai_drama}</span>}
+                <span className="whitespace-pre-wrap">{option.english}</span>
+                {option.thai_drama.trim() && <span className="mt-1 block whitespace-pre-wrap text-xs text-gray-400">{option.thai_drama}</span>}
               </span>
             </span>
             {hasAnsweredCurrentQuestion && isCorrectOption && <span className="text-lg font-bold text-green-500">✓</span>}
