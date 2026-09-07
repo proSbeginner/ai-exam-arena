@@ -41,6 +41,7 @@ export function QuizResult({
             alt=""
             width={1408}
             height={768}
+            loading="eager"
             aria-hidden
             className={`pointer-events-none absolute left-1/2 top-[-2rem] z-0 h-[36rem] w-[36rem] max-h-none max-w-none -translate-x-1/2 object-contain drop-shadow-xl ${passed ? 'animate-wiggle' : ''}`}
           />

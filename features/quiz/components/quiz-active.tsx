@@ -150,6 +150,7 @@ export function QuizActive({
           alt=""
           width={1408}
           height={768}
+          loading="eager"
           aria-hidden
           className={`h-[36rem] w-[36rem] max-h-none max-w-none object-contain drop-shadow-xl transition-all duration-300 ${mascotAnimation}`}
         />
