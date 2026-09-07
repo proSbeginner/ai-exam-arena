@@ -1,13 +1,10 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# AI Exam Arena — Agent Instructions
 
-# This is NOT the Next.js you know
+โปรดอ่านเอกสารที่เกี่ยวข้องก่อนทำงานกับโปรเจกต์:
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+- [โครงสร้างโปรเจกต์](docs/PROJECT_STRUCTURES.md) — ownership, layering และตำแหน่งไฟล์
+- [คำสั่งและ API](docs/COMMANDS.md) — คำสั่งรัน/ทดสอบ และ Admin question API
+- [ฐานข้อมูล](docs/DATABASE_SCHEMA.md) — schema และความสัมพันธ์ของตาราง
+- [บันทึกการออกแบบ](docs/NOTES.md) — แนวคิดและ trade-off สำคัญของระบบ
 
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
-
-## Project structure
-
-Before creating, moving, or refactoring project files, read [`docs/PROJECT_STRUCTURES.md`](docs/PROJECT_STRUCTURES.md) and follow its approved ownership and layering rules.
+เมื่อเพิ่มหรือย้ายไฟล์ ให้ตรวจสอบ `docs/PROJECT_STRUCTURES.md` ก่อนเสมอ และอัปเดตเอกสารที่เกี่ยวข้องเมื่อโครงสร้างหรือวิธีใช้งานเปลี่ยนแปลง
