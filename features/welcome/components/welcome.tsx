@@ -39,7 +39,7 @@ export function Welcome({
   updatePinConfirm,
   updatePlayerName,
 }: WelcomeProps) {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     void submitPlayerName();
   };

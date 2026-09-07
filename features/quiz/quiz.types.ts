@@ -20,7 +20,7 @@ export interface QuestionSource {
 export interface ExamQuestion {
   id: string;
   mode: QuizMode;
-  topic: string;
+  labels: string[];
   english: string;
   thai_drama: string;
   options: QuizOption[];

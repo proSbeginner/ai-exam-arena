@@ -4,7 +4,8 @@ export type AdminQuestionInput = Omit<ExamQuestion, 'id'>;
 
 export interface AdminQuestionFormState {
   mode: QuizMode;
-  topic: string;
+  labels: string[];
+  labelInput: string;
   english: string;
   thai_drama: string;
   options: QuizOption[];
