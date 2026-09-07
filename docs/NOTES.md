@@ -68,6 +68,15 @@ app/layout.tsx
 
 ในทางกลับกัน หาก `useSyncExternalStore` ทำให้เกิดปัญหาด้าน snapshot, cache หรือ hydration และข้อมูลนั้นเป็นเพียง state ภายในแอป ให้ย้ายกลับมาใช้ `Context` + `useState` ได้
 
+## Quiz resume, review และ restart
+
+การกระทำบนหน้า Summary และ Leaderboard แยกตามสถานะของ attempt:
+
+- `ทำต่อ` ใช้กับ attempt ที่ยังทำไม่ครบ และต้องคงคำถาม คำตอบ คะแนน และตำแหน่งเดิมไว้
+- `ทวนคำตอบ` ใช้กับ attempt ที่ทำครบแล้ว และเปิดคำถามพร้อมคำตอบเดิมในโหมด review โดยเริ่มจากข้อแรก
+- `เล่นอีกครั้ง` ใช้เริ่มรอบใหม่ ต้องเปิด dialog เพื่อยืนยันก่อนจึงจะล้าง progress และทิ้ง attempt เดิม
+- การ refresh ต้องโหลด attempt เดิมกลับมา ไม่สร้าง attempt ใหม่โดยอัตโนมัติ
+
 ## Summary stamp sound effect
 
 ภายหลังให้เพิ่ม sound effect สั้น ๆ เช่นเสียง “ปึ้ง!” เมื่อ animation แบบตราประทับของ summary panel แสดงจบ โดยต้องตรวจสอบข้อจำกัดของ browser ที่อาจไม่อนุญาตให้เล่นเสียงอัตโนมัติโดยไม่มี user interaction

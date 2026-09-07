@@ -11,6 +11,14 @@ export const ANSWER_MOOD = {
   WRONG: 'wrong',
 } as const;
 
+const configuredPassingScore = Number(process.env.NEXT_PUBLIC_PASSING_SCORE_PERCENTAGE);
+
+export const PASSING_SCORE_PERCENTAGE = Number.isFinite(configuredPassingScore)
+  && configuredPassingScore >= 0
+  && configuredPassingScore <= 100
+  ? configuredPassingScore
+  : 80;
+
 export const RANKS = [
   { min: 0, title: 'AI Intern', emoji: '🌱' },
   { min: 3, title: 'Cloud Apprentice', emoji: '⚙️' },

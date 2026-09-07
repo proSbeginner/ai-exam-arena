@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 import { MOOD_IMAGES } from '../quiz.assets';
 import { ATTEMPT_STATUS } from '../quiz.constants';
+import { hasPassedQuiz } from '../quiz.logic';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizHeader } from './quiz-header';
 import { QuizRestartDialog } from '@/features/shared/components/quiz-restart-dialog';
@@ -35,7 +36,7 @@ export function QuizResult({
 }: QuizResultProps) {
   const [showRestartConfirmation, setShowRestartConfirmation] = useState(false);
   const isCompleted = quizState.gameOver || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
-  const passed = isCompleted && quizState.score >= Math.ceil(questions.length / 2);
+  const passed = isCompleted && hasPassedQuiz(quizState.score, questions.length);
   const percentage = questions.length > 0 ? Math.round((quizState.score / questions.length) * 100) : 0;
   return (
     <main

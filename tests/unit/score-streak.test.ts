@@ -191,7 +191,7 @@ describe('goToNext', () => {
   it('ends the quiz with the appropriate final mood after every question is answered', () => {
     const state = makeState({
       currentQIndex: questions.length - 1,
-      score: 1,
+      score: 2,
       answeredMap: new Map([
         [0, questions[0].options[0].id],
         [1, questions[1].options[0].id],

@@ -1,10 +1,13 @@
-import { RANKS } from './quiz.constants';
-import { ATTEMPT_STATUS } from './quiz.constants';
+import { ATTEMPT_STATUS, PASSING_SCORE_PERCENTAGE, RANKS } from './quiz.constants';
 import type { ExamQuestion } from './quiz.types';
 import type { AnswerResult, NextQuestionResult, QuizState } from './quiz.types';
 
 export function getRank(score: number): (typeof RANKS)[number] {
   return RANKS.filter((rank) => score >= rank.min).at(-1) ?? RANKS[0];
+}
+
+export function hasPassedQuiz(score: number, questionCount: number): boolean {
+  return questionCount > 0 && score * 100 >= questionCount * PASSING_SCORE_PERCENTAGE;
 }
 
 export const STREAK_MILESTONES = [3, 5, 7, 10];
@@ -105,7 +108,7 @@ export function getNextQuestion(
     return {
       currentQIndex: state.currentQIndex,
       gameOver: true,
-      mood: state.score >= Math.ceil(questionCount / 2) ? 'passed' : 'failed',
+      mood: hasPassedQuiz(state.score, questionCount) ? 'passed' : 'failed',
     };
   }
 
