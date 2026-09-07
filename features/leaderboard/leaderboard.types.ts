@@ -1,3 +1,4 @@
+import type { PlayerRank } from '@/features/rank/rank.types';
 import type { QuizMode } from '@/features/quiz/quiz.types';
 
 export type LeaderboardAttemptStatus = 'completed' | 'abandoned';
@@ -12,5 +13,7 @@ export interface LeaderboardEntry {
   correctCount: number;
   accuracy: number;
   attemptStatus: LeaderboardAttemptStatus;
+  mmr?: number;
+  rank?: PlayerRank;
   completedAt: string;
 }
