@@ -24,6 +24,9 @@ export function Leaderboard() {
   const [mode, setMode] = useState<QuizMode>('university');
   const playerId = useSyncExternalStore(subscribeToPlayerName, getStoredPlayerId, () => null);
   const { entries, error, isLoading } = useLeaderboard(mode, playerId);
+  const leaderboardVersion = entries
+    .map((entry, index) => `${index}:${entry.playerId}:${entry.completedAt}:${entry.answeredCount}:${entry.correctCount}`)
+    .join('|') || 'empty';
   const playerRank = playerId ? getPlayerRank(entries, playerId) : null;
   const currentPlayerEntry = playerId ? entries.find((entry) => entry.playerId === playerId) : undefined;
   const [showRestartConfirmation, setShowRestartConfirmation] = useState(false);
@@ -64,8 +67,13 @@ export function Leaderboard() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-400 via-fuchsia-400 to-purple-600 p-4 font-sans sm:p-8">
-      <section className="mx-auto w-full max-w-3xl rounded-3xl bg-white/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8">
+    <main
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-pink-400 via-fuchsia-400 to-purple-600 bg-[length:200%_200%] p-4 font-sans sm:p-8 animate-leaderboard-background"
+    >
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="leaderboard-spotlight animate-leaderboard-spotlight absolute inset-[-50%]" />
+      </div>
+      <section className="relative z-10 mx-auto w-full max-w-3xl rounded-3xl bg-white/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8">
         <div className="text-center">
           <p className="text-sm font-bold uppercase tracking-wide text-purple-500">Hall of Fame</p>
           <h1 className="mt-1 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-3xl font-black tracking-tight text-transparent">
@@ -113,11 +121,11 @@ export function Leaderboard() {
           <div className="max-h-[35rem] overflow-y-auto">
             {!isLoading && !error && entries.map((entry, index) => (
               <div
-                key={`${entry.playerId}-${entry.completedAt}`}
-                className={`grid grid-cols-[3rem_1fr_5rem_5rem] gap-2 border-t border-purple-50 px-4 py-4 text-sm sm:grid-cols-[4rem_1fr_7rem_7rem] ${entry.playerId === playerId ? 'bg-pink-50' : 'bg-white'}`}
+                key={`${entry.playerId}-${entry.completedAt}-${leaderboardVersion}`}
+                className={`grid grid-cols-[3rem_1fr_5rem_5rem] gap-2 border-t border-purple-50 bg-white px-4 py-4 text-sm sm:grid-cols-[4rem_1fr_7rem_7rem] ${entry.playerId === playerId ? 'animate-leaderboard-current-row-flash' : ''}`}
               >
-                <span className="font-black text-purple-500">{index + 1}</span>
-                <span className="min-w-0 truncate font-bold text-gray-700">
+                <span className="font-black text-gray-400">{index + 1}</span>
+                <span className={`min-w-0 truncate font-bold ${entry.playerId === playerId ? 'bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent font-black' : 'text-gray-700'}`}>
                   {entry.playerName}
                   {entry.attemptStatus === 'abandoned' && <span className="ml-2 text-xs font-medium text-gray-400">(ยังไม่จบ)</span>}
                 </span>
