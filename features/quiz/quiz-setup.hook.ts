@@ -64,11 +64,16 @@ export function getStoredQuizSetup(): QuizSetup | null {
 }
 
 export function saveQuizSetup(setup: QuizSetup): void {
-  window.sessionStorage.setItem(QUIZ_SETUP_STORAGE_KEY, JSON.stringify(setup));
+  const serializedSetup = JSON.stringify(setup);
+  cachedQuizSetupStorageValue = serializedSetup;
+  cachedQuizSetup = setup;
+  window.sessionStorage.setItem(QUIZ_SETUP_STORAGE_KEY, serializedSetup);
   notifyListeners();
 }
 
 export function clearQuizSetup(): void {
+  cachedQuizSetupStorageValue = null;
+  cachedQuizSetup = null;
   window.sessionStorage.removeItem(QUIZ_SETUP_STORAGE_KEY);
   notifyListeners();
 }

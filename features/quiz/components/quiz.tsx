@@ -25,6 +25,7 @@ interface QuizProps {
   goToPrevious: () => void;
   hasAnsweredCurrentQuestion: boolean;
   hasQuizSetup: boolean;
+  isQuizSetupReady: boolean;
   isPlayerReady: boolean;
   pageKey: number;
   playerName: string | null;
@@ -54,6 +55,7 @@ export function Quiz({
   goToPrevious,
   hasAnsweredCurrentQuestion,
   hasQuizSetup,
+  isQuizSetupReady,
   isPlayerReady,
   pageKey,
   playerName,
@@ -71,13 +73,14 @@ export function Quiz({
   const router = useRouter();
 
   useEffect(() => {
+    if (!isQuizSetupReady) return;
     if (isPlayerReady && !playerName) {
       router.replace(APP_ROUTES.welcome);
     }
     if (isPlayerReady && playerName && !hasQuizSetup) {
       router.replace(APP_ROUTES.quizSetup);
     }
-  }, [hasQuizSetup, isPlayerReady, playerName, router]);
+  }, [hasQuizSetup, isPlayerReady, isQuizSetupReady, playerName, router]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

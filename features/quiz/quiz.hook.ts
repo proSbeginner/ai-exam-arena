@@ -69,6 +69,11 @@ export function useQuiz() {
     getStoredQuizSetup,
     () => null,
   );
+  const isQuizSetupReady = useSyncExternalStore(
+    subscribeToQuizSetup,
+    () => true,
+    () => false,
+  );
   const isPlayerReady = useSyncExternalStore(
     subscribeToPlayerName,
     () => true,
@@ -364,6 +369,7 @@ export function useQuiz() {
     goToPrevious,
     hasAnsweredCurrentQuestion,
     hasQuizSetup: Boolean(quizSetup),
+    isQuizSetupReady,
     isPlayerReady,
     pageKey,
     playerName,
