@@ -62,6 +62,12 @@ export async function createMockPlayer(playerName: string, pin: string) {
   return toPlayerProfile(player);
 }
 
+export async function hasMockPlayer(playerName: string): Promise<boolean> {
+  await simulateMockNetworkDelay();
+  throwIfMockServiceUnavailable();
+  return players.has(normalizePlayerName(playerName));
+}
+
 export async function authenticateMockPlayer(playerName: string, pin: string) {
   await simulateMockNetworkDelay();
   throwIfMockServiceUnavailable();

@@ -7,12 +7,15 @@ export default function WelcomePage() {
   const {
     playerNameError,
     isSubmitting,
-    mode,
+    isCheckingPlayer,
+    isNewPlayer,
     pinError,
     pin,
+    pinConfirm,
+    pinConfirmError,
     playerName,
-    toggleMode,
     updatePin,
+    updatePinConfirm,
     submitPlayerName,
     updatePlayerName,
   } = useWelcome();
@@ -21,13 +24,16 @@ export default function WelcomePage() {
     <Welcome
       playerNameError={playerNameError}
       isSubmitting={isSubmitting}
-      mode={mode}
+      isCheckingPlayer={isCheckingPlayer}
+      isNewPlayer={isNewPlayer}
       pinError={pinError}
       pin={pin}
+      pinConfirm={pinConfirm}
+      pinConfirmError={pinConfirmError}
       playerName={playerName}
       submitPlayerName={submitPlayerName}
-      toggleMode={toggleMode}
       updatePin={updatePin}
+      updatePinConfirm={updatePinConfirm}
       updatePlayerName={updatePlayerName}
     />
   );

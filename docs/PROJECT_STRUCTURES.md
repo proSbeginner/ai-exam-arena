@@ -48,6 +48,21 @@ mock-api/quiz/
 └── questions.mock.ts
 ```
 
+## Approved leaderboard feature structure
+
+```text
+features/leaderboard/
+├── services/
+│   └── leaderboard.api.ts
+├── leaderboard.constants.ts
+├── leaderboard.hook.ts
+├── leaderboard.logic.ts
+└── leaderboard.types.ts
+
+mock-api/leaderboard/
+└── mock-leaderboard.ts
+```
+
 ## Data ownership
 
 | Current export | Target location | Responsibility |

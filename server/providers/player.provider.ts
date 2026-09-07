@@ -1,4 +1,4 @@
-import { authenticateMockPlayer, createMockPlayer } from '@/mock-api/welcome/mock-player';
+import { authenticateMockPlayer, createMockPlayer, hasMockPlayer } from '@/mock-api/welcome/mock-player';
 
 import { DataSourceConfigError, getDataSource } from './data-source';
 
@@ -8,11 +8,19 @@ export interface Player {
 }
 
 export interface PlayerProvider {
+  hasPlayer(playerName: string): Promise<boolean>;
   createPlayer(playerName: string, pin: string): Promise<Player>;
   authenticatePlayer(playerName: string, pin: string): Promise<Player>;
 }
 
 async function createSupabasePlayer(): Promise<Player> {
+  throw new DataSourceConfigError(
+    'The Supabase player provider is not configured yet.',
+    'SUPABASE_PROVIDER_NOT_READY',
+  );
+}
+
+async function hasSupabasePlayer(): Promise<boolean> {
   throw new DataSourceConfigError(
     'The Supabase player provider is not configured yet.',
     'SUPABASE_PROVIDER_NOT_READY',
@@ -28,6 +36,6 @@ async function authenticateSupabasePlayer(): Promise<Player> {
 
 export function getPlayerProvider(): PlayerProvider {
   return getDataSource() === 'mock'
-    ? { createPlayer: createMockPlayer, authenticatePlayer: authenticateMockPlayer }
-    : { createPlayer: createSupabasePlayer, authenticatePlayer: authenticateSupabasePlayer };
+    ? { hasPlayer: hasMockPlayer, createPlayer: createMockPlayer, authenticatePlayer: authenticateMockPlayer }
+    : { hasPlayer: hasSupabasePlayer, createPlayer: createSupabasePlayer, authenticatePlayer: authenticateSupabasePlayer };
 }

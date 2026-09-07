@@ -3,32 +3,37 @@
 import Image from 'next/image';
 
 import { TextInput } from '@/features/shared/components/text-input';
-import type { WelcomeMode } from '../welcome.types';
 import { PLAYER_NAME_MAX_LENGTH } from '../welcome.constants';
 
 interface WelcomeProps {
   playerNameError: string | null;
   isSubmitting: boolean;
-  mode: WelcomeMode;
+  isCheckingPlayer: boolean;
+  isNewPlayer: boolean | null;
   pinError: string | null;
   pin: string;
+  pinConfirm: string;
+  pinConfirmError: string | null;
   playerName: string;
   submitPlayerName: () => Promise<void>;
-  toggleMode: () => void;
   updatePin: (value: string) => void;
+  updatePinConfirm: (value: string) => void;
   updatePlayerName: (value: string) => void;
 }
 
 export function Welcome({
   playerNameError,
   isSubmitting,
-  mode,
+  isCheckingPlayer,
+  isNewPlayer,
   pinError,
   pin,
+  pinConfirm,
+  pinConfirmError,
   playerName,
   submitPlayerName,
-  toggleMode,
   updatePin,
+  updatePinConfirm,
   updatePlayerName,
 }: WelcomeProps) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -90,40 +95,52 @@ export function Welcome({
             hint="ใช้ A–Z และ _ เท่านั้น"
             showCounter
           />
-          <TextInput
-            id="player-pin"
-            name="pin"
-            type="password"
-            inputMode="numeric"
-            maxLength={6}
-            value={pin}
-            onChange={(event) => updatePin(event.target.value)}
-            placeholder="6-DIGIT PIN"
-            className="bg-white/70"
-            autoComplete="off"
-            error={pinError}
-            hint="ใช้ตัวเลข 6 หลักสำหรับกลับเข้าเล่น"
-            showCounter
-          />
+          {isNewPlayer !== null && (
+            <>
+              <TextInput
+                id="player-pin"
+                name="pin"
+                type="password"
+                inputMode="numeric"
+                maxLength={6}
+                value={pin}
+                onChange={(event) => updatePin(event.target.value)}
+                placeholder="6-DIGIT PIN"
+                className="bg-white/70"
+                autoComplete="off"
+                error={pinError}
+                hint="ใช้ตัวเลข 6 หลักสำหรับกลับเข้าเล่น"
+                showCounter
+              />
+              {isNewPlayer && (
+                <TextInput
+                  id="player-pin-confirm"
+                  name="pinConfirm"
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={pinConfirm}
+                  onChange={(event) => updatePinConfirm(event.target.value)}
+                  placeholder="CONFIRM PIN"
+                  className="bg-white/70"
+                  autoComplete="off"
+                  error={pinConfirmError}
+                  hint="ยืนยัน PIN อีกครั้ง"
+                />
+              )}
+            </>
+          )}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isCheckingPlayer}
             className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3.5 text-lg font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95 disabled:cursor-not-allowed"
           >
-            <span>{isSubmitting ? 'กำลังเตรียมเกม...' : mode === 'register' ? 'สร้างผู้เล่น!' : 'กลับเข้าเล่น!'}</span>
+            <span>{isSubmitting || isCheckingPlayer ? 'กำลังตรวจสอบ...' : isNewPlayer === null ? 'ตรวจสอบชื่อ' : 'เริ่มฝึกฝน!'}</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="m9 18 6-6-6-6" />
             </svg>
           </button>
         </form>
-
-        <button
-          type="button"
-          onClick={toggleMode}
-          className="relative z-10 mt-4 w-full cursor-pointer text-center text-xs font-medium text-purple-500 hover:text-pink-500"
-        >
-          {mode === 'register' ? 'มีผู้เล่นอยู่แล้ว? กลับเข้าเล่น' : 'ยังไม่มีผู้เล่น? สร้างใหม่'}
-        </button>
 
         <p className="relative z-10 mt-8 text-center text-xs text-gray-400">Powered by your own creativity &amp; love 💖</p>
       </div>
