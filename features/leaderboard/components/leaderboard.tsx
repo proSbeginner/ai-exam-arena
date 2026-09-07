@@ -6,11 +6,9 @@ import { useRouter } from 'next/navigation';
 import { getStoredPlayerId, subscribeToPlayerName } from '@/features/welcome/welcome.hook';
 import { QUIZ_MODE_OPTIONS } from '@/features/quiz/quiz.constants';
 import { getStoredQuizSetup, saveQuizSetup, subscribeToQuizSetup } from '@/features/quiz/quiz-setup.hook';
-import {
-  clearQuizProgress,
-  saveQuizReviewAttemptId,
-} from '@/features/quiz/quiz-progress.storage';
-import { discardQuizAttempt, getQuizAttempt } from '@/features/quiz/services/quiz-attempt.api';
+import { saveQuizReviewAttemptId } from '@/features/quiz/quiz-progress.storage';
+import { getQuizAttempt } from '@/features/quiz/services/quiz-attempt.api';
+import { restartQuizAttempt } from '@/features/quiz/quiz-restart';
 import { ConfirmationDialog } from '@/features/shared/components/confirmation-dialog';
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import { APP_ROUTES } from '@/features/shared/routes';
@@ -46,16 +44,13 @@ export function Leaderboard() {
   const restartPlayerQuiz = async () => {
     if (!currentPlayerEntry) return;
 
-    clearQuizProgress();
-    if (currentPlayerEntry.attemptId) {
-      await discardQuizAttempt(currentPlayerEntry.attemptId).catch(() => undefined);
-    }
-    saveQuizSetup({
+    await restartQuizAttempt({
+      attemptId: currentPlayerEntry.attemptId,
       mode: currentPlayerEntry.mode || mode,
-      questionLimit: currentPlayerEntry.questionCount,
+      questionCount: currentPlayerEntry.questionCount,
+      navigate: router.push,
     });
     setShowRestartConfirmation(false);
-    router.push(APP_ROUTES.quiz);
   };
 
   const returnToWelcome = () => {
@@ -144,7 +139,7 @@ export function Leaderboard() {
                   ? currentPlayerEntry.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
                     ? 'ทวนคำตอบ'
                     : 'ทำต่อ'
-                  : 'เลือกสนาม'}
+                  : 'ลงสนาม'}
               </button>
               {currentPlayerEntry && (
                 <button

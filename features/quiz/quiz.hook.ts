@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useRouter } from 'next/navigation';
 
 import {
   CHEER_MESSAGES,
@@ -22,6 +23,7 @@ import {
 
 import {
   createInitialQuizState,
+  canReuseQuizAttempt,
   evaluateAnswer,
   getNextQuestion,
   getPreviousQuestion,
@@ -32,18 +34,17 @@ import {
 import { getQuizQuestions } from './services/quiz.api';
 import {
   createQuizAttempt,
-  discardQuizAttempt,
   getQuizAttempt,
   updateQuizAttempt,
 } from './services/quiz-attempt.api';
 import {
-  clearQuizProgress,
   clearQuizReviewAttemptId,
   getStoredQuizReviewAttemptId,
   getStoredQuizProgress,
   saveQuizProgress,
 } from './quiz-progress.storage';
 import type { QuizState } from './quiz.types';
+import { restartQuizAttempt } from './quiz-restart';
 
 type QuestionLoadStatus = 'loading' | 'ready' | 'empty' | 'error';
 
@@ -54,6 +55,7 @@ function pickRandomIndex(length: number): number {
 }
 
 export function useQuiz() {
+  const router = useRouter();
   const playerName = useSyncExternalStore(
     subscribeToPlayerName,
     getStoredPlayerName,
@@ -138,17 +140,17 @@ export function useQuiz() {
           attempt = await getQuizAttempt(playerId, quizSetup.mode);
         }
 
-        const matchingAttempt = attempt && attempt.questionIds.length === selectedQuestions.length
-          && attempt.questionIds.every((questionId) => selectedQuestions.some((question) => question.id === questionId))
-          ? attempt
-          : null;
+        const matchingAttempt = canReuseQuizAttempt(attempt, selectedQuestions) ? attempt : null;
         const reviewAttemptId = getStoredQuizReviewAttemptId();
         const shouldReviewAttempt = Boolean(matchingAttempt && matchingAttempt.id === reviewAttemptId);
         if (shouldReviewAttempt) clearQuizReviewAttemptId();
         setIsReviewing(shouldReviewAttempt);
+        const attemptQuestionPool = matchingAttempt && matchingAttempt.state.attemptStatus !== ATTEMPT_STATUS.COMPLETED
+          ? modeQuestions
+          : selectedQuestions;
         const attemptQuestions = matchingAttempt
           ? matchingAttempt.questionIds
-              .map((questionId) => selectedQuestions.find((question) => question.id === questionId))
+              .map((questionId) => attemptQuestionPool.find((question) => question.id === questionId))
               .filter((question): question is ExamQuestion => Boolean(question))
           : randomizedQuestions;
         const preparedQuestions = matchingAttempt && quizSetup
@@ -290,23 +292,18 @@ export function useQuiz() {
     [persistProgress, questions, quizState, syncAttempt],
   );
 
-  const restartGame = useCallback(() => {
-    const nextState = createInitialQuizState();
-    const randomizedQuestions = randomizeQuizQuestions(questions, quizSetup?.mode);
+  const restartGame = useCallback(async () => {
+    if (!quizSetup) return;
 
     setIsReviewing(false);
-    clearQuizProgress();
-    if (attemptId) void discardQuizAttempt(attemptId).catch(() => undefined);
-    setQuestions(randomizedQuestions);
-    setQuizState(nextState);
-    if (playerId && playerName && quizSetup) {
-      void createQuizAttempt(playerId, playerName, quizSetup, randomizedQuestions.map((question) => question.id), nextState)
-        .then((attempt) => setAttemptId(attempt.id))
-        .catch(() => undefined);
-    }
-    setPageKey((current) => current + 1);
+    await restartQuizAttempt({
+      attemptId,
+      mode: quizSetup.mode,
+      questionCount: questions.length || quizSetup.questionLimit,
+      navigate: router.push,
+    });
     setConfettiKey(0);
-  }, [attemptId, playerId, playerName, questions, quizSetup]);
+  }, [attemptId, questions.length, quizSetup, router]);
 
   const showSummary = useCallback(() => {
     if (quizState.gameOver) return;
