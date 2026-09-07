@@ -6,6 +6,11 @@ export const ATTEMPT_STATUS = {
   ABANDONED: 'abandoned',
 } as const;
 
+export const ANSWER_MOOD = {
+  CORRECT: 'correct',
+  WRONG: 'wrong',
+} as const;
+
 export const RANKS = [
   { min: 0, title: 'AI Intern', emoji: '🌱' },
   { min: 3, title: 'Cloud Apprentice', emoji: '⚙️' },

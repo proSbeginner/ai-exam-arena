@@ -9,3 +9,5 @@ export const MOOD_IMAGES: Record<MoodState, string> = {
 };
 
 export const CORRECT_IMAGES = ['/images/correct1.png', '/images/correct2.png'];
+
+export const WRONG_IMAGES = ['/images/wrong1.png', '/images/wrong2.png'];

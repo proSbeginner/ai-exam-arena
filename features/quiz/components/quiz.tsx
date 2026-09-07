@@ -18,6 +18,7 @@ interface QuizProps {
   cheerIdx: number;
   confettiKey: number;
   correctImage: string;
+  wrongImage: string;
   currentQuestion: ExamQuestion | undefined;
   currentRank: { emoji: string; title: string };
   goToNext: () => void;
@@ -46,6 +47,7 @@ export function Quiz({
   cheerIdx,
   confettiKey,
   correctImage,
+  wrongImage,
   currentQuestion,
   currentRank,
   goToNext,
@@ -125,6 +127,7 @@ export function Quiz({
       cheerIdx={cheerIdx}
       confettiKey={confettiKey}
       correctImage={correctImage}
+      wrongImage={wrongImage}
       currentQuestion={currentQuestion}
       currentRank={currentRank}
       goToNext={goToNext}

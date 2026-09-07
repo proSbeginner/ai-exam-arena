@@ -11,6 +11,7 @@ export default function QuizPage() {
     cheerIdx,
     confettiKey,
     correctImage,
+    wrongImage,
     currentQuestion,
     currentRank,
     goToNext,
@@ -40,6 +41,7 @@ export default function QuizPage() {
       cheerIdx={cheerIdx}
       confettiKey={confettiKey}
       correctImage={correctImage}
+      wrongImage={wrongImage}
       currentQuestion={currentQuestion}
       currentRank={currentRank}
       goToNext={goToNext}

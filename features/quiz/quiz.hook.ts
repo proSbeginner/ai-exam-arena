@@ -6,8 +6,8 @@ import {
   CHEER_MESSAGES,
   SYMPATHY_MESSAGES,
 } from './quiz.content';
-import { CORRECT_IMAGES } from './quiz.assets';
-import { ATTEMPT_STATUS } from './quiz.constants';
+import { CORRECT_IMAGES, WRONG_IMAGES } from './quiz.assets';
+import { ANSWER_MOOD, ATTEMPT_STATUS } from './quiz.constants';
 import type { ExamQuestion } from './quiz.types';
 import {
   getStoredQuizSetup,
@@ -67,6 +67,7 @@ export function useQuiz() {
   const [cheerIdx, setCheerIdx] = useState(0);
   const [sympathyIdx, setSympathyIdx] = useState(0);
   const [correctImage, setCorrectImage] = useState(CORRECT_IMAGES[0]);
+  const [wrongImage, setWrongImage] = useState(WRONG_IMAGES[0]);
   const [confettiKey, setConfettiKey] = useState(0);
   const [pageKey, setPageKey] = useState(0);
 
@@ -194,8 +195,12 @@ export function useQuiz() {
       setCheerIdx(pickRandomIndex(CHEER_MESSAGES.length));
       setSympathyIdx(pickRandomIndex(SYMPATHY_MESSAGES.length));
 
-      if (result.mood === 'correct') {
+      if (result.mood === ANSWER_MOOD.CORRECT) {
         setCorrectImage(CORRECT_IMAGES[pickRandomIndex(CORRECT_IMAGES.length)]);
+      }
+
+      if (result.mood === ANSWER_MOOD.WRONG) {
+        setWrongImage(WRONG_IMAGES[pickRandomIndex(WRONG_IMAGES.length)]);
       }
 
       if (result.triggerConfetti) {
@@ -267,6 +272,7 @@ export function useQuiz() {
     cheerIdx,
     confettiKey,
     correctImage,
+    wrongImage,
     currentQuestion,
     currentRank,
     goToNext,

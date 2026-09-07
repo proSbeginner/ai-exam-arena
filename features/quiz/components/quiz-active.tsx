@@ -17,6 +17,7 @@ interface QuizActiveProps {
   cheerIdx: number;
   confettiKey: number;
   correctImage: string;
+  wrongImage: string;
   currentQuestion: ExamQuestion;
   currentRank: { emoji: string; title: string };
   goToNext: () => void;
@@ -117,6 +118,7 @@ export function QuizActive({
   cheerIdx,
   confettiKey,
   correctImage,
+  wrongImage,
   currentQuestion,
   currentRank,
   goToNext,
@@ -147,7 +149,13 @@ export function QuizActive({
       <ConfettiBurst burstKey={confettiKey} />
       <div className="pointer-events-none absolute inset-x-0 top-[-2rem] z-0 flex justify-center">
         <Image
-          src={quizState.mood === 'correct' ? correctImage : MOOD_IMAGES[quizState.mood]}
+          src={
+            quizState.mood === 'correct'
+              ? correctImage
+              : quizState.mood === 'wrong'
+                ? wrongImage
+                : MOOD_IMAGES[quizState.mood]
+          }
           alt=""
           width={1408}
           height={768}
