@@ -37,8 +37,9 @@ export function Leaderboard() {
       return;
     }
 
+    const playerMode = currentPlayerEntry.mode || mode;
     saveQuizSetup({
-      mode: currentPlayerEntry.mode,
+      mode: playerMode,
       questionLimit: currentPlayerEntry.questionCount,
     });
     if (currentPlayerEntry.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED && currentPlayerEntry.attemptId) {
@@ -55,7 +56,7 @@ export function Leaderboard() {
       await discardQuizAttempt(currentPlayerEntry.attemptId).catch(() => undefined);
     }
     saveQuizSetup({
-      mode: currentPlayerEntry.mode,
+      mode: currentPlayerEntry.mode || mode,
       questionLimit: currentPlayerEntry.questionCount,
     });
     setShowRestartConfirmation(false);
