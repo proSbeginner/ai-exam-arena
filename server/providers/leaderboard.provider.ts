@@ -1,32 +1,13 @@
-import { getMockLeaderboard } from '@/mock-api/leaderboard/mock-leaderboard';
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import type { LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
-import { filterLeaderboardEntries, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
-import type { DatabaseLeaderboardAttemptRow } from '@/server/database/types';
-import { transformLeaderboardAttempt } from '@/server/database/transformers/leaderboard.transform';
-
 import { getDataSource } from './data-source';
-import { supabaseQuery, supabaseRequest } from '@/supabase/client';
+import { mockLeaderboardProvider } from '@/server/providers/mock-leaderboard.provider';
+import { supabaseLeaderboardProvider } from '@/server/providers/supabase-leaderboard.provider';
 
 export interface LeaderboardProvider {
   getLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardEntry[]>;
 }
 
-async function getSupabaseLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardEntry[]> {
-  const query = supabaseQuery({
-    select: 'id,player_id,attempt_status,question_ids,completed_at,updated_at,state,players(player_name)',
-    mode: `eq.${mode}`,
-    attempt_status: 'in.(completed,abandoned)',
-  });
-  const attempts = await supabaseRequest<DatabaseLeaderboardAttemptRow[]>(`quiz_attempts?${query}`);
-  const entries = attempts.map(transformLeaderboardAttempt);
-
-  void playerId;
-  return sortLeaderboard(filterLeaderboardEntries(entries));
-}
-
 export function getLeaderboardProvider(): LeaderboardProvider {
-  return getDataSource() === 'mock'
-    ? { getLeaderboard: getMockLeaderboard }
-    : { getLeaderboard: getSupabaseLeaderboard };
+  return getDataSource() === 'mock' ? mockLeaderboardProvider : supabaseLeaderboardProvider;
 }

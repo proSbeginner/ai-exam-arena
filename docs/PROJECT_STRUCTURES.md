@@ -110,6 +110,17 @@ server/
 │       ├── player.transform.ts
 │       └── leaderboard.transform.ts
 └── providers/
+    ├── admin-question.provider.ts
+    ├── mock-admin-question.provider.ts
+    ├── mock-attempt.provider.ts
+    ├── mock-leaderboard.provider.ts
+    ├── mock-player.provider.ts
+    ├── mock-quiz.provider.ts
+    ├── supabase-admin-question.provider.ts
+    ├── supabase-attempt.provider.ts
+    ├── supabase-leaderboard.provider.ts
+    ├── supabase-player.provider.ts
+    ├── supabase-quiz.provider.ts
     └── ...
 
 supabase/
@@ -188,7 +199,7 @@ The map is keyed by `playerId` and quiz mode, and contains the attempt state, se
 - `app/` owns routing and page composition.
 - `features/` owns feature-specific UI, state, domain logic, types, and content.
 - `services/` owns calls to external APIs.
-- `server/providers/` selects the data source for API routes.
+- `server/providers/` selects the data source for API routes and exposes provider interfaces to routes.
 - `server/database/` owns database row types and database-to-application transformers.
 - `supabase/` owns the Supabase REST client and migrations.
 - `mock-api/` owns mock providers and mock fixtures.

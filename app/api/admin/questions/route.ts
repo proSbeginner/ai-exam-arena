@@ -1,7 +1,7 @@
 import { validateAdminQuestion } from '@/features/admin/admin.logic';
 import type { AdminQuestionInput } from '@/features/admin/admin.types';
-import { getMockScenario, simulateMockNetworkDelay, throwIfMockServiceUnavailable } from '@/mock-api/mock-api.config';
-import { createMockAdminQuestion, listMockAdminQuestions } from '@/mock-api/quiz/mock-admin-questions';
+import { DataSourceConfigError } from '@/server/providers/data-source';
+import { getAdminQuestionProvider } from '@/server/providers/admin-question.provider';
 
 function authorize(request: Request): Response | null {
   const expected = process.env.ADMIN_EMAIL?.trim().toLowerCase();
@@ -12,8 +12,12 @@ function authorize(request: Request): Response | null {
 
 export async function GET(request: Request) {
   const denied = authorize(request); if (denied) return denied;
-  await simulateMockNetworkDelay(); throwIfMockServiceUnavailable();
-  return Response.json({ questions: getMockScenario() === 'empty-questions' ? [] : listMockAdminQuestions() });
+  try {
+    return Response.json({ questions: await getAdminQuestionProvider().listQuestions() });
+  } catch (error) {
+    if (error instanceof DataSourceConfigError) return Response.json({ error: { message: error.message } }, { status: 503 });
+    return Response.json({ error: { message: 'ไม่สามารถโหลดคำถามได้' } }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
@@ -21,6 +25,10 @@ export async function POST(request: Request) {
   const input = (await request.json()) as AdminQuestionInput;
   const validationError = validateAdminQuestion(input);
   if (validationError) return Response.json({ error: { message: validationError } }, { status: 400 });
-  await simulateMockNetworkDelay(); throwIfMockServiceUnavailable();
-  return Response.json({ question: createMockAdminQuestion(input) }, { status: 201 });
+  try {
+    return Response.json({ question: await getAdminQuestionProvider().createQuestion(input) }, { status: 201 });
+  } catch (error) {
+    if (error instanceof DataSourceConfigError) return Response.json({ error: { message: error.message } }, { status: 503 });
+    return Response.json({ error: { message: 'ไม่สามารถบันทึกคำถามได้' } }, { status: 500 });
+  }
 }
