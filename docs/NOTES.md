@@ -67,3 +67,7 @@ app/layout.tsx
 หาก Context เริ่มทำให้ re-render มากเกินไป หรือมี external store ที่ต้อง sync อย่างเป็นระบบ สามารถย้ายส่วนที่เกี่ยวข้องไปใช้ `useSyncExternalStore` ได้ โดยเก็บ interface ของ store และค่าที่ component ใช้ให้ใกล้เคียงเดิม เพื่อลดผลกระทบต่อหน้าอื่น
 
 ในทางกลับกัน หาก `useSyncExternalStore` ทำให้เกิดปัญหาด้าน snapshot, cache หรือ hydration และข้อมูลนั้นเป็นเพียง state ภายในแอป ให้ย้ายกลับมาใช้ `Context` + `useState` ได้
+
+## Summary stamp sound effect
+
+ภายหลังให้เพิ่ม sound effect สั้น ๆ เช่นเสียง “ปึ้ง!” เมื่อ animation แบบตราประทับของ summary panel แสดงจบ โดยต้องตรวจสอบข้อจำกัดของ browser ที่อาจไม่อนุญาตให้เล่นเสียงอัตโนมัติโดยไม่มี user interaction

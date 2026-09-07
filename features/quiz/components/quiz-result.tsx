@@ -47,7 +47,7 @@ export function QuizResult({
             <QuizHeader changePlayerName={changePlayerName} currentRank={currentRank} />
           </div>
           <div className="relative z-10 h-40" aria-hidden />
-          <div className="relative z-10 space-y-1 rounded-2xl border-2 border-pink-400/70 bg-transparent backdrop-blur-sm">
+          <div className="relative z-10 space-y-1 rounded-2xl border-2 border-pink-400/70 bg-transparent backdrop-blur-sm animate-stamp-in">
             <h1 className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-3xl font-extrabold text-transparent drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">
               {isCompleted ? (passed ? '🎉 PASSED!' : '😭 TRY AGAIN') : 'สรุปผลการทำข้อสอบ'}
             </h1>
