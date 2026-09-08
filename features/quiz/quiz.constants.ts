@@ -34,6 +34,20 @@ export const RANKS = [
   { min: 9, title: 'AI Master', emoji: '🏆' },
 ];
 
+export const STREAK_MILESTONES = [3, 5, 10, 15, 20];
+
+export const STREAK_TITLES: Record<number, string> = {
+  2: "Double Kill",
+  3: "Killing Spree",
+  4: "Dominating",
+  5: "Mega Kill",
+  6: "Unstoppable",
+  7: "Wicked Sick",
+  8: "Monster Kill",
+  9: "Godlike",
+  10: "Beyond Godlike",
+};
+
 export const QUIZ_MODE_OPTIONS: Array<{
   value: QuizMode;
   label: string;

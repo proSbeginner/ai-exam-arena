@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useRef, type CSSProperties, type TouchEvent } from 'react';
+import { useCallback, useRef, type TouchEvent } from 'react';
 
 import { getQuizMascotImage } from '../quiz.assets';
 import { QUIZ_MOOD } from '../quiz.constants';
@@ -15,6 +15,7 @@ import { QuizQuestionDrama } from './quiz-question-drama';
 import { QuizFunFact } from './quiz-fun-fact';
 import { QuizMascotSpeechBubble } from './quiz-mascot-speech-bubble';
 import { QuizStreakBadge } from './quiz-streak-badge';
+import { QuizConfettiBurst } from './quiz-confetti-burst';
 
 interface QuizActiveProps {
   answerQuestion: (selectedOptionId: string) => void;
@@ -37,50 +38,6 @@ interface QuizActiveProps {
   quizState: QuizState;
   selectedAnswer: string | undefined;
   sympathyIdx: number;
-}
-
-function getParticles(count: number) {
-  const colors = ['#f472b6', '#a78bfa', '#60a5fa', '#fbbf24', '#34d399', '#fb923c'];
-  const sizes = ['h-3 w-2', 'h-2.5 w-1.5', 'h-2 w-2.5', 'h-4 w-1'];
-
-  return Array.from({ length: count }, (_, index) => {
-    const randomValues = new Uint32Array(4);
-    crypto.getRandomValues(randomValues);
-
-    return {
-      id: index,
-      color: colors[index % colors.length],
-      size: sizes[index % sizes.length],
-      left: `${randomValues[0] % 100}%`,
-      delay: `${(randomValues[1] % 500) / 1000}s`,
-      dx: `${Number(randomValues[2] % 401) - 200}px`,
-      rot: `${randomValues[3] % 720}deg`,
-      duration: `${1.5 + (randomValues[0] % 1500) / 1000}s`,
-    };
-  });
-}
-
-function ConfettiBurst({ burstKey }: { burstKey: number }) {
-  if (burstKey === 0) return null;
-
-  return (
-    <div key={burstKey} className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
-      {getParticles(30).map((particle) => (
-        <div
-          key={particle.id}
-          className={`confetti-piece ${particle.size}`}
-          style={{
-            left: particle.left,
-            backgroundColor: particle.color,
-            animationDelay: particle.delay,
-            animationDuration: particle.duration,
-            '--dx': particle.dx,
-            '--rot': particle.rot,
-          } as CSSProperties}
-        />
-      ))}
-    </div>
-  );
 }
 
 function useSwipe(onUp: () => void, onDown: () => void) {
@@ -155,7 +112,7 @@ export function QuizActive({
       data-testid="quiz-active"
       className="relative flex min-h-screen touch-pan-y flex-col items-center justify-between overflow-x-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
     >
-      <ConfettiBurst burstKey={confettiKey} />
+      <QuizConfettiBurst burstKey={confettiKey} streak={quizState.streak} />
       <div className="pointer-events-none absolute inset-x-0 top-[-2rem] z-0 flex justify-center">
         <Image
           src={getQuizMascotImage(quizState.mood, correctImage, wrongImage)}
@@ -177,9 +134,6 @@ export function QuizActive({
           key={`mascot-${quizState.mood}-${quizState.currentQIndex}`}
           className="relative z-10 flex h-48 w-full items-center justify-center"
         >
-          {quizState.streak > 1 && (
-            <QuizStreakBadge streak={quizState.streak} />
-          )}
           <QuizMascotSpeechBubble
             cheerIdx={cheerIdx}
             mood={quizState.mood}
@@ -188,7 +142,10 @@ export function QuizActive({
           />
         </div>
 
-        <QuizProgress answeredCount={answeredCount} totalQuestions={questions.length} />
+        <div className="relative w-full">
+          {quizState.streak > 1 && <QuizStreakBadge streak={quizState.streak} />}
+          <QuizProgress answeredCount={answeredCount} totalQuestions={questions.length} />
+        </div>
 
         <div key={`card-${pageKey}`} className="w-full space-y-4 rounded-3xl bg-white p-6 shadow-xl animate-bounce-in">
           <div className="flex flex-wrap items-center justify-between gap-2">

@@ -1,4 +1,4 @@
-import { ATTEMPT_STATUS, PASSING_SCORE_PERCENTAGE, QUIZ_MODE_OPTION_LIMITS, RANKS } from './quiz.constants';
+import { ATTEMPT_STATUS, PASSING_SCORE_PERCENTAGE, QUIZ_MODE_OPTION_LIMITS, RANKS, STREAK_MILESTONES, STREAK_TITLES } from './quiz.constants';
 import type { QuizAttemptRecord } from './quiz-attempt.types';
 import type { ExamQuestion } from './quiz.types';
 import type { AnswerResult, NextQuestionResult, QuizMode, QuizState } from './quiz.types';
@@ -26,7 +26,15 @@ export function hasPassedQuiz(score: number, questionCount: number): boolean {
   return questionCount > 0 && score * 100 >= questionCount * PASSING_SCORE_PERCENTAGE;
 }
 
-export const STREAK_MILESTONES = [3, 5, 7, 10];
+export function isStreakMilestone(streak: number): boolean {
+  return STREAK_MILESTONES.includes(streak) || (streak > 20 && streak % 5 === 0);
+}
+
+export function getStreakTitle(streak: number): string | null {
+  if (streak < 2) return null;
+  return STREAK_TITLES[Math.min(streak, 10)] ?? null;
+}
+
 
 function randomIndex(max: number): number {
   const randomValues = new Uint32Array(1);
@@ -119,7 +127,7 @@ export function evaluateAnswer(
     streak,
     mood: 'correct',
     answeredMap,
-    triggerConfetti: STREAK_MILESTONES.includes(streak) || rankChanged,
+    triggerConfetti: isStreakMilestone(streak) || rankChanged,
     rankChanged,
   };
 }

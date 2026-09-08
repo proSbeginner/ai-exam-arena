@@ -5,6 +5,8 @@ import {
   evaluateAnswer,
   getNextQuestion,
   getPreviousQuestion,
+  getStreakTitle,
+  isStreakMilestone,
   getRank,
   isQuestionAvailableForMode,
   randomizeQuestionOptions,
@@ -296,5 +298,35 @@ describe('restartGame', () => {
       summaryVisible: false,
       attemptStatus: 'active',
     });
+  });
+});
+
+describe('streak titles and milestones', () => {
+  it.each([
+    [2, 'Double Kill'],
+    [3, 'Killing Spree'],
+    [4, 'Dominating'],
+    [5, 'Mega Kill'],
+    [6, 'Unstoppable'],
+    [7, 'Wicked Sick'],
+    [8, 'Monster Kill'],
+    [9, 'Godlike'],
+    [10, 'Beyond Godlike'],
+    [11, 'Beyond Godlike'],
+  ])('returns the Dota-style title for streak %i', (streak, title) => {
+    expect(getStreakTitle(streak)).toBe(title);
+  });
+
+  it('does not return a title before a double kill', () => {
+    expect(getStreakTitle(0)).toBeNull();
+    expect(getStreakTitle(1)).toBeNull();
+  });
+
+  it.each([3, 5, 10, 15, 20, 25, 30])('marks streak %i as a confetti milestone', (streak) => {
+    expect(isStreakMilestone(streak)).toBe(true);
+  });
+
+  it.each([0, 1, 2, 4, 6, 11, 24, 26])('does not mark streak %i as a confetti milestone', (streak) => {
+    expect(isStreakMilestone(streak)).toBe(false);
   });
 });
