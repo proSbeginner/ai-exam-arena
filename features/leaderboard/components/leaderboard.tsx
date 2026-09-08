@@ -134,24 +134,26 @@ export function Leaderboard() {
         <div className="mx-auto mt-5 flex w-full max-w-md flex-wrap justify-center gap-3">
           {playerId && (
             <>
-              <button
-                type="button"
-                onClick={() => void continuePlayerQuiz()}
-                className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white px-4 py-2.5 text-sm font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
-              >
-                {currentPlayerEntry
-                  ? currentPlayerEntry.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
+              {(!currentPlayerEntry || currentPlayerEntry.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.ABANDONED || currentPlayerEntry.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED) && (
+                <button
+                  type="button"
+                  onClick={() => void continuePlayerQuiz()}
+                  className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white px-4 py-2.5 text-sm font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
+                >
+                  {currentPlayerEntry?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
                     ? 'ทวนคำตอบ'
-                    : 'ทำต่อ'
-                  : 'ลงสนาม'}
-              </button>
+                    : currentPlayerEntry?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.ABANDONED
+                      ? 'ทำต่อ'
+                      : 'ลงสนาม'}
+                </button>
+              )}
               {currentPlayerEntry && (
                 <button
                   type="button"
                   onClick={() => setShowRestartConfirmation(true)}
                   className="flex-1 cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:shadow-pink-500/30 active:scale-95"
                 >
-                  เล่นอีกครั้ง
+                  เล่นใหม่
                 </button>
               )}
             </>
@@ -169,7 +171,7 @@ export function Leaderboard() {
       </section>
       {showRestartConfirmation && (
         <ConfirmationDialog
-          title="เล่นอีกครั้งหรือไม่ ?"
+          title="เล่นใหม่หรือไม่ ?"
           message="ความคืบหน้าของชุดปัจจุบันจะถูกทิ้ง และระบบจะสุ่มคำถามชุดใหม่ให้"
           onCancel={() => setShowRestartConfirmation(false)}
           onConfirm={() => void restartPlayerQuiz()}

@@ -81,14 +81,14 @@ export function QuizResult({
           onClick={() => setShowRestartConfirmation(true)}
           className="flex-1 cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
         >
-          เล่นอีกครั้ง 🚀
+          เล่นใหม่ 🚀
         </button>
       </div>
         </div>
       </div>
       {showRestartConfirmation && (
         <ConfirmationDialog
-          title="เล่นอีกครั้งหรือไม่ ?"
+          title="เล่นใหม่หรือไม่ ?"
           message="ความคืบหน้าของชุดปัจจุบันจะถูกทิ้ง และระบบจะสุ่มคำถามชุดใหม่ให้"
           onCancel={() => setShowRestartConfirmation(false)}
           onConfirm={() => {
