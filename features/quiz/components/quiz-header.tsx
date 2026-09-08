@@ -1,6 +1,6 @@
 import { BrandTitle } from '@/features/shared/components/brand-title';
 import { LeaderboardLink } from '@/features/shared/components/leaderboard-link';
-import { RankEmblemBadge } from '@/features/shared/components/rank-emblem-badge';
+import { RankEmblemTooltip } from '@/features/shared/components/rank-emblem-tooltip';
 import type { PlayerRank } from '@/features/rank/rank.types';
 import { PlayerRankBadge } from '@/features/shared/components/player-rank-badge';
 
@@ -17,7 +17,7 @@ export function QuizHeader({ selectPlayer, currentRank, currentMmrRank }: QuizHe
         <h1 className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-xl font-bold text-transparent">
           <BrandTitle />
         </h1>
-        <>{currentMmrRank ? <RankEmblemBadge mobileIconOnly rank={currentMmrRank} /> : <PlayerRankBadge rank={currentRank} />}</>
+        <>{currentMmrRank ? <RankEmblemTooltip rank={currentMmrRank} /> : <PlayerRankBadge rank={currentRank} />}</>
       </div>
       <div className="flex items-center gap-2">
         <LeaderboardLink inline variant="header" />

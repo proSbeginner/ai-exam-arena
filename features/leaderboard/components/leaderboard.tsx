@@ -14,7 +14,7 @@ import type { QuizMode } from '@/features/quiz/quiz.types';
 import { APP_ROUTES } from '@/features/shared/routes';
 
 import { getPlayerRank } from '../leaderboard.logic';
-import { RankEmblemBadge } from '@/features/shared/components/rank-emblem-badge';
+import { RankEmblemTooltip } from '@/features/shared/components/rank-emblem-tooltip';
 
 import { useLeaderboard } from '../leaderboard.hook';
 import { LEADERBOARD_ATTEMPT_STATUS } from '../leaderboard.constants';
@@ -123,7 +123,7 @@ export function Leaderboard() {
                   {entry.playerName}
                   {entry.attemptStatus === 'abandoned' && <span className="ml-2 text-xs font-medium text-gray-400">(ยังไม่จบ)</span>}
                 </span>
-                <RankEmblemBadge compact rank={entry.rank ?? { name: 'Herald', mmr: 0, stars: 1 }} />
+                <RankEmblemTooltip compact rank={entry.rank ?? { name: 'Herald', mmr: 0, stars: 1 }} />
                 <span className="text-right text-gray-500">{entry.answeredCount}/{entry.questionCount}</span>
                 <span className="text-right font-bold text-pink-500">{entry.correctCount} / {entry.accuracy}%</span>
               </div>
