@@ -81,6 +81,29 @@ app/layout.tsx
 
 ภายหลังให้เพิ่ม sound effect สั้น ๆ เช่นเสียง “ปึ้ง!” เมื่อ animation แบบตราประทับของ summary panel แสดงจบ โดยต้องตรวจสอบข้อจำกัดของ browser ที่อาจไม่อนุญาตให้เล่นเสียงอัตโนมัติโดยไม่มี user interaction
 
+## Quiz answers
+
+ตาราง `quiz_answers` คือหลักฐานถาวรของการทำข้อสอบ เก็บคำตอบรายข้อของแต่ละ attempt และใช้ดูคำตอบเดิมในหน้า `ทวนคำตอบ` โดย `selected_option_id` ต้องเป็น UUID ของแถวใน `question_options` ไม่ใช่ค่า `option_key` ที่ใช้ใน application เช่น `option-b`
+
+Naming contract ของตัวเลือก:
+
+- `question_options.option_key` คือชื่อ field ฝั่ง DB และเก็บค่าเช่น `option-b`
+- `ExamQuestion.options[].optionKey` คือชื่อ field ฝั่ง application และเก็บค่าเดียวกับ `option_key`
+- `question_options.id` คือ primary key UUID ของ DB ควรเรียกใน application ว่า `optionId` และใช้เป็น `selectedOptionId` เมื่อส่งไปบันทึกใน `quiz_answers`
+- ห้ามใช้ชื่อ `id` ฝั่ง application แทน `optionKey` เพราะคำว่า `id` ต้องสื่อถึง primary key ของ DB
+
+### Optimistic locking ของ quiz attempt
+
+ปัจจุบันยังไม่เปิดใช้ optimistic locking อย่างสมบูรณ์ เพราะ `current_question_index` ใช้สำหรับตรวจว่าผู้เล่นกำลังตอบคำถามที่ถูกต้องเท่านั้น และค่าเดิมอาจยังไม่เปลี่ยนหลังบันทึกคำตอบ จึงไม่สามารถป้องกัน request ซ้ำหรือ concurrent update ได้อย่างเพียงพอ
+
+เมื่อพร้อมทำงานส่วนนี้ ให้เพิ่ม migration สำหรับ column:
+
+```sql
+quiz_attempts.version integer not null default 0
+```
+
+จากนั้นให้ใช้ `version` เดิมเป็นเงื่อนไขใน update และเพิ่มค่า version ทีละหนึ่ง หาก update ได้ศูนย์แถวให้ถือว่าเกิด concurrent update ส่วน `current_question_index` ยังคงทำหน้าที่ตรวจลำดับคำถามแยกต่างหาก
+
 ## Chrome mobile mode scrolling
 
 พบว่า Chrome DevTools mobile mode อาจเลื่อนหรือ swipe หน้า quiz ไม่ได้หลังเลือกคำตอบ ขณะที่ browser บน mobile จริงทำงานปกติ จึงยังไม่ปรับแก้ต่อในตอนนี้ ให้ตรวจสอบอีกครั้งหลังรัน production build ก่อนตัดสินใจแก้ถาวร
