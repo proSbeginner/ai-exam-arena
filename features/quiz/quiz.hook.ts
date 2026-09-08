@@ -187,6 +187,7 @@ export function useQuiz() {
             gameOver: shouldReviewAttempt ? false : matchingAttempt.state.gameOver,
             summaryVisible: shouldReviewAttempt ? false : matchingAttempt.state.summaryVisible,
             attemptStatus: shouldReviewAttempt ? ATTEMPT_STATUS.ACTIVE : matchingAttempt.state.attemptStatus,
+            streak: shouldReviewAttempt ? 0 : matchingAttempt.state.streak,
             answeredMap: new Map(Object.entries(matchingAttempt.state.answeredMap).map(([index, answer]) => [Number(index), answer])),
           });
         } else if (matchingAttempt) {
