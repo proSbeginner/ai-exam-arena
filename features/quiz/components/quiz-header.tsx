@@ -8,13 +8,14 @@ interface QuizHeaderProps {
   selectPlayer: () => void;
   currentMmrRank?: PlayerRank | null;
   currentRank: { emoji: string; title: string };
+  embedded?: boolean;
 }
 
-export function QuizHeader({ selectPlayer, currentRank, currentMmrRank }: QuizHeaderProps) {
+export function QuizHeader({ selectPlayer, currentRank, currentMmrRank, embedded = false }: QuizHeaderProps) {
   return (
-    <header className="mx-auto flex w-full max-w-lg items-center justify-between py-4">
+    <header className={`mx-auto flex w-full max-w-lg items-center justify-between ${embedded ? '' : 'py-4'}`}>
       <div className="flex items-center gap-2">
-        <h1 className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-xl font-bold text-transparent">
+        <h1 className="whitespace-nowrap bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-base font-bold text-transparent sm:text-xl">
           <BrandTitle />
         </h1>
         <>{currentMmrRank ? <RankEmblemTooltip rank={currentMmrRank} /> : <PlayerRankBadge rank={currentRank} />}</>

@@ -56,7 +56,7 @@ export function QuizResult({
             className={`pointer-events-none absolute left-1/2 top-[-2rem] z-0 h-[36rem] w-[36rem] max-h-none max-w-none -translate-x-1/2 object-contain drop-shadow-xl ${passed ? 'animate-wiggle' : ''}`}
           />
           <div className="relative z-10">
-            <QuizHeader selectPlayer={selectPlayer} currentRank={currentRank} currentMmrRank={currentMmrRank} />
+            <QuizHeader embedded selectPlayer={selectPlayer} currentRank={currentRank} currentMmrRank={currentMmrRank} />
           </div>
           <div className="relative z-10 h-40" aria-hidden />
           <QuizResultSummary
