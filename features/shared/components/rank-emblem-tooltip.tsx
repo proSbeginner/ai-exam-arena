@@ -11,11 +11,13 @@ import { RankEmblemBadge } from './rank-emblem-badge';
 
 interface RankEmblemTooltipProps {
   rank: PlayerRank;
-  variant?: 'quiz' | 'leaderboard';
+  variant?: 'quiz' | 'leaderboard' | 'toolbar';
 }
 
 export function RankEmblemTooltip({ rank, variant = 'quiz' }: RankEmblemTooltipProps) {
   const isLeaderboard = variant === 'leaderboard';
+  const isToolbar = variant === 'toolbar';
+  const tooltipAnimationClass = isToolbar ? 'animate-rank-toolbar-in' : '';
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const containerRef = useRef<HTMLSpanElement>(null);
@@ -40,7 +42,9 @@ export function RankEmblemTooltip({ rank, variant = 'quiz' }: RankEmblemTooltipP
       const bounds = containerRef.current.getBoundingClientRect();
       setPosition(
           isLeaderboard
-          ? { top: bounds.top + bounds.height / 2, left: bounds.right + 8 }
+          ? { top: bounds.top + bounds.height / 2, left: Math.min(bounds.right + 8, window.innerWidth - 232) }
+          : isToolbar
+            ? { top: bounds.bottom + 8, left: Math.max(56, Math.min(bounds.left, window.innerWidth - 232)) }
           : { top: bounds.bottom + 8, left: bounds.left + bounds.width / 2 },
       );
     }
@@ -64,7 +68,7 @@ export function RankEmblemTooltip({ rank, variant = 'quiz' }: RankEmblemTooltipP
             <span
               role="tooltip"
               style={{ top: position.top, left: position.left }}
-              className={`fixed z-50 flex w-56 flex-col items-center gap-0.5 rounded-2xl bg-gradient-to-br from-fuchsia-500/85 via-purple-500/85 to-indigo-600/85 p-4 text-center text-white shadow-xl backdrop-blur-sm ${isLeaderboard ? '-translate-y-1/2 before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:border-y-8 before:border-r-8 before:border-y-transparent before:border-r-fuchsia-500/85' : '-translate-x-1/2 before:absolute before:-top-2 before:left-1/2 before:-translate-x-1/2 before:border-x-8 before:border-b-8 before:border-x-transparent before:border-b-fuchsia-500/85'} before:content-['']`}
+              className={`fixed z-50 flex w-56 flex-col items-center gap-0.5 rounded-2xl bg-gradient-to-br from-fuchsia-500/85 via-purple-500/85 to-indigo-600/85 p-4 text-center text-white shadow-xl backdrop-blur-sm ${isLeaderboard ? '-translate-y-1/2 before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:border-y-8 before:border-r-8 before:border-y-transparent before:border-r-fuchsia-500/85' : isToolbar ? '' : '-translate-x-1/2 before:absolute before:-top-2 before:left-1/2 before:-translate-x-1/2 before:border-x-8 before:border-b-8 before:border-x-transparent before:border-b-fuchsia-500/85'} ${tooltipAnimationClass} before:content-['']`}
             >
               <Image
                 src={asset}

@@ -3,7 +3,7 @@
 import { useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { getStoredPlayerId, subscribeToPlayerName } from '@/features/welcome/welcome.hook';
+import { getStoredPlayerId, getStoredPlayerName, subscribeToPlayerName } from '@/features/welcome/welcome.hook';
 import { QUIZ_MODE_OPTIONS } from '@/features/quiz/quiz.constants';
 import { getStoredQuizSetup, saveQuizSetup, subscribeToQuizSetup } from '@/features/quiz/quiz-setup.hook';
 import { saveQuizReviewAttemptId } from '@/features/quiz/quiz-progress.storage';
@@ -15,6 +15,7 @@ import { APP_ROUTES } from '@/features/shared/routes';
 
 import { getPlayerRank } from '../leaderboard.logic';
 import { RankEmblemTooltip } from '@/features/shared/components/rank-emblem-tooltip';
+import { AppToolbar } from '@/features/shared/components/app-toolbar';
 
 import { useLeaderboard } from '../leaderboard.hook';
 import { LEADERBOARD_ATTEMPT_STATUS } from '../leaderboard.constants';
@@ -26,11 +27,13 @@ export function Leaderboard() {
   const storedQuizSetup = useSyncExternalStore(subscribeToQuizSetup, getStoredQuizSetup, () => null);
   const mode = modeOverride ?? storedQuizSetup?.mode ?? 'university';
   const playerId = useSyncExternalStore(subscribeToPlayerName, getStoredPlayerId, () => null);
+  const playerName = useSyncExternalStore(subscribeToPlayerName, getStoredPlayerName, () => null);
   const { entries, currentAttempt, error, isLoading } = useLeaderboard(mode, playerId);
   const leaderboardVersion = entries
     .map((entry, index) => `${index}:${entry.playerId}:${entry.completedAt}:${entry.answeredCount}:${entry.correctCount}`)
     .join('|') || 'empty';
   const playerRank = playerId ? getPlayerRank(entries, playerId) : null;
+  const currentPlayerEntry = playerId ? entries.find((entry) => entry.playerId === playerId) : undefined;
   const [showRestartConfirmation, setShowRestartConfirmation] = useState(false);
 
   const continuePlayerQuiz = async () => {
@@ -60,10 +63,18 @@ export function Leaderboard() {
 
   return (
     <main
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-pink-400 via-fuchsia-400 to-purple-600 bg-[length:200%_200%] p-4 font-sans sm:p-8 animate-leaderboard-background"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-pink-400 via-fuchsia-400 to-purple-600 bg-[length:200%_200%] p-4 pt-20 font-sans sm:p-8 animate-leaderboard-background"
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="leaderboard-spotlight animate-leaderboard-spotlight absolute inset-[-50%]" />
+      </div>
+      <div className="fixed inset-x-0 top-0 z-30 px-4">
+        <AppToolbar
+          playerName={playerName ?? ''}
+          selectPlayer={() => router.push(APP_ROUTES.welcome)}
+          currentMmrRank={currentPlayerEntry?.rank}
+          showNavigation={false}
+        />
       </div>
       <section className="relative z-10 mx-auto w-full max-w-3xl rounded-3xl bg-white/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8">
         <div className="text-center">

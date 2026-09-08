@@ -8,7 +8,7 @@ import { ATTEMPT_STATUS } from '../quiz.constants';
 import { hasPassedQuiz } from '../quiz.logic';
 import type { PlayerRank } from '@/features/rank/rank.types';
 import type { ExamQuestion, QuizState } from '../quiz.types';
-import { QuizHeader } from './quiz-header';
+import { AppToolbar } from '@/features/shared/components/app-toolbar';
 import { ConfirmationDialog } from '@/features/shared/components/confirmation-dialog';
 import { QuizResultSummary } from './quiz-result-summary';
 
@@ -42,9 +42,12 @@ export function QuizResult({
   return (
     <main
       data-testid="quiz-result"
-      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
+      className="relative flex min-h-screen w-full flex-col items-center justify-start overflow-hidden pt-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
     >
-      <div className="relative z-10 flex w-full max-w-lg items-center justify-center">
+      <div className="fixed inset-x-0 top-0 z-30 px-4">
+        <AppToolbar playerName={playerName} selectPlayer={selectPlayer} currentRank={currentRank} currentMmrRank={currentMmrRank} />
+      </div>
+      <div className="relative z-10 my-auto flex w-full max-w-lg items-center justify-center">
         <div className="relative isolate w-full space-y-4 rounded-3xl bg-white/60 p-8 text-center shadow-2xl backdrop-blur-xl animate-bounce-in">
           <Image
             src={MOOD_IMAGES[quizState.mood]}
@@ -53,11 +56,8 @@ export function QuizResult({
             height={768}
             loading="eager"
             aria-hidden
-            className={`pointer-events-none absolute left-1/2 top-[-2rem] z-0 h-[36rem] w-[36rem] max-h-none max-w-none -translate-x-1/2 object-contain drop-shadow-xl ${passed ? 'animate-wiggle' : ''}`}
+            className={`pointer-events-none absolute left-1/2 top-[-6rem] z-0 h-[36rem] w-[36rem] max-h-none max-w-none -translate-x-1/2 object-contain drop-shadow-xl ${passed ? 'animate-wiggle' : ''}`}
           />
-          <div className="relative z-10">
-            <QuizHeader embedded selectPlayer={selectPlayer} currentRank={currentRank} currentMmrRank={currentMmrRank} />
-          </div>
           <div className="relative z-10 h-40" aria-hidden />
           <QuizResultSummary
             answeredCount={answeredCount}

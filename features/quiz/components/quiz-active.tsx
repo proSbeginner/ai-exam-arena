@@ -7,7 +7,7 @@ import { getQuizMascotImage } from '../quiz.assets';
 import { QUIZ_MOOD } from '../quiz.constants';
 import type { PlayerRank } from '@/features/rank/rank.types';
 import type { ExamQuestion, QuizState } from '../quiz.types';
-import { QuizHeader } from './quiz-header';
+import { AppToolbar } from '@/features/shared/components/app-toolbar';
 import { QuizProgress } from './quiz-progress';
 import { QuizAnswerOptions } from './quiz-answer-options';
 import { QuizQuestion } from './quiz-question';
@@ -134,11 +134,11 @@ export function QuizActive({
         />
       </div>
 
-      <div className="relative z-20 w-full">
-        <QuizHeader selectPlayer={selectPlayer} currentRank={currentRank} currentMmrRank={currentMmrRank} />
+      <div className="fixed inset-x-0 top-0 z-30 px-4">
+        <AppToolbar playerName={playerName} selectPlayer={selectPlayer} currentRank={currentRank} currentMmrRank={currentMmrRank} />
       </div>
 
-      <div className="relative z-10 flex w-full max-w-lg flex-col gap-6 pb-24">
+      <div className="relative z-10 flex w-full max-w-lg flex-col gap-6 pb-24 pt-16">
         <div
           key={`mascot-${quizState.mood}-${quizState.currentQIndex}`}
           className="relative z-10 flex h-48 w-full items-center justify-center"

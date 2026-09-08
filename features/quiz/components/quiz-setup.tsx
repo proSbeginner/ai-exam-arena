@@ -1,6 +1,7 @@
 'use client';
 
 import { TextInput } from '@/features/shared/components/text-input';
+import { AppToolbar } from '@/features/shared/components/app-toolbar';
 
 import type { QuizMode } from '../quiz.types';
 
@@ -14,6 +15,8 @@ interface QuizSetupProps {
   startQuiz: () => void;
   updateMode: (mode: QuizMode) => void;
   updateQuestionLimit: (value: string) => void;
+  playerName: string;
+  selectPlayer: () => void;
 }
 
 export function QuizSetup({
@@ -26,9 +29,14 @@ export function QuizSetup({
   startQuiz,
   updateMode,
   updateQuestionLimit,
+  playerName,
+  selectPlayer,
 }: QuizSetupProps) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 pt-16">
+      <div className="fixed inset-x-0 top-0 z-30 px-4">
+        <AppToolbar playerName={playerName} selectPlayer={selectPlayer} />
+      </div>
       <section className="w-full max-w-lg space-y-6 rounded-3xl bg-white p-6 shadow-xl sm:p-8">
         <div>
           <p className="text-sm font-bold uppercase tracking-wide text-purple-500">Quiz setup</p>
