@@ -5,6 +5,7 @@ import { useQuiz } from '@/features/quiz/quiz.hook';
 
 export default function QuizPage() {
   const {
+    answerError,
     answerQuestion,
     answeredCount,
     selectPlayer,
@@ -20,6 +21,8 @@ export default function QuizPage() {
     hasAnsweredCurrentQuestion,
     hasQuizSetup,
     isQuizSetupReady,
+    isSubmittingAnswer,
+    isReviewing,
     isPlayerReady,
     pageKey,
     playerName,
@@ -37,6 +40,7 @@ export default function QuizPage() {
 
   return (
     <Quiz
+      answerError={answerError}
       answerQuestion={answerQuestion}
       answeredCount={answeredCount}
       selectPlayer={selectPlayer}
@@ -52,6 +56,8 @@ export default function QuizPage() {
       hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
       hasQuizSetup={hasQuizSetup}
       isQuizSetupReady={isQuizSetupReady}
+      isSubmittingAnswer={isSubmittingAnswer}
+      isReviewing={isReviewing}
       isPlayerReady={isPlayerReady}
       pageKey={pageKey}
       playerName={playerName}

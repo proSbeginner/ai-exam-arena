@@ -26,6 +26,7 @@ import {
   evaluateAnswer,
   getNextQuestion,
   getPreviousQuestion,
+  hasPassedQuiz,
   getRank,
   isQuestionAvailableForMode,
   randomizeQuizQuestions,
@@ -344,16 +345,24 @@ export function useQuiz() {
   const showSummary = useCallback(() => {
     if (quizState.gameOver) return;
 
-    const nextState: QuizState = {
-      ...quizState,
-      summaryVisible: true,
-      attemptStatus: ATTEMPT_STATUS.ABANDONED,
-    };
+    const nextState: QuizState = isReviewing
+      ? {
+          ...quizState,
+          summaryVisible: true,
+          gameOver: true,
+          mood: hasPassedQuiz(quizState.score, questions.length) ? "passed" : "failed",
+          attemptStatus: ATTEMPT_STATUS.COMPLETED,
+        }
+      : {
+          ...quizState,
+          summaryVisible: true,
+          attemptStatus: ATTEMPT_STATUS.ABANDONED,
+        };
 
     setQuizState(nextState);
     persistProgress(nextState);
     syncAttempt(nextState);
-  }, [persistProgress, quizState, syncAttempt]);
+  }, [hasPassedQuiz, isReviewing, persistProgress, questions.length, quizState, syncAttempt]);
 
   const resumeQuiz = useCallback(() => {
     if (!quizState.summaryVisible || isSubmittingAnswer) return;
@@ -409,6 +418,7 @@ export function useQuiz() {
     hasQuizSetup: Boolean(quizSetup),
     isQuizSetupReady,
     isPlayerReady,
+    isReviewing,
     isSubmittingAnswer,
     pageKey,
     playerName,

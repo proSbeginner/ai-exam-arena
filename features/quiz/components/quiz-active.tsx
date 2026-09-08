@@ -32,7 +32,9 @@ interface QuizActiveProps {
   goToNext: () => void;
   goToPrevious: () => void;
   hasAnsweredCurrentQuestion: boolean;
+  isReviewing: boolean,
   isSubmittingAnswer: boolean;
+
   onShowSummary: () => void;
   pageKey: number;
   playerName: string;
@@ -92,6 +94,7 @@ export function QuizActive({
   goToNext,
   goToPrevious,
   hasAnsweredCurrentQuestion,
+  isReviewing,
   isSubmittingAnswer,
   onShowSummary,
   pageKey,
@@ -108,7 +111,7 @@ export function QuizActive({
       : quizState.mood === QUIZ_MOOD.WRONG
         ? 'animate-shake'
         : 'animate-floaty';
-  const canShowSummary = answeredCount < questions.length && quizState.currentQIndex < questions.length - 1;
+  const canShowSummary = questions.length > 0;
 
   return (
     <div
@@ -194,10 +197,10 @@ export function QuizActive({
           <button
             type="button"
             onClick={goToNext}
-            disabled={isSubmittingAnswer}
+            disabled={quizState.currentQIndex === questions.length - 1 || isSubmittingAnswer}
             className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {quizState.currentQIndex === questions.length - 1 ? 'สรุปผลตอนนี้' : 'ข้อถัดไป'}
+            {'ข้อถัดไป'}
             <span aria-hidden>→</span>
           </button>
         </div>

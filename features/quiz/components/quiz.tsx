@@ -30,7 +30,9 @@ interface QuizProps {
   hasQuizSetup: boolean;
   isQuizSetupReady: boolean;
   isPlayerReady: boolean;
+  isReviewing: boolean,
   isSubmittingAnswer: boolean;
+
   pageKey: number;
   playerName: string | null;
   questionLoadError: string | null;
@@ -63,6 +65,7 @@ export function Quiz({
   hasQuizSetup,
   isQuizSetupReady,
   isPlayerReady,
+  isReviewing,
   isSubmittingAnswer,
   pageKey,
   playerName,
@@ -146,6 +149,7 @@ export function Quiz({
       goToNext={goToNext}
       goToPrevious={goToPrevious}
       hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
+      isReviewing={isReviewing}
       isSubmittingAnswer={isSubmittingAnswer}
       onShowSummary={showSummary}
       pageKey={pageKey}
