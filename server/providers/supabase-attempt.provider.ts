@@ -67,26 +67,39 @@ async function getSupabaseAttemptById(attemptId: string): Promise<QuizAttemptRec
 }
 
 async function submitSupabaseAnswer(attemptId: string, questionId: string, selectedOptionId: string) {
+  // Load the current attempt and identify the question/option being answered.
   const attempt = await getSupabaseAttemptById(attemptId);
   if (!attempt) throw new Error("Attempt not found.");
   if (attempt.state.attemptStatus === "completed") throw new Error("Attempt is already completed.");
+
   const query = supabaseQuery({ select: "*,question_options(*)", id: `eq.${questionId}`, limit: "1" });
   const rows = await supabaseRequest<DatabaseQuestionRow[]>(`questions?${query}`);
   const question = rows[0] ? transformQuestion(rows[0]) : null;
+  const selectedOption = rows[0]?.question_options.find((option) => option.option_key === selectedOptionId);
+
+  // Reject answers for another question, duplicate answers, or unknown options.
   const questionIndex = attempt.questionIds.indexOf(questionId);
   if (!question || questionIndex !== attempt.state.currentQIndex) throw new InvalidAttemptAnswerError("Invalid question.");
   if (attempt.state.answeredMap[String(questionIndex)]) throw new InvalidAttemptAnswerError("Question has already been answered.");
-  if (!question.options.some((option) => option.id === selectedOptionId)) throw new InvalidAttemptAnswerError("Invalid answer.");
+  if (!selectedOption) throw new InvalidAttemptAnswerError("Invalid answer.");
+
+  // Calculate the trusted next state on the server.
   const state: QuizState = { ...attempt.state, answeredMap: new Map(Object.entries(attempt.state.answeredMap).map(([index, answer]) => [Number(index), answer])) };
   const result = evaluateAnswer(state, question, selectedOptionId);
   const nextState: QuizState = { ...state, score: result.score, streak: result.streak, mood: result.mood, answeredMap: result.answeredMap };
+
+  // Persist the attempt progress using the server-calculated state.
   const updatedRows = await supabaseRequest<DatabaseAttemptRow[]>(`quiz_attempts?id=eq.${attemptId}`, {
     method: 'PATCH',
     headers: { Prefer: 'return=representation' },
     body: JSON.stringify({ attempt_status: 'active', current_question_index: nextState.currentQIndex, score: nextState.score, state: serializeQuizState(nextState) }),
   });
   const updated = transformAttempt(updatedRows[0], attempt.playerName);
-  await supabaseRequest("quiz_answers", { method: "POST", body: JSON.stringify({ attempt_id: attemptId, question_id: questionId, selected_option_id: selectedOptionId, is_correct: selectedOptionId === question.correctOptionId }) });
+
+  // Store the answer with the database UUID, not the application option key.
+  await supabaseRequest("quiz_answers", { method: "POST", body: JSON.stringify({ attempt_id: attemptId, question_id: questionId, selected_option_id: selectedOption.id, is_correct: selectedOptionId === question.correctOptionId }) });
+
+  // Return the updated attempt and correctness result to the API route.
   return { attempt: updated, isCorrect: selectedOptionId === question.correctOptionId };
 }
 
