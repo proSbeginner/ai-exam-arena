@@ -346,19 +346,16 @@ export function useQuiz() {
   const showSummary = useCallback(() => {
     if (quizState.gameOver) return;
 
-    const nextState: QuizState = isReviewing
-      ? {
-          ...quizState,
-          summaryVisible: true,
-          gameOver: true,
-          mood: hasPassedQuiz(quizState.score, questions.length) ? "passed" : "failed",
-          attemptStatus: ATTEMPT_STATUS.COMPLETED,
-        }
-      : {
-          ...quizState,
-          summaryVisible: true,
-          attemptStatus: ATTEMPT_STATUS.ABANDONED,
-        };
+    const shouldComplete = isReviewing || quizState.answeredMap.size >= questions.length;
+    const nextState: QuizState = {
+      ...quizState,
+      summaryVisible: true,
+      gameOver: shouldComplete,
+      mood: shouldComplete
+        ? hasPassedQuiz(quizState.score, questions.length) ? 'passed' : 'failed'
+        : quizState.mood,
+      attemptStatus: shouldComplete ? ATTEMPT_STATUS.COMPLETED : ATTEMPT_STATUS.ABANDONED,
+    };
 
     setQuizState(nextState);
     persistProgress(nextState);

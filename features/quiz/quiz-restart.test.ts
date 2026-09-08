@@ -41,7 +41,7 @@ describe('restartQuizAttempt', () => {
     expect(mocks.discardQuizAttempt).toHaveBeenCalledWith('attempt-1');
     expect(mocks.saveQuizSetup).toHaveBeenCalledWith({ mode: 'university', questionLimit: 5 });
     expect(navigate).toHaveBeenCalledWith('/quiz/setup');
-    expect(mocks.clearQuizProgress.mock.invocationCallOrder[0]).toBeLessThan(mocks.discardQuizAttempt.mock.invocationCallOrder[0]);
+    expect(mocks.discardQuizAttempt.mock.invocationCallOrder[0]).toBeLessThan(mocks.clearQuizProgress.mock.invocationCallOrder[0]);
     expect(mocks.discardQuizAttempt.mock.invocationCallOrder[0]).toBeLessThan(mocks.saveQuizSetup.mock.invocationCallOrder[0]);
     expect(mocks.saveQuizSetup.mock.invocationCallOrder[0]).toBeLessThan(navigate.mock.invocationCallOrder[0]);
   });
@@ -61,7 +61,7 @@ describe('restartQuizAttempt', () => {
     expect(navigate).toHaveBeenCalledWith('/quiz/setup');
   });
 
-  it('continues to setup even when deleting the old attempt fails', async () => {
+  it('does not clear progress or navigate when deleting the old attempt fails', async () => {
     const navigate = vi.fn();
     mocks.discardQuizAttempt.mockRejectedValueOnce(new Error('delete failed'));
 
@@ -70,9 +70,11 @@ describe('restartQuizAttempt', () => {
       mode: 'secondary',
       questionCount: 2,
       navigate,
-    })).resolves.toBeUndefined();
+    })).rejects.toThrow('delete failed');
 
-    expect(mocks.saveQuizSetup).toHaveBeenCalledWith({ mode: 'secondary', questionLimit: 2 });
-    expect(navigate).toHaveBeenCalledWith('/quiz/setup');
+    expect(mocks.clearQuizProgress).not.toHaveBeenCalled();
+    expect(mocks.clearQuizReviewAttemptId).not.toHaveBeenCalled();
+    expect(mocks.saveQuizSetup).not.toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
   });
 });

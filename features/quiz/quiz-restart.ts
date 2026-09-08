@@ -12,9 +12,9 @@ interface RestartQuizAttemptInput {
 }
 
 export async function restartQuizAttempt({ attemptId, mode, questionCount, navigate }: RestartQuizAttemptInput): Promise<void> {
+  if (attemptId) await discardQuizAttempt(attemptId);
   clearQuizProgress();
   clearQuizReviewAttemptId();
-  if (attemptId) await discardQuizAttempt(attemptId).catch(() => undefined);
   saveQuizSetup({ mode, questionLimit: questionCount });
   navigate(APP_ROUTES.quizSetup);
 }
