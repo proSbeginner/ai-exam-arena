@@ -99,7 +99,7 @@ export function Leaderboard() {
         )}
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-purple-100">
-          <div className="grid grid-cols-[2rem_2.5rem_minmax(0,1fr)_3.5rem_4.5rem] gap-2 bg-purple-50 px-2 py-3 text-xs font-bold text-purple-500 sm:grid-cols-[4rem_9rem_1fr_7rem_7rem] sm:px-4">
+          <div className="grid grid-cols-[2rem_2.5rem_minmax(0,1fr)_3.5rem_4.5rem] items-center gap-2 bg-purple-50 px-2 py-3 text-xs font-bold text-purple-500 sm:grid-cols-[4rem_9rem_1fr_7rem_7rem] sm:px-4">
             <span>Rank</span>
             <span>Tier</span>
             <span>Player</span>
@@ -116,7 +116,7 @@ export function Leaderboard() {
             {!isLoading && !error && entries.map((entry, index) => (
               <div
                 key={`${entry.playerId}-${entry.completedAt}-${leaderboardVersion}`}
-                className={`grid grid-cols-[2rem_2.5rem_minmax(0,1fr)_3.5rem_4.5rem] gap-2 border-t border-purple-50 bg-white px-2 py-4 text-sm sm:grid-cols-[4rem_9rem_1fr_7rem_7rem] sm:px-4 ${entry.playerId === playerId ? 'animate-leaderboard-current-row-flash' : ''}`}
+                className={`grid grid-cols-[2rem_2.5rem_minmax(0,1fr)_3.5rem_4.5rem] items-center gap-2 border-t border-purple-50 bg-white px-2 py-4 text-sm sm:grid-cols-[4rem_9rem_1fr_7rem_7rem] sm:px-4 ${entry.playerId === playerId ? 'animate-leaderboard-current-row-flash' : ''}`}
               >
                 <span className="font-black text-gray-400">{index + 1}</span>
                 <RankEmblemTooltip variant="leaderboard" rank={entry.rank ?? { name: 'Herald', mmr: 0, stars: 1 }} />
