@@ -18,7 +18,6 @@ export function applyClientAttemptUpdate(
     ...current,
     currentQIndex: Math.max(0, Math.min(requested.currentQIndex, Math.max(questionCount - 1, 0))),
     summaryVisible: attemptStatus !== ATTEMPT_STATUS.ACTIVE,
-    gameOver: attemptStatus === ATTEMPT_STATUS.COMPLETED,
     attemptStatus,
     mood: attemptStatus === ATTEMPT_STATUS.COMPLETED
       ? current.score * 100 >= questionCount * PASSING_SCORE_PERCENTAGE ? 'passed' : 'failed'

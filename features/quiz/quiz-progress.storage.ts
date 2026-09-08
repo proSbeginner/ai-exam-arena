@@ -13,8 +13,7 @@ interface StoredQuizProgress {
     streak: number;
     mood: QuizState['mood'];
     answeredMap: Record<string, string>;
-    gameOver: boolean;
-    summaryVisible: boolean;
+      summaryVisible: boolean;
     attemptStatus: QuizState['attemptStatus'];
   };
 }

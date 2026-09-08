@@ -10,7 +10,6 @@ function makeState(overrides: Partial<SerializedQuizState> = {}): SerializedQuiz
     streak: 0,
     mood: 'idle',
     answeredMap: {},
-    gameOver: false,
     summaryVisible: false,
     attemptStatus: 'active',
     ...overrides,
@@ -23,7 +22,6 @@ describe('applyClientAttemptUpdate', () => {
 
     expect(result.attemptStatus).toBe('active');
     expect(result.summaryVisible).toBe(false);
-    expect(result.gameOver).toBe(false);
     expect(result.currentQIndex).toBe(1);
   });
 
@@ -32,7 +30,6 @@ describe('applyClientAttemptUpdate', () => {
 
     expect(result.attemptStatus).toBe('abandoned');
     expect(result.summaryVisible).toBe(true);
-    expect(result.gameOver).toBe(false);
   });
 
   it('marks a fully answered attempt completed when completion is requested', () => {
@@ -44,7 +41,6 @@ describe('applyClientAttemptUpdate', () => {
 
     expect(result.attemptStatus).toBe('completed');
     expect(result.summaryVisible).toBe(true);
-    expect(result.gameOver).toBe(true);
     expect(result.mood).toBe('passed');
   });
 

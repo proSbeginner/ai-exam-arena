@@ -20,7 +20,6 @@ const initialState: QuizState = {
   streak: 0,
   mood: 'idle',
   answeredMap: new Map(),
-  gameOver: false,
   summaryVisible: false,
   attemptStatus: ATTEMPT_STATUS.ACTIVE,
 };

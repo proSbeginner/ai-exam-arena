@@ -101,6 +101,8 @@ export function useQuiz() {
   const [pageKey, setPageKey] = useState(0);
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [answerError, setAnswerError] = useState<string | null>(null);
+  const [summarySaveError, setSummarySaveError] = useState<string | null>(null);
+  const [isSavingSummary, setIsSavingSummary] = useState(false);
 
   useEffect(() => {
     if (!playerId || !quizSetup) return;
@@ -184,7 +186,6 @@ export function useQuiz() {
             ...matchingAttempt.state,
             currentQIndex: shouldReviewAttempt ? 0 : matchingAttempt.state.currentQIndex,
             mood: shouldReviewAttempt ? 'idle' : matchingAttempt.state.mood,
-            gameOver: shouldReviewAttempt ? false : matchingAttempt.state.gameOver,
             summaryVisible: shouldReviewAttempt ? false : matchingAttempt.state.summaryVisible,
             attemptStatus: shouldReviewAttempt ? ATTEMPT_STATUS.ACTIVE : matchingAttempt.state.attemptStatus,
             streak: shouldReviewAttempt ? 0 : matchingAttempt.state.streak,
@@ -233,31 +234,28 @@ export function useQuiz() {
   }, [attemptId, isReviewing]);
 
   const goToNext = useCallback(() => {
-    if (quizState.gameOver || questions.length === 0 || isSubmittingAnswer) return;
+    if (quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED || questions.length === 0 || isSubmittingAnswer) return;
 
     const next = getNextQuestion(quizState, questions.length);
     const nextState: QuizState = {
       ...quizState,
       currentQIndex: next.currentQIndex,
-      gameOver: next.gameOver,
       mood: next.mood,
-      summaryVisible: next.gameOver,
-      attemptStatus: next.gameOver ? ATTEMPT_STATUS.COMPLETED : ATTEMPT_STATUS.ACTIVE,
+      summaryVisible: false,
+      attemptStatus: ATTEMPT_STATUS.ACTIVE,
     };
 
     setQuizState(nextState);
     persistProgress(nextState);
-    void syncAttempt(nextState).then(() => {
-      if (next.gameOver && attemptId && !isReviewing) void applyAttemptRating(attemptId).catch(() => undefined);
-    });
+    void syncAttempt(nextState);
 
-    if (!next.gameOver && next.currentQIndex !== quizState.currentQIndex) {
+    if (next.currentQIndex !== quizState.currentQIndex) {
       setPageKey((current) => current + 1);
     }
-  }, [attemptId, isReviewing, isSubmittingAnswer, persistProgress, questions.length, quizState, syncAttempt]);
+  }, [isSubmittingAnswer, persistProgress, questions.length, quizState, syncAttempt]);
 
   const goToPrevious = useCallback(() => {
-    if (quizState.currentQIndex === 0 || quizState.gameOver || isSubmittingAnswer) return;
+    if (quizState.currentQIndex === 0 || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED || isSubmittingAnswer) return;
     const nextState = getPreviousQuestion(quizState);
     setQuizState(nextState);
     persistProgress(nextState);
@@ -267,7 +265,7 @@ export function useQuiz() {
 
   const answerQuestion = useCallback(
     async (selectedOptionId: string) => {
-      if (quizState.answeredMap.has(quizState.currentQIndex) || quizState.gameOver || questions.length === 0 || isSubmittingAnswer) return;
+      if (quizState.answeredMap.has(quizState.currentQIndex) || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED || questions.length === 0 || isSubmittingAnswer) return;
 
       setAnswerError(null);
       setIsSubmittingAnswer(true);
@@ -291,7 +289,6 @@ export function useQuiz() {
         streak: result.streak,
         mood: result.mood,
         answeredMap: result.answeredMap,
-        gameOver: false,
         summaryVisible: false,
         attemptStatus: ATTEMPT_STATUS.ACTIVE,
       };
@@ -330,35 +327,51 @@ export function useQuiz() {
     setConfettiKey(0);
   }, [attemptId, quizSetup, router]);
 
-  const showSummary = useCallback(() => {
-    if (quizState.gameOver) return;
+  const showSummary = useCallback(async () => {
+    if (quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED || isSavingSummary) return;
 
-    const shouldComplete = isReviewing || quizState.answeredMap.size >= questions.length;
+    const hasAnsweredAllQuestions = quizState.answeredMap.size >= questions.length;
     const nextState: QuizState = {
       ...quizState,
       summaryVisible: true,
-      gameOver: shouldComplete,
-      mood: shouldComplete
+      mood: hasAnsweredAllQuestions
         ? hasPassedQuiz(quizState.score, questions.length) ? 'passed' : 'failed'
         : quizState.mood,
-      attemptStatus: shouldComplete ? ATTEMPT_STATUS.COMPLETED : ATTEMPT_STATUS.ABANDONED,
+      attemptStatus: hasAnsweredAllQuestions ? ATTEMPT_STATUS.COMPLETED : ATTEMPT_STATUS.ABANDONED,
     };
+
+    setSummarySaveError(null);
+
+    if (attemptId && !isReviewing) {
+      setIsSavingSummary(true);
+      try {
+        await updateQuizAttempt(attemptId, nextState);
+        if (hasAnsweredAllQuestions) void applyAttemptRating(attemptId).catch(() => undefined);
+      } catch (error) {
+        setSummarySaveError(
+          error instanceof Error
+            ? error.message
+            : 'ไม่สามารถบันทึกสรุปผลได้ กรุณาลองใหม่อีกครั้ง',
+        );
+        setIsSavingSummary(false);
+        return;
+      }
+      setIsSavingSummary(false);
+    }
 
     setQuizState(nextState);
     persistProgress(nextState);
-    syncAttempt(nextState);
-  }, [hasPassedQuiz, isReviewing, persistProgress, questions.length, quizState, syncAttempt]);
+  }, [attemptId, isReviewing, isSavingSummary, persistProgress, questions.length, quizState]);
 
   const resumeQuiz = useCallback(() => {
     if (!quizState.summaryVisible || isSubmittingAnswer) return;
 
-    const reviewingCompletedAttempt = quizState.gameOver || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
+    const reviewingCompletedAttempt = quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
 
     const nextState: QuizState = {
       ...quizState,
       currentQIndex: reviewingCompletedAttempt ? 0 : quizState.currentQIndex,
       mood: 'idle',
-      gameOver: false,
       summaryVisible: false,
       attemptStatus: ATTEMPT_STATUS.ACTIVE,
     };
@@ -416,7 +429,9 @@ export function useQuiz() {
     retryQuestionLoad,
     selectedAnswer,
     showSummary,
+    summarySaveError,
     sympathyIdx,
+    isSavingSummary,
   };
 }
 

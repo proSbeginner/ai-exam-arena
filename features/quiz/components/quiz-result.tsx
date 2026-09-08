@@ -36,7 +36,7 @@ export function QuizResult({
   restartGame,
 }: QuizResultProps) {
   const [showRestartConfirmation, setShowRestartConfirmation] = useState(false);
-  const isCompleted = quizState.gameOver || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
+  const isCompleted = quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
   const passed = isCompleted && hasPassedQuiz(quizState.score, questions.length);
   const percentage = questions.length > 0 ? Math.round((quizState.score / questions.length) * 100) : 0;
   return (

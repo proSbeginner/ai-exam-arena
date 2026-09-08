@@ -63,7 +63,6 @@ export interface QuizState {
   streak: number;
   mood: MoodState;
   answeredMap: Map<number, string>;
-  gameOver: boolean;
   summaryVisible: boolean;
   attemptStatus: AttemptStatus;
 }
@@ -79,6 +78,6 @@ export interface AnswerResult {
 
 export interface NextQuestionResult {
   currentQIndex: number;
-  gameOver: boolean;
+  isLastQuestion: boolean;
   mood: MoodState;
 }

@@ -16,7 +16,6 @@ const attempt = (overrides: Partial<QuizAttemptRecord> = {}): QuizAttemptRecord 
     streak: 0,
     mood: 'idle',
     answeredMap: {},
-    gameOver: false,
     summaryVisible: false,
     attemptStatus: 'active',
   },

@@ -22,8 +22,8 @@ export default function QuizPage() {
     hasQuizSetup,
     isQuizSetupReady,
     isSubmittingAnswer,
-    isReviewing,
-    isPlayerReady,
+    isSavingSummary,
+      isPlayerReady,
     pageKey,
     playerName,
     questionLoadError,
@@ -35,6 +35,7 @@ export default function QuizPage() {
     retryQuestionLoad,
     selectedAnswer,
     showSummary,
+    summarySaveError,
     sympathyIdx,
   } = useQuiz();
 
@@ -57,7 +58,7 @@ export default function QuizPage() {
       hasQuizSetup={hasQuizSetup}
       isQuizSetupReady={isQuizSetupReady}
       isSubmittingAnswer={isSubmittingAnswer}
-      isReviewing={isReviewing}
+      isSavingSummary={isSavingSummary}
       isPlayerReady={isPlayerReady}
       pageKey={pageKey}
       playerName={playerName}
@@ -70,6 +71,7 @@ export default function QuizPage() {
       retryQuestionLoad={retryQuestionLoad}
       selectedAnswer={selectedAnswer}
       showSummary={showSummary}
+      summarySaveError={summarySaveError}
       sympathyIdx={sympathyIdx}
     />
   );

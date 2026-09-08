@@ -139,22 +139,14 @@ export function getNextQuestion(
   if (state.currentQIndex < questionCount - 1) {
     return {
       currentQIndex: state.currentQIndex + 1,
-      gameOver: false,
+      isLastQuestion: state.currentQIndex + 1 >= questionCount - 1,
       mood: 'idle',
-    };
-  }
-
-  if (state.answeredMap.size >= questionCount) {
-    return {
-      currentQIndex: state.currentQIndex,
-      gameOver: true,
-      mood: hasPassedQuiz(state.score, questionCount) ? 'passed' : 'failed',
     };
   }
 
   return {
     currentQIndex: state.currentQIndex,
-    gameOver: false,
+    isLastQuestion: true,
     mood: 'idle',
   };
 }
@@ -171,7 +163,6 @@ export function createInitialQuizState(): QuizState {
     streak: 0,
     mood: 'idle',
     answeredMap: new Map(),
-    gameOver: false,
     summaryVisible: false,
     attemptStatus: ATTEMPT_STATUS.ACTIVE,
   };

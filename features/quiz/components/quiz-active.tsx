@@ -32,15 +32,16 @@ interface QuizActiveProps {
   goToNext: () => void;
   goToPrevious: () => void;
   hasAnsweredCurrentQuestion: boolean;
-  isReviewing: boolean,
+  isSavingSummary: boolean;
   isSubmittingAnswer: boolean;
 
-  onShowSummary: () => void;
+  onShowSummary: () => void | Promise<void>;
   pageKey: number;
   playerName: string;
   questions: ExamQuestion[];
   quizState: QuizState;
   selectedAnswer: string | undefined;
+  summarySaveError: string | null;
   sympathyIdx: number;
 }
 
@@ -94,7 +95,7 @@ export function QuizActive({
   goToNext,
   goToPrevious,
   hasAnsweredCurrentQuestion,
-  isReviewing,
+  isSavingSummary,
   isSubmittingAnswer,
   onShowSummary,
   pageKey,
@@ -102,6 +103,7 @@ export function QuizActive({
   questions,
   quizState,
   selectedAnswer,
+  summarySaveError,
   sympathyIdx,
 }: QuizActiveProps) {
   const swipe = useSwipe(goToNext, goToPrevious);
@@ -209,13 +211,18 @@ export function QuizActive({
           <div className="flex w-full justify-center">
             <button
               type="button"
-              onClick={onShowSummary}
-              disabled={isSubmittingAnswer}
-              className="cursor-pointer bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-sm font-bold text-transparent underline decoration-purple-300 underline-offset-4 transition-opacity hover:opacity-75"
+              onClick={() => void onShowSummary()}
+              disabled={isSubmittingAnswer || isSavingSummary}
+              className="cursor-pointer bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-sm font-bold text-transparent underline decoration-purple-300 underline-offset-4 transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              สรุปผลตอนนี้
+              {isSavingSummary ? 'กำลังบันทึก...' : 'สรุปผลตอนนี้'}
             </button>
           </div>
+        )}
+        {summarySaveError && (
+          <p className="text-center text-sm font-bold text-red-600" role="alert">
+            {summarySaveError}
+          </p>
         )}
 
       </div>

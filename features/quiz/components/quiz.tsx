@@ -30,7 +30,7 @@ interface QuizProps {
   hasQuizSetup: boolean;
   isQuizSetupReady: boolean;
   isPlayerReady: boolean;
-  isReviewing: boolean,
+  isSavingSummary: boolean;
   isSubmittingAnswer: boolean;
 
   pageKey: number;
@@ -43,7 +43,8 @@ interface QuizProps {
   resumeQuiz: () => void;
   retryQuestionLoad: () => void;
   selectedAnswer: string | undefined;
-  showSummary: () => void;
+  showSummary: () => void | Promise<void>;
+  summarySaveError: string | null;
   sympathyIdx: number;
 }
 
@@ -65,7 +66,7 @@ export function Quiz({
   hasQuizSetup,
   isQuizSetupReady,
   isPlayerReady,
-  isReviewing,
+  isSavingSummary,
   isSubmittingAnswer,
   pageKey,
   playerName,
@@ -78,6 +79,7 @@ export function Quiz({
   retryQuestionLoad,
   selectedAnswer,
   showSummary,
+  summarySaveError,
   sympathyIdx,
 }: QuizProps) {
   const router = useRouter();
@@ -149,7 +151,7 @@ export function Quiz({
       goToNext={goToNext}
       goToPrevious={goToPrevious}
       hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
-      isReviewing={isReviewing}
+      isSavingSummary={isSavingSummary}
       isSubmittingAnswer={isSubmittingAnswer}
       onShowSummary={showSummary}
       pageKey={pageKey}
@@ -157,6 +159,7 @@ export function Quiz({
       questions={questions}
       quizState={quizState}
       selectedAnswer={selectedAnswer}
+      summarySaveError={summarySaveError}
       sympathyIdx={sympathyIdx}
     />
   ) : (

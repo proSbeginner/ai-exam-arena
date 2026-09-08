@@ -9,7 +9,6 @@ const state: QuizState = {
   streak: 1,
   mood: 'correct',
   answeredMap: new Map([[0, 'option-a']]),
-  gameOver: false,
   summaryVisible: false,
   attemptStatus: 'active',
 };

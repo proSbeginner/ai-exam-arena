@@ -24,7 +24,6 @@ function makeState(opts: Partial<QuizState> = {}): QuizState {
     streak: opts.streak ?? 0,
     mood: opts.mood ?? 'idle',
     answeredMap: opts.answeredMap ?? new Map(),
-    gameOver: opts.gameOver ?? false,
     summaryVisible: opts.summaryVisible ?? false,
     attemptStatus: opts.attemptStatus ?? 'active',
   };
@@ -234,7 +233,7 @@ describe('goToNext', () => {
     const state = makeState({ currentQIndex: 0, answeredMap: new Map() });
     const result = getNextQuestion(state, questions.length);
     expect(result.currentQIndex).toBe(1);
-    expect(result.gameOver).toBe(false);
+    expect(result.isLastQuestion).toBe(true);
   });
 
   it('does not advance past last question', () => {
@@ -254,8 +253,8 @@ describe('goToNext', () => {
     });
 
     expect(getNextQuestion(state, questions.length)).toMatchObject({
-      gameOver: true,
-      mood: 'passed',
+      isLastQuestion: true,
+      mood: 'idle',
     });
   });
 });
@@ -280,8 +279,7 @@ describe('getNextQuestion navigation', () => {
 
     expect(getNextQuestion(state, 2)).toMatchObject({
       currentQIndex: 1,
-      gameOver: false,
-    });
+      });
   });
 });
 
@@ -294,8 +292,7 @@ describe('restartGame', () => {
       streak: 0,
       mood: 'idle',
       answeredMap: new Map(),
-      gameOver: false,
-      summaryVisible: false,
+        summaryVisible: false,
       attemptStatus: 'active',
     });
   });
