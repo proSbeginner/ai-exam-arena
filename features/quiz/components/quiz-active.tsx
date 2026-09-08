@@ -132,7 +132,7 @@ export function QuizActive({
         />
       </div>
 
-      <div className="relative z-10 w-full">
+      <div className="relative z-20 w-full">
         <QuizHeader selectPlayer={selectPlayer} currentRank={currentRank} currentMmrRank={currentMmrRank} />
       </div>
 

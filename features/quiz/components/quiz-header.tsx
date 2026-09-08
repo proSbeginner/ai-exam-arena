@@ -17,7 +17,7 @@ export function QuizHeader({ selectPlayer, currentRank, currentMmrRank }: QuizHe
         <h1 className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-xl font-bold text-transparent">
           <BrandTitle />
         </h1>
-        <>{currentMmrRank ? <RankEmblemBadge rank={currentMmrRank} /> : <PlayerRankBadge rank={currentRank} />}</>
+        <>{currentMmrRank ? <RankEmblemBadge mobileIconOnly rank={currentMmrRank} /> : <PlayerRankBadge rank={currentRank} />}</>
       </div>
       <div className="flex items-center gap-2">
         <LeaderboardLink inline variant="header" />
