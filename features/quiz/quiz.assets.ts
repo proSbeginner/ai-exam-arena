@@ -4,7 +4,7 @@ import { QUIZ_MOOD } from './quiz.constants';
 export const MOOD_IMAGES: Record<MoodState, string> = {
   idle: '/images/idle.png',
   correct: '/images/correct1.png',
-  wrong: '/images/wrong.png',
+  wrong: '/images/wrong1.png',
   passed: '/images/pass.png',
   failed: '/images/fail.png',
 };
