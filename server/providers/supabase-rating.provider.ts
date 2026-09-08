@@ -34,7 +34,7 @@ async function getRating(playerId: string, mode: QuizMode): Promise<PlayerRating
 }
 
 async function applyAttemptRating(input: ApplyRatingInput): Promise<PlayerRating> {
-  const mmrChange = calculateRatingChange(input.correctCount, input.questionCount, input.answeredCount, input.optionCounts);
+  const mmrChange = calculateRatingChange(input.correctCount, input.questionCount, input.answeredCount, input.optionCounts, input.maxStreak);
   const rows = await supabaseRequest<DatabasePlayerRatingRow[]>('rpc/apply_attempt_rating', {
     method: 'POST',
     body: JSON.stringify({

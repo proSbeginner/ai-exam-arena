@@ -35,6 +35,17 @@ export async function POST(request: Request) {
     const selectedQuestions = attempt.questionIds.map((id) => questions.find((question) => question.id === id));
     if (selectedQuestions.some((question) => !question)) throw new Error("Attempt questions are unavailable.");
     const optionCounts = selectedQuestions.map((question) => Math.min(question!.options.length, QUIZ_MODE_OPTION_LIMITS[attempt.setup.mode]));
+    let currentStreak = 0;
+    let maxStreak = 0;
+    for (const [index, question] of selectedQuestions.entries()) {
+      const selectedOptionId = attempt.state.answeredMap[String(index)];
+      if (selectedOptionId && selectedOptionId === question!.correctOptionId) {
+        currentStreak += 1;
+        maxStreak = Math.max(maxStreak, currentStreak);
+      } else {
+        currentStreak = 0;
+      }
+    }
     const rating = await getRatingProvider().applyAttemptRating({
       playerId: attempt.playerId,
       mode: attempt.setup.mode,
@@ -42,6 +53,7 @@ export async function POST(request: Request) {
       answeredCount: Object.keys(attempt.state.answeredMap).length,
       correctCount: attempt.state.score,
       optionCounts,
+      maxStreak,
       attemptId: attempt.id,
     });
     return Response.json({ rating });

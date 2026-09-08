@@ -32,4 +32,12 @@ describe('rating change', () => {
     expect(calculateRatingChange(1000, 1000, 1000, Array(1000).fill(4))).toBe(300);
     expect(calculateRatingChange(0, 1000, 1000, Array(1000).fill(4))).toBe(-100);
   });
+
+  it('adds a small capped bonus for a sustained correct streak', () => {
+    expect(calculateRatingChange(4, 4, 4, [4, 4, 4, 4], 2)).toBe(60);
+    expect(calculateRatingChange(4, 4, 4, [4, 4, 4, 4], 3)).toBe(65);
+    expect(calculateRatingChange(4, 4, 4, [4, 4, 4, 4], 10)).toBe(80);
+    expect(calculateRatingChange(4, 4, 4, [4, 4, 4, 4], 20)).toBe(90);
+    expect(calculateRatingChange(4, 4, 4, [4, 4, 4, 4], 100)).toBe(135);
+  });
 });

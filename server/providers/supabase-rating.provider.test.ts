@@ -26,7 +26,7 @@ describe('supabase rating provider', () => {
 
     const rating = await supabaseRatingProvider.applyAttemptRating({
       playerId: 'player-1', mode: 'university', attemptId: 'attempt-1', questionCount: 2,
-      answeredCount: 2, correctCount: 2, optionCounts: [4, 4],
+      answeredCount: 2, correctCount: 2, optionCounts: [4, 4], maxStreak: 2,
     });
 
     expect(rating.mmr).toBe(220);
@@ -40,7 +40,7 @@ describe('supabase rating provider', () => {
 
     await supabaseRatingProvider.applyAttemptRating({
       playerId: 'player-1', mode: 'primary', attemptId: 'attempt-1', questionCount: 2,
-      answeredCount: 2, correctCount: 2, optionCounts: [2, 2],
+      answeredCount: 2, correctCount: 2, optionCounts: [2, 2], maxStreak: 2,
     });
 
     expect(supabaseRequest).toHaveBeenCalledTimes(1);

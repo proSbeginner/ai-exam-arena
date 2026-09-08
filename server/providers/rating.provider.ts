@@ -19,6 +19,7 @@ export interface ApplyRatingInput {
   answeredCount: number;
   correctCount: number;
   optionCounts: number[];
+  maxStreak: number;
   attemptId: string;
 }
 

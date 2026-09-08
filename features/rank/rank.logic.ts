@@ -3,6 +3,7 @@ import {
   MAX_RATING_CHANGE_PER_ATTEMPT,
   RANK_STAR_MMR,
   RANK_TIERS,
+  STREAK_MMR_BONUS_TIERS,
 } from './rank.constants';
 import type { PlayerRank } from './rank.types';
 
@@ -25,6 +26,7 @@ export function calculateRatingChange(
   questionCount: number,
   answeredCount: number,
   optionCounts: number[],
+  maxStreak = 0,
 ): number {
   if (questionCount <= 0 || answeredCount <= 0 || optionCounts.length === 0) return 0;
 
@@ -34,5 +36,6 @@ export function calculateRatingChange(
   const confidence = Math.min(answeredCount / 20, 1);
   const change = MAX_RATING_CHANGE_PER_ATTEMPT * performance * confidence;
 
-  return Math.round(Math.max(-MAX_RATING_CHANGE_PER_ATTEMPT, Math.min(MAX_RATING_CHANGE_PER_ATTEMPT, change)));
+  const streakBonus = [...STREAK_MMR_BONUS_TIERS].reverse().find((tier) => maxStreak >= tier.minStreak)?.bonus ?? 0;
+  return Math.round(Math.max(-MAX_RATING_CHANGE_PER_ATTEMPT, Math.min(MAX_RATING_CHANGE_PER_ATTEMPT, change + streakBonus)));
 }

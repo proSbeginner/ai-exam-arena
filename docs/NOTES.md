@@ -129,3 +129,5 @@ ratingChange = round(300 * performance * confidence)
 เพื่อป้องกันการโกง client ส่งเพียง `attemptId` ไปยัง server เท่านั้น Server จะอ่าน attempt และคำตอบที่ตรวจสอบแล้วจากฐานข้อมูล คำนวณ rating เอง และใช้ `player_rating_events` ป้องกัน attempt เดิมถูกคิด MMR ซ้ำ
 
 การอัปเดต rating ของ Supabase ใช้ `apply_attempt_rating` RPC เพื่อ insert event และเพิ่ม aggregate rating ใน transaction เดียว หาก request เดิมถูกส่งซ้ำ RPC จะคืนค่า rating ปัจจุบันโดยไม่เพิ่ม MMR ซ้ำ
+
+เมื่อ attempt จบ ระบบจะคำนวณ `maxStreak` จากคำตอบจริงบน server แล้วเพิ่มโบนัส MMR แบบจำกัดตั้งแต่ streak 3 ถึง 100+ โดยโบนัสสูงสุดคือ +75 ที่ streak 100 ข้อขึ้นไป และยังอยู่ภายใต้เพดาน ±300 MMR ต่อ attempt

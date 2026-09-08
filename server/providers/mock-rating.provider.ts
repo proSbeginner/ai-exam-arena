@@ -23,7 +23,7 @@ async function applyAttemptRating(input: ApplyRatingInput): Promise<PlayerRating
 
   const next: PlayerRating = {
     ...current,
-    mmr: Math.max(0, current.mmr + calculateRatingChange(input.correctCount, input.questionCount, input.answeredCount, input.optionCounts)),
+    mmr: Math.max(0, current.mmr + calculateRatingChange(input.correctCount, input.questionCount, input.answeredCount, input.optionCounts, input.maxStreak)),
     answeredCount: current.answeredCount + input.answeredCount,
     correctCount: current.correctCount + input.correctCount,
     completedAttemptCount: current.completedAttemptCount + (input.answeredCount === input.questionCount ? 1 : 0),
