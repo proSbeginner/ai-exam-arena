@@ -127,3 +127,5 @@ ratingChange = round(300 * performance * confidence)
 การเปลี่ยนแปลงถูกจำกัดไม่เกิน ±300 MMR ต่อ attempt และ MMR ต่ำสุดคือ 0 โดยคำนวณแยกตาม mode เช่น `primary`, `secondary` และ `university`
 
 เพื่อป้องกันการโกง client ส่งเพียง `attemptId` ไปยัง server เท่านั้น Server จะอ่าน attempt และคำตอบที่ตรวจสอบแล้วจากฐานข้อมูล คำนวณ rating เอง และใช้ `player_rating_events` ป้องกัน attempt เดิมถูกคิด MMR ซ้ำ
+
+การอัปเดต rating ของ Supabase ใช้ `apply_attempt_rating` RPC เพื่อ insert event และเพิ่ม aggregate rating ใน transaction เดียว หาก request เดิมถูกส่งซ้ำ RPC จะคืนค่า rating ปัจจุบันโดยไม่เพิ่ม MMR ซ้ำ

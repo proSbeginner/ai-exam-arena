@@ -20,10 +20,8 @@ describe('supabase rating provider', () => {
     });
   });
 
-  it('records a rating event before upserting the aggregate rating', async () => {
+  it('applies rating through one atomic RPC call', async () => {
     supabaseRequest
-      .mockResolvedValueOnce([{ player_id: 'player-1', mode: 'university', mmr: 120, answered_count: 20, correct_count: 15, completed_attempt_count: 1 }])
-      .mockResolvedValueOnce([{ attempt_id: 'attempt-1' }])
       .mockResolvedValueOnce([{ player_id: 'player-1', mode: 'university', mmr: 220, answered_count: 22, correct_count: 17, completed_attempt_count: 2 }]);
 
     const rating = await supabaseRatingProvider.applyAttemptRating({
@@ -32,20 +30,19 @@ describe('supabase rating provider', () => {
     });
 
     expect(rating.mmr).toBe(220);
-    expect(supabaseRequest).toHaveBeenCalledTimes(3);
-    expect(supabaseRequest.mock.calls[1][1].body).toContain('attempt-1');
+    expect(supabaseRequest).toHaveBeenCalledTimes(1);
+    expect(supabaseRequest.mock.calls[0][0]).toBe('rpc/apply_attempt_rating');
+    expect(supabaseRequest.mock.calls[0][1].body).toContain('attempt-1');
   });
 
-  it('does not update rating when the attempt event already exists', async () => {
-    supabaseRequest
-      .mockResolvedValueOnce([{ player_id: 'player-1', mode: 'primary', mmr: 60, answered_count: 2, correct_count: 2, completed_attempt_count: 1 }])
-      .mockResolvedValueOnce([]);
+  it('returns the current rating when the attempt event already exists', async () => {
+    supabaseRequest.mockResolvedValueOnce([{ player_id: 'player-1', mode: 'primary', mmr: 60, answered_count: 2, correct_count: 2, completed_attempt_count: 1 }]);
 
     await supabaseRatingProvider.applyAttemptRating({
       playerId: 'player-1', mode: 'primary', attemptId: 'attempt-1', questionCount: 2,
       answeredCount: 2, correctCount: 2, optionCounts: [2, 2],
     });
 
-    expect(supabaseRequest).toHaveBeenCalledTimes(2);
+    expect(supabaseRequest).toHaveBeenCalledTimes(1);
   });
 });

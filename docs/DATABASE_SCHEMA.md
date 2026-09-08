@@ -116,6 +116,15 @@ players
           └── question_ids (frozen order for this attempt)
 ```
 
+## Atomic rating application
+
+`player_rating_events.attempt_id` is the idempotency key for rating. The
+`apply_attempt_rating` RPC inserts the event and updates `player_ratings` in
+one database transaction. A repeated request for the same attempt returns the
+current aggregate rating without incrementing it again. This prevents both
+duplicate MMR awards and the partial state where an event exists but its
+aggregate update failed.
+
 ## Leaderboard calculation
 
 The leaderboard can be calculated from `quiz_attempts` and `quiz_answers`:
