@@ -49,7 +49,7 @@ export function Leaderboard() {
     await restartQuizAttempt({
       attemptId: currentPlayerEntry.attemptId,
       mode: currentPlayerEntry.mode || mode,
-      questionCount: currentPlayerEntry.questionCount,
+      questionCount: null,
       navigate: router.push,
     });
     setShowRestartConfirmation(false);

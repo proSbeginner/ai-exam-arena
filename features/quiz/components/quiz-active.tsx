@@ -19,6 +19,7 @@ import { QuizConfettiBurst } from './quiz-confetti-burst';
 
 interface QuizActiveProps {
   answerQuestion: (selectedOptionId: string) => void;
+  answerError: string | null;
   answeredCount: number;
   selectPlayer: () => void;
   cheerIdx: number;
@@ -31,6 +32,7 @@ interface QuizActiveProps {
   goToNext: () => void;
   goToPrevious: () => void;
   hasAnsweredCurrentQuestion: boolean;
+  isSubmittingAnswer: boolean;
   onShowSummary: () => void;
   pageKey: number;
   playerName: string;
@@ -77,6 +79,7 @@ function useSwipe(onUp: () => void, onDown: () => void) {
 
 export function QuizActive({
   answerQuestion,
+  answerError,
   answeredCount,
   selectPlayer,
   cheerIdx,
@@ -89,6 +92,7 @@ export function QuizActive({
   goToNext,
   goToPrevious,
   hasAnsweredCurrentQuestion,
+  isSubmittingAnswer,
   onShowSummary,
   pageKey,
   playerName,
@@ -166,6 +170,7 @@ export function QuizActive({
             hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
             selectedAnswer={selectedAnswer}
           />
+          {answerError && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-600">{answerError}</p>}
 
           {hasAnsweredCurrentQuestion && currentQuestion.funFact ? (
             <QuizFunFact>{currentQuestion.funFact}</QuizFunFact>
@@ -176,7 +181,7 @@ export function QuizActive({
           <button
             type="button"
             onClick={goToPrevious}
-            disabled={quizState.currentQIndex === 0}
+            disabled={quizState.currentQIndex === 0 || isSubmittingAnswer}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold transition-all active:scale-95 ${
               quizState.currentQIndex === 0
                 ? 'cursor-not-allowed bg-gray-100 text-gray-300'
@@ -189,7 +194,8 @@ export function QuizActive({
           <button
             type="button"
             onClick={goToNext}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95"
+            disabled={isSubmittingAnswer}
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-3 font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {quizState.currentQIndex === questions.length - 1 ? 'สรุปผลตอนนี้' : 'ข้อถัดไป'}
             <span aria-hidden>→</span>
@@ -201,6 +207,7 @@ export function QuizActive({
             <button
               type="button"
               onClick={onShowSummary}
+              disabled={isSubmittingAnswer}
               className="cursor-pointer bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-sm font-bold text-transparent underline decoration-purple-300 underline-offset-4 transition-opacity hover:opacity-75"
             >
               สรุปผลตอนนี้

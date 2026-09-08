@@ -14,6 +14,7 @@ import { QuizResult } from './quiz-result';
 
 interface QuizProps {
   answerQuestion: (selectedOptionId: string) => void;
+  answerError: string | null;
   answeredCount: number;
   selectPlayer: () => void;
   cheerIdx: number;
@@ -29,6 +30,7 @@ interface QuizProps {
   hasQuizSetup: boolean;
   isQuizSetupReady: boolean;
   isPlayerReady: boolean;
+  isSubmittingAnswer: boolean;
   pageKey: number;
   playerName: string | null;
   questionLoadError: string | null;
@@ -45,6 +47,7 @@ interface QuizProps {
 
 export function Quiz({
   answerQuestion,
+  answerError,
   answeredCount,
   selectPlayer,
   cheerIdx,
@@ -60,6 +63,7 @@ export function Quiz({
   hasQuizSetup,
   isQuizSetupReady,
   isPlayerReady,
+  isSubmittingAnswer,
   pageKey,
   playerName,
   questionLoadError,
@@ -130,6 +134,7 @@ export function Quiz({
   return !quizState.summaryVisible ? (
     <QuizActive
       answerQuestion={answerQuestion}
+      answerError={answerError}
       answeredCount={answeredCount}
       selectPlayer={selectPlayer}
       cheerIdx={cheerIdx}
@@ -141,6 +146,7 @@ export function Quiz({
       goToNext={goToNext}
       goToPrevious={goToPrevious}
       hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
+      isSubmittingAnswer={isSubmittingAnswer}
       onShowSummary={showSummary}
       pageKey={pageKey}
       playerName={playerName}

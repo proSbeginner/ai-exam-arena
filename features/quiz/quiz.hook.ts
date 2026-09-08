@@ -98,6 +98,8 @@ export function useQuiz() {
   const [confettiKey, setConfettiKey] = useState(0);
   const [currentMmrRank, setCurrentMmrRank] = useState<PlayerRank | null>(null);
   const [pageKey, setPageKey] = useState(0);
+  const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
+  const [answerError, setAnswerError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!playerId || !quizSetup) return;
@@ -229,7 +231,7 @@ export function useQuiz() {
   }, [attemptId, isReviewing]);
 
   const goToNext = useCallback(() => {
-    if (quizState.gameOver || questions.length === 0) return;
+    if (quizState.gameOver || questions.length === 0 || isSubmittingAnswer) return;
 
     if (quizState.currentQIndex === questions.length - 1 && quizState.answeredMap.size < questions.length) {
       const nextState: QuizState = {
@@ -263,28 +265,36 @@ export function useQuiz() {
     if (!next.gameOver && next.currentQIndex !== quizState.currentQIndex) {
       setPageKey((current) => current + 1);
     }
-  }, [attemptId, isReviewing, persistProgress, questions.length, quizState, syncAttempt]);
+  }, [attemptId, isReviewing, isSubmittingAnswer, persistProgress, questions.length, quizState, syncAttempt]);
 
   const goToPrevious = useCallback(() => {
-    if (quizState.currentQIndex === 0 || quizState.gameOver) return;
+    if (quizState.currentQIndex === 0 || quizState.gameOver || isSubmittingAnswer) return;
     const nextState = getPreviousQuestion(quizState);
     setQuizState(nextState);
     persistProgress(nextState);
     syncAttempt(nextState);
     setPageKey((current) => current + 1);
-  }, [persistProgress, quizState, syncAttempt]);
+  }, [isSubmittingAnswer, persistProgress, quizState, syncAttempt]);
 
   const answerQuestion = useCallback(
-    (selectedOptionId: string) => {
-      if (quizState.answeredMap.has(quizState.currentQIndex) || quizState.gameOver || questions.length === 0) return;
+    async (selectedOptionId: string) => {
+      if (quizState.answeredMap.has(quizState.currentQIndex) || quizState.gameOver || questions.length === 0 || isSubmittingAnswer) return;
 
+      setAnswerError(null);
+      setIsSubmittingAnswer(true);
       const result = evaluateAnswer(
         quizState,
         questions[quizState.currentQIndex],
         selectedOptionId,
       );
-      if (attemptId) {
-        void submitQuizAnswer(attemptId, questions[quizState.currentQIndex].id, selectedOptionId).catch(() => undefined);
+      try {
+        if (attemptId) {
+          await submitQuizAnswer(attemptId, questions[quizState.currentQIndex].id, selectedOptionId);
+        }
+      } catch {
+        setAnswerError('บันทึกคำตอบไม่สำเร็จ กรุณาลองตอบข้อนี้อีกครั้ง');
+        setIsSubmittingAnswer(false);
+        return;
       }
       const nextState: QuizState = {
         ...quizState,
@@ -299,7 +309,6 @@ export function useQuiz() {
 
       setQuizState(nextState);
       persistProgress(nextState);
-      syncAttempt(nextState);
       setCheerIdx(pickRandomIndex(CHEER_MESSAGES.length));
       setSympathyIdx(pickRandomIndex(SYMPATHY_MESSAGES.length));
 
@@ -314,8 +323,9 @@ export function useQuiz() {
       if (result.triggerConfetti) {
         setConfettiKey((current) => current + 1);
       }
+      setIsSubmittingAnswer(false);
     },
-    [attemptId, persistProgress, questions, quizState, syncAttempt],
+    [attemptId, isSubmittingAnswer, persistProgress, questions, quizState],
   );
 
   const restartGame = useCallback(async () => {
@@ -325,11 +335,11 @@ export function useQuiz() {
     await restartQuizAttempt({
       attemptId,
       mode: quizSetup.mode,
-      questionCount: questions.length || quizSetup.questionLimit,
+      questionCount: null,
       navigate: router.push,
     });
     setConfettiKey(0);
-  }, [attemptId, questions.length, quizSetup, router]);
+  }, [attemptId, quizSetup, router]);
 
   const showSummary = useCallback(() => {
     if (quizState.gameOver) return;
@@ -346,7 +356,7 @@ export function useQuiz() {
   }, [persistProgress, quizState, syncAttempt]);
 
   const resumeQuiz = useCallback(() => {
-    if (!quizState.summaryVisible) return;
+    if (!quizState.summaryVisible || isSubmittingAnswer) return;
 
     const reviewingCompletedAttempt = quizState.gameOver || quizState.attemptStatus === ATTEMPT_STATUS.COMPLETED;
 
@@ -365,7 +375,7 @@ export function useQuiz() {
       persistProgress(nextState);
       syncAttempt(nextState);
     }
-  }, [persistProgress, quizState, syncAttempt]);
+  }, [isSubmittingAnswer, persistProgress, quizState, syncAttempt]);
 
   const selectPlayer = useCallback(() => {
     router.push(APP_ROUTES.welcome);
@@ -383,6 +393,7 @@ export function useQuiz() {
 
   return {
     answerQuestion,
+    answerError,
     answeredCount,
     selectPlayer,
     cheerIdx,
@@ -398,6 +409,7 @@ export function useQuiz() {
     hasQuizSetup: Boolean(quizSetup),
     isQuizSetupReady,
     isPlayerReady,
+    isSubmittingAnswer,
     pageKey,
     playerName,
     questionLoadError,
