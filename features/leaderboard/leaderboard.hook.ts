@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react';
 import type { QuizMode } from '@/features/quiz/quiz.types';
 
 import { getLeaderboard } from './services/leaderboard.api';
-import type { LeaderboardEntry } from './leaderboard.types';
+import type { LeaderboardData } from './leaderboard.types';
 
 export function useLeaderboard(mode: QuizMode, playerId: string | null) {
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [data, setData] = useState<LeaderboardData>({ entries: [], currentAttempt: null });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +17,7 @@ export function useLeaderboard(mode: QuizMode, playerId: string | null) {
 
     void getLeaderboard(mode, playerId ?? undefined)
       .then((nextEntries) => {
-        if (isCurrentRequest) setEntries(nextEntries);
+        if (isCurrentRequest) setData(nextEntries);
       })
       .catch(() => {
         if (isCurrentRequest) setError('ไม่สามารถโหลด leaderboard ได้ในขณะนี้');
@@ -31,5 +31,5 @@ export function useLeaderboard(mode: QuizMode, playerId: string | null) {
     };
   }, [mode, playerId]);
 
-  return { entries, error, isLoading };
+  return { ...data, error, isLoading };
 }

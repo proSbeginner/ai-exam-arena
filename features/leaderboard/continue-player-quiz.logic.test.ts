@@ -48,10 +48,10 @@ describe('resolveContinuePlayerQuiz', () => {
   it('uses the leaderboard entry when the attempt lookup fails', async () => {
     const result = await resolveContinuePlayerQuiz({
       playerId: 'player-1', mode: 'secondary',
-      currentPlayerEntry: {
-        attemptId: 'attempt-2', playerId: 'player-1', playerName: 'PLAYER', mode: 'secondary',
-        answeredCount: 1, questionCount: 3, correctCount: 1, accuracy: 100,
-        attemptStatus: 'abandoned', completedAt: '2026-01-01T00:00:00.000Z',
+      currentAttempt: {
+        attemptId: 'attempt-2', mode: 'secondary',
+        questionCount: 3,
+        attemptStatus: 'abandoned',
       },
       getQuizAttempt: vi.fn().mockRejectedValue(new Error('network error')),
     });

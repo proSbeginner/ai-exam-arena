@@ -1,13 +1,14 @@
 import type { QuizMode } from '@/features/quiz/quiz.types';
 
-import type { LeaderboardEntry } from '../leaderboard.types';
+import type { LeaderboardData } from '../leaderboard.types';
 
 interface LeaderboardResponse {
-  leaderboard: LeaderboardEntry[];
+  leaderboard: LeaderboardData['entries'];
+  currentAttempt: LeaderboardData['currentAttempt'];
   mode: QuizMode;
 }
 
-export async function getLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardEntry[]> {
+export async function getLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardData> {
   const params = new URLSearchParams({ mode });
   if (playerId) params.set('playerId', playerId);
   const response = await fetch(`/api/leaderboard?${params.toString()}`, { cache: 'no-store' });
@@ -17,5 +18,5 @@ export async function getLeaderboard(mode: QuizMode, playerId?: string): Promise
   }
 
   const payload = (await response.json()) as LeaderboardResponse;
-  return payload.leaderboard;
+  return { entries: payload.leaderboard, currentAttempt: payload.currentAttempt };
 }

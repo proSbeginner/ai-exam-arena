@@ -3,7 +3,7 @@ import type { QuizMode, QuizSetup } from '@/features/quiz/quiz.types';
 import { APP_ROUTES } from '@/features/shared/routes';
 
 import { LEADERBOARD_ATTEMPT_STATUS } from './leaderboard.constants';
-import type { LeaderboardEntry } from './leaderboard.types';
+import type { CurrentAttemptSummary } from './leaderboard.types';
 
 type GetQuizAttempt = (playerId: string, mode: QuizMode) => Promise<QuizAttemptRecord | null>;
 
@@ -14,30 +14,30 @@ export type ContinuePlayerQuizAction =
 interface ResolveContinuePlayerQuizInput {
   playerId: string | null;
   mode: QuizMode;
-  currentPlayerEntry?: LeaderboardEntry;
+  currentAttempt?: CurrentAttemptSummary | null;
   getQuizAttempt: GetQuizAttempt;
 }
 
 export async function resolveContinuePlayerQuiz({
   playerId,
   mode,
-  currentPlayerEntry,
+  currentAttempt,
   getQuizAttempt,
 }: ResolveContinuePlayerQuizInput): Promise<ContinuePlayerQuizAction | null> {
   if (!playerId) return null;
 
   const existingAttempt = await getQuizAttempt(playerId, mode).catch(() => null);
 
-  if (!existingAttempt && !currentPlayerEntry) {
+  if (!existingAttempt && !currentAttempt) {
     return { type: 'redirect-to-setup', route: APP_ROUTES.quizSetup, setup: { mode, questionLimit: null } };
   }
 
-  const attemptMode = existingAttempt?.setup.mode ?? currentPlayerEntry?.mode ?? mode;
-  const questionLimit = existingAttempt?.questionIds.length ?? currentPlayerEntry?.questionCount ?? null;
+  const attemptMode = existingAttempt?.setup.mode ?? currentAttempt?.mode ?? mode;
+  const questionLimit = existingAttempt?.questionIds.length ?? currentAttempt?.questionCount ?? null;
   const reviewAttemptId = existingAttempt?.state.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
     ? existingAttempt.id
-    : currentPlayerEntry?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
-      ? currentPlayerEntry.attemptId
+    : currentAttempt?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
+      ? currentAttempt.attemptId
       : undefined;
 
   return {

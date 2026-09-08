@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
   try {
     const leaderboard = await getLeaderboardProvider().getLeaderboard(mode, playerId);
-    return Response.json({ leaderboard, mode });
+    return Response.json({ ...leaderboard, leaderboard: leaderboard.entries, mode });
   } catch (error) {
     if (error instanceof MockApiError) {
       return Response.json(

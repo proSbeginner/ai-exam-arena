@@ -1,5 +1,5 @@
 import type { QuizMode } from '@/features/quiz/quiz.types';
-import type { LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
+import type { CurrentAttemptSummary, LeaderboardData, LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
 import { filterLeaderboardEntries, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
 import { getMockAttempt } from '@/mock-api/quiz/mock-attempts';
 import {
@@ -220,22 +220,33 @@ const entries: LeaderboardEntry[] = [
   },
 ];
 
-export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardEntry[]> {
+export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardData> {
   await simulateMockNetworkDelay();
   throwIfMockServiceUnavailable();
 
-  if (getMockScenario() === 'empty-questions') return [];
+  if (getMockScenario() === 'empty-questions') return { entries: [], currentAttempt: null };
 
   const modeEntries = filterLeaderboardEntries(entries.filter((entry) => entry.mode === mode));
   const playerAttempt = playerId ? await getMockAttempt(playerId, mode) : null;
 
+  let currentAttempt: CurrentAttemptSummary | null = null;
+
+  if (playerAttempt) {
+    currentAttempt = {
+      attemptId: playerAttempt.id,
+      mode: playerAttempt.setup.mode,
+      questionCount: playerAttempt.questionIds.length,
+      attemptStatus: playerAttempt.state.attemptStatus,
+    };
+  }
+
   if (!playerAttempt || playerAttempt.state.attemptStatus === 'active') {
-    return sortLeaderboard(modeEntries);
+    return { entries: sortLeaderboard(modeEntries), currentAttempt };
   }
 
   const answeredCount = Object.keys(playerAttempt.state.answeredMap).length;
   const correctCount = playerAttempt.state.score;
-  const currentPlayerEntry: LeaderboardEntry = {
+  const currentAttemptEntry: LeaderboardEntry = {
     attemptId: playerAttempt.id,
     playerId: playerAttempt.playerId,
     playerName: playerAttempt.playerName,
@@ -248,7 +259,8 @@ export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Pro
     completedAt: playerAttempt.completedAt ?? playerAttempt.updatedAt,
   };
 
-  return sortLeaderboard(
-    answeredCount > 0 ? [...modeEntries, currentPlayerEntry] : modeEntries,
-  );
+  return {
+    entries: sortLeaderboard(answeredCount > 0 ? [...modeEntries, currentAttemptEntry] : modeEntries),
+    currentAttempt,
+  };
 }

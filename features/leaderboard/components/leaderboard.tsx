@@ -26,16 +26,15 @@ export function Leaderboard() {
   const storedQuizSetup = useSyncExternalStore(subscribeToQuizSetup, getStoredQuizSetup, () => null);
   const mode = modeOverride ?? storedQuizSetup?.mode ?? 'university';
   const playerId = useSyncExternalStore(subscribeToPlayerName, getStoredPlayerId, () => null);
-  const { entries, error, isLoading } = useLeaderboard(mode, playerId);
+  const { entries, currentAttempt, error, isLoading } = useLeaderboard(mode, playerId);
   const leaderboardVersion = entries
     .map((entry, index) => `${index}:${entry.playerId}:${entry.completedAt}:${entry.answeredCount}:${entry.correctCount}`)
     .join('|') || 'empty';
   const playerRank = playerId ? getPlayerRank(entries, playerId) : null;
-  const currentPlayerEntry = playerId ? entries.find((entry) => entry.playerId === playerId) : undefined;
   const [showRestartConfirmation, setShowRestartConfirmation] = useState(false);
 
   const continuePlayerQuiz = async () => {
-    const action = await resolveContinuePlayerQuiz({ playerId, mode, currentPlayerEntry, getQuizAttempt });
+    const action = await resolveContinuePlayerQuiz({ playerId, mode, currentAttempt, getQuizAttempt });
     if (!action) return;
 
     saveQuizSetup(action.setup);
@@ -44,11 +43,11 @@ export function Leaderboard() {
   };
 
   const restartPlayerQuiz = async () => {
-    if (!currentPlayerEntry) return;
+    if (!currentAttempt) return;
 
     await restartQuizAttempt({
-      attemptId: currentPlayerEntry.attemptId,
-      mode: currentPlayerEntry.mode || mode,
+      attemptId: currentAttempt.attemptId,
+      mode: currentAttempt.mode || mode,
       questionCount: null,
       navigate: router.push,
     });
@@ -136,20 +135,20 @@ export function Leaderboard() {
         <div className="mx-auto mt-5 flex w-full max-w-md flex-wrap justify-center gap-3">
           {playerId && (
             <>
-              {(!currentPlayerEntry || currentPlayerEntry.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.ABANDONED || currentPlayerEntry.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED) && (
+              {(!currentAttempt || currentAttempt.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.ABANDONED || currentAttempt.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED) && (
                 <button
                   type="button"
                   onClick={() => void continuePlayerQuiz()}
                   className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white px-4 py-2.5 text-sm font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
                 >
-                  {currentPlayerEntry?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
+                  {currentAttempt?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
                     ? 'ทวนคำตอบ'
-                    : currentPlayerEntry?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.ABANDONED
+                    : currentAttempt?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.ABANDONED
                       ? 'ทำต่อ'
                       : 'ลงสนาม'}
                 </button>
               )}
-              {currentPlayerEntry && (
+              {currentAttempt && (
                 <button
                   type="button"
                   onClick={() => setShowRestartConfirmation(true)}
