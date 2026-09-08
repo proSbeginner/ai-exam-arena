@@ -11,10 +11,11 @@ import { RankEmblemBadge } from './rank-emblem-badge';
 
 interface RankEmblemTooltipProps {
   rank: PlayerRank;
-  compact?: boolean;
+  variant?: 'quiz' | 'leaderboard';
 }
 
-export function RankEmblemTooltip({ rank, compact = false }: RankEmblemTooltipProps) {
+export function RankEmblemTooltip({ rank, variant = 'quiz' }: RankEmblemTooltipProps) {
+  const isLeaderboard = variant === 'leaderboard';
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const containerRef = useRef<HTMLSpanElement>(null);
@@ -38,8 +39,8 @@ export function RankEmblemTooltip({ rank, compact = false }: RankEmblemTooltipPr
     if (!isOpen && containerRef.current) {
       const bounds = containerRef.current.getBoundingClientRect();
       setPosition(
-        compact
-          ? { top: bounds.top + bounds.height / 2, left: bounds.right - 16 }
+          isLeaderboard
+          ? { top: bounds.top + bounds.height / 2, left: bounds.right + 8 }
           : { top: bounds.bottom + 8, left: bounds.left + bounds.width / 2 },
       );
     }
@@ -63,7 +64,7 @@ export function RankEmblemTooltip({ rank, compact = false }: RankEmblemTooltipPr
             <span
               role="tooltip"
               style={{ top: position.top, left: position.left }}
-              className={`fixed z-50 flex w-56 flex-col items-center gap-0.5 rounded-2xl bg-gradient-to-br from-fuchsia-500/85 via-purple-500/85 to-indigo-600/85 p-4 text-center text-white shadow-xl backdrop-blur-sm ${compact ? '-translate-y-1/2 before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:border-y-8 before:border-r-8 before:border-y-transparent before:border-r-fuchsia-500/85' : '-translate-x-1/2 before:absolute before:-top-2 before:left-1/2 before:-translate-x-1/2 before:border-x-8 before:border-b-8 before:border-x-transparent before:border-b-fuchsia-500/85'} before:content-['']`}
+              className={`fixed z-50 flex w-56 flex-col items-center gap-0.5 rounded-2xl bg-gradient-to-br from-fuchsia-500/85 via-purple-500/85 to-indigo-600/85 p-4 text-center text-white shadow-xl backdrop-blur-sm ${isLeaderboard ? '-translate-y-1/2 before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:border-y-8 before:border-r-8 before:border-y-transparent before:border-r-fuchsia-500/85' : '-translate-x-1/2 before:absolute before:-top-2 before:left-1/2 before:-translate-x-1/2 before:border-x-8 before:border-b-8 before:border-x-transparent before:border-b-fuchsia-500/85'} before:content-['']`}
             >
               <Image
                 src={asset}
@@ -82,7 +83,7 @@ export function RankEmblemTooltip({ rank, compact = false }: RankEmblemTooltipPr
         : null}
 
       <span className="hidden sm:inline-flex">
-        <RankEmblemBadge rank={rank} compact={compact} />
+          <RankEmblemBadge rank={rank} compact={isLeaderboard} />
       </span>
     </span>
   );

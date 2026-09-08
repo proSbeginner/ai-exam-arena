@@ -99,10 +99,10 @@ export function Leaderboard() {
         )}
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-purple-100">
-          <div className="grid grid-cols-[3rem_1fr_7rem_5rem_5rem] gap-2 bg-purple-50 px-4 py-3 text-xs font-bold text-purple-500 sm:grid-cols-[4rem_1fr_9rem_7rem_7rem]">
+          <div className="grid grid-cols-[2rem_2.5rem_minmax(0,1fr)_3.5rem_4.5rem] gap-2 bg-purple-50 px-2 py-3 text-xs font-bold text-purple-500 sm:grid-cols-[4rem_9rem_1fr_7rem_7rem] sm:px-4">
             <span>Rank</span>
-            <span>Player</span>
             <span>Tier</span>
+            <span>Player</span>
             <span className="text-right">Answered</span>
             <span className="text-right">Score</span>
           </div>
@@ -116,14 +116,14 @@ export function Leaderboard() {
             {!isLoading && !error && entries.map((entry, index) => (
               <div
                 key={`${entry.playerId}-${entry.completedAt}-${leaderboardVersion}`}
-                className={`grid grid-cols-[3rem_1fr_7rem_5rem_5rem] gap-2 border-t border-purple-50 bg-white px-4 py-4 text-sm sm:grid-cols-[4rem_1fr_9rem_7rem_7rem] ${entry.playerId === playerId ? 'animate-leaderboard-current-row-flash' : ''}`}
+                className={`grid grid-cols-[2rem_2.5rem_minmax(0,1fr)_3.5rem_4.5rem] gap-2 border-t border-purple-50 bg-white px-2 py-4 text-sm sm:grid-cols-[4rem_9rem_1fr_7rem_7rem] sm:px-4 ${entry.playerId === playerId ? 'animate-leaderboard-current-row-flash' : ''}`}
               >
                 <span className="font-black text-gray-400">{index + 1}</span>
+                <RankEmblemTooltip variant="leaderboard" rank={entry.rank ?? { name: 'Herald', mmr: 0, stars: 1 }} />
                 <span className={`min-w-0 truncate font-bold ${entry.playerId === playerId ? 'bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent font-black' : 'text-gray-700'}`}>
                   {entry.playerName}
                   {entry.attemptStatus === 'abandoned' && <span className="ml-2 text-xs font-medium text-gray-400">(ยังไม่จบ)</span>}
                 </span>
-                <RankEmblemTooltip compact rank={entry.rank ?? { name: 'Herald', mmr: 0, stars: 1 }} />
                 <span className="text-right text-gray-500">{entry.answeredCount}/{entry.questionCount}</span>
                 <span className="text-right font-bold text-pink-500">{entry.correctCount} / {entry.accuracy}%</span>
               </div>
