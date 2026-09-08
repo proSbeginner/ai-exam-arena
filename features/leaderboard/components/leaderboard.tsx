@@ -68,7 +68,7 @@ export function Leaderboard() {
       </div>
       <section className="relative z-10 mx-auto w-full max-w-3xl rounded-3xl bg-white/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8">
         <div className="text-center">
-          <p className="text-sm font-bold uppercase tracking-wide text-purple-500">Hall of Fame</p>
+          <p className="text-sm font-bold uppercase tracking-wide text-purple-500">หอเกียรติยศ 🏆</p>
           <h1 className="mt-1 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-3xl font-black tracking-tight text-transparent">
             Leaderboard
           </h1>

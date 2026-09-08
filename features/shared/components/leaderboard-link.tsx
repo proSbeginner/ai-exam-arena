@@ -24,7 +24,7 @@ export function LeaderboardLink({
         href={APP_ROUTES.leaderboard}
         className={linkClassName}
       >
-        ดูอันดับการแข่งขัน{showTrophy ? ' 🏆' : ''}
+        หอเกียรติยศ{showTrophy ? ' 🏆' : ''}
       </Link>
     </div>
   );
