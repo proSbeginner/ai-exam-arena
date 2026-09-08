@@ -3,7 +3,7 @@ import type { QuizSetup, QuizState } from '@/features/quiz/quiz.types';
 import { evaluateAnswer } from '@/features/quiz/quiz.logic';
 import { getMockQuizQuestions } from '@/mock-api/quiz/mock-questions';
 import { InvalidAttemptAnswerError } from '@/server/providers/attempt-errors';
-import { applyClientAttemptUpdate } from '@/server/providers/attempt-state';
+import { applyClientAttemptUpdate } from '@/features/quiz/utils/attemptState';
 import { ATTEMPT_STATUS } from '@/features/quiz/quiz.constants';
 import { simulateMockNetworkDelay, throwIfMockServiceUnavailable, MockApiError } from '../mock-api.config';
 

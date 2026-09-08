@@ -1,12 +1,18 @@
-import { ATTEMPT_STATUS, PASSING_SCORE_PERCENTAGE } from '@/features/quiz/quiz.constants';
-import type { SerializedQuizState } from '@/features/quiz/quiz-attempt.types';
+import { ATTEMPT_STATUS, PASSING_SCORE_PERCENTAGE } from '../quiz.constants';
+import type { SerializedQuizState } from '../quiz-attempt.types';
 
-export function applyClientAttemptUpdate(current: SerializedQuizState, requested: SerializedQuizState, questionCount: number): SerializedQuizState {
+export function applyClientAttemptUpdate(
+  current: SerializedQuizState,
+  requested: SerializedQuizState,
+  questionCount: number,
+): SerializedQuizState {
   const answeredCount = Object.keys(current.answeredMap).length;
   const isCompleted = answeredCount >= questionCount;
   const attemptStatus = isCompleted && requested.attemptStatus === ATTEMPT_STATUS.COMPLETED
     ? ATTEMPT_STATUS.COMPLETED
-    : !isCompleted && requested.summaryVisible ? ATTEMPT_STATUS.ABANDONED : ATTEMPT_STATUS.ACTIVE;
+    : !isCompleted && requested.summaryVisible
+      ? ATTEMPT_STATUS.ABANDONED
+      : ATTEMPT_STATUS.ACTIVE;
 
   return {
     ...current,
