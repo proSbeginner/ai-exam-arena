@@ -1,6 +1,7 @@
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import type { CurrentAttemptSummary, LeaderboardData, LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
 import { filterLeaderboardEntries, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
+import { getRankFromMmr } from '@/features/rank/rank.logic';
 import { getMockAttempt } from '@/mock/api/quiz/attempts/mock-attempts';
 const entries: LeaderboardEntry[] = [
   {
@@ -214,8 +215,33 @@ const entries: LeaderboardEntry[] = [
   },
 ];
 
+const mockMmrByPlayerId: Record<string, number> = {
+  'mock-player-001': 100,
+  'mock-player-002': 360,
+  'mock-player-003': 540,
+  'mock-player-004': 680,
+  'mock-player-005': 820,
+  'mock-player-006': 960,
+  'mock-player-007': 1140,
+  'mock-player-008': 1260,
+  'mock-player-009': 1440,
+  'mock-player-010': 1560,
+  'mock-player-011': 1740,
+  'mock-player-012': 1860,
+  'mock-player-013': 1980,
+  'mock-player-014': 2040,
+  'mock-player-015': 2100,
+  'mock-player-016': 2250,
+  'mock-player-017': 2400,
+  'mock-player-018': 2700,
+  'mock-player-019': 3200,
+};
+
 export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardData> {
-  const modeEntries = filterLeaderboardEntries(entries.filter((entry) => entry.mode === mode));
+  const modeEntries = filterLeaderboardEntries(entries.filter((entry) => entry.mode === mode)).map((entry) => {
+    const mmr = mockMmrByPlayerId[entry.playerId] ?? 0;
+    return { ...entry, mmr, rank: getRankFromMmr(mmr) };
+  });
   const playerAttempt = playerId ? await getMockAttempt(playerId, mode) : null;
 
   let currentAttempt: CurrentAttemptSummary | null = null;
