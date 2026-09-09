@@ -6,10 +6,8 @@ import {
   deleteMockAdminQuestion,
   listMockAdminQuestions,
   updateMockAdminQuestion,
-} from '@/mock/api/quiz/mock-admin-questions';
+} from '@/mock/api/admin/questions/mock-admin-questions';
 
-const originalScenario = process.env.MOCK_API_SCENARIO;
-const originalDelay = process.env.MOCK_API_DELAY_MS;
 let createdQuestionId: string | undefined;
 
 const input: AdminQuestionInput = {
@@ -29,14 +27,10 @@ const input: AdminQuestionInput = {
 afterEach(() => {
   if (createdQuestionId) deleteMockAdminQuestion(createdQuestionId);
   createdQuestionId = undefined;
-  process.env.MOCK_API_SCENARIO = originalScenario;
-  process.env.MOCK_API_DELAY_MS = originalDelay;
 });
 
 describe('admin question mock CRUD', () => {
   it('creates, lists, updates, and deletes a question', () => {
-    process.env.MOCK_API_SCENARIO = 'happy';
-    process.env.MOCK_API_DELAY_MS = '0';
 
     const created = createMockAdminQuestion(input);
     createdQuestionId = created.id;

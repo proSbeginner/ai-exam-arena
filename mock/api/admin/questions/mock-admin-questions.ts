@@ -1,8 +1,10 @@
 import type { AdminQuestionInput } from '@/features/admin/admin.types';
 import type { ExamQuestion } from '@/features/quiz/quiz.types';
-import { questions } from './questions.mock';
+import { questions } from '@/mock/api/quiz/questions/mock-questions';
 
-export function listMockAdminQuestions(): ExamQuestion[] { return [...questions]; }
+export function listMockAdminQuestions(): ExamQuestion[] {
+  return [...questions];
+}
 
 export function createMockAdminQuestion(input: AdminQuestionInput): ExamQuestion {
   const question: ExamQuestion = { ...input, id: `mock-question-${crypto.randomUUID()}` };
