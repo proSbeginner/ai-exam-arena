@@ -8,6 +8,7 @@ import { QUIZ_MOOD } from '../quiz.constants';
 import type { PlayerRank } from '@/features/rank/rank.types';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { AppToolbar } from '@/features/shared/components/app-toolbar';
+import { Toast } from '@/features/shared/components/toast';
 import { QuizProgress } from './quiz-progress';
 import { QuizAnswerOptions } from './quiz-answer-options';
 import { QuizQuestion } from './quiz-question';
@@ -122,6 +123,7 @@ export function QuizActive({
       className="relative flex min-h-screen touch-pan-y flex-col items-center justify-between overflow-x-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 font-sans"
     >
       <QuizConfettiBurst burstKey={confettiKey} streak={quizState.streak} />
+      <Toast key={answerError ?? "answer-error-none"} message={answerError} variant="error" />
       <div className="pointer-events-none absolute inset-x-0 top-[-2rem] z-0 flex justify-center">
         <Image
           src={getQuizMascotImage(quizState.mood, correctImage, wrongImage)}
@@ -176,8 +178,6 @@ export function QuizActive({
             selectedAnswer={selectedAnswer}
             isSubmittingAnswer={isSubmittingAnswer}
           />
-          {answerError && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-600">{answerError}</p>}
-
           {hasAnsweredCurrentQuestion && currentQuestion.funFact ? (
             <QuizFunFact>{currentQuestion.funFact}</QuizFunFact>
           ) : null}
