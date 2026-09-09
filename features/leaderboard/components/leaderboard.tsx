@@ -16,6 +16,8 @@ import { APP_ROUTES } from '@/features/shared/routes';
 import { getPlayerRank } from '../leaderboard.logic';
 import { RankEmblemTooltip } from '@/features/shared/components/rank-emblem-tooltip';
 import { AppToolbar } from '@/features/shared/components/app-toolbar';
+import { AppToolbarSkeleton } from '@/features/shared/components/app-toolbar-skeleton';
+import { LeaderboardLoadingSkeleton } from './leaderboard-loading-skeleton';
 
 import { useLeaderboard } from '../leaderboard.hook';
 import { LEADERBOARD_ATTEMPT_STATUS } from '../leaderboard.constants';
@@ -63,18 +65,22 @@ export function Leaderboard() {
 
   return (
     <main
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-pink-400 via-fuchsia-400 to-purple-600 bg-[length:200%_200%] p-4 pt-20 font-sans sm:p-8 animate-leaderboard-background"
+      className="relative flex min-h-screen items-center justify-center isolate overflow-hidden bg-slate-50 p-4 pt-20 font-sans sm:p-8"
     >
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <div className="leaderboard-spotlight animate-leaderboard-spotlight absolute inset-[-50%]" />
       </div>
       <div className="fixed inset-x-0 top-0 z-30 px-4">
-        <AppToolbar
-          playerName={playerName ?? ''}
-          selectPlayer={() => router.push(APP_ROUTES.welcome)}
-          currentMmrRank={currentPlayerEntry?.rank}
-          showNavigation={false}
-        />
+        {isLoading ? (
+          <AppToolbarSkeleton />
+        ) : (
+          <AppToolbar
+            playerName={playerName ?? ''}
+            selectPlayer={() => router.push(APP_ROUTES.welcome)}
+            currentMmrRank={currentPlayerEntry?.rank}
+            showNavigation={false}
+          />
+        )}
       </div>
       <section className="relative z-10 mx-auto w-full max-w-3xl rounded-3xl bg-white/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8">
         <div className="text-center">
@@ -117,7 +123,7 @@ export function Leaderboard() {
             <span className="text-right">Score</span>
           </div>
 
-          {isLoading && <p className="px-4 py-10 text-center text-sm text-gray-400">กำลังโหลดอันดับ...</p>}
+          {isLoading && <LeaderboardLoadingSkeleton />}
           {!isLoading && error && <p className="px-4 py-10 text-center text-sm text-red-500">{error}</p>}
           {!isLoading && !error && entries.length === 0 && (
             <p className="px-4 py-10 text-center text-sm text-gray-400">ยังไม่มีข้อมูลการจัดอันดับในโหมดนี้</p>

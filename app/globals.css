@@ -44,16 +44,11 @@ body {
   50% { transform: translateY(-12px); }
 }
 
-@keyframes leaderboard-background {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
 @keyframes leaderboard-spotlight {
-  0% { opacity: 0; transform: rotate(0deg) scale(0.9); }
+  0% { opacity: 0.25; transform: rotate(0deg) scale(0.9); }
   20% { opacity: 1; transform: rotate(72deg) scale(1); }
   80% { opacity: 0.9; transform: rotate(288deg) scale(1.05); }
-  100% { opacity: 0; transform: rotate(360deg) scale(1.1); }
+  100% { opacity: 0.25; transform: rotate(360deg) scale(1.1); }
 }
 
 @keyframes leaderboard-current-row-flash {
@@ -128,20 +123,21 @@ body {
 .animate-pop { animation: pop 0.45s ease-out both; }
 .animate-shake { animation: shake 0.5s ease-in-out both; }
 .animate-floaty { animation: floaty 3s ease-in-out infinite; }
-.animate-leaderboard-background { animation: leaderboard-background 10s ease-in-out 1 both; }
 .leaderboard-spotlight {
   background: conic-gradient(
     from 0deg at 50% 50%,
-    transparent 0deg 38deg,
-    rgba(255, 255, 255, 0.72) 54deg,
-    transparent 72deg 178deg,
-    rgba(255, 230, 250, 0.58) 198deg,
-    transparent 220deg 360deg
+    transparent 0deg 32deg,
+    rgba(236, 72, 153, 0.78) 48deg,
+    transparent 68deg 142deg,
+    rgba(139, 92, 246, 0.8) 164deg,
+    transparent 188deg 250deg,
+    rgba(59, 130, 246, 0.65) 274deg,
+    transparent 300deg 360deg
   );
-  filter: blur(12px);
-  mix-blend-mode: screen;
+  filter: blur(8px);
+  mix-blend-mode: normal;
 }
-.animate-leaderboard-spotlight { animation: leaderboard-spotlight 5s linear 1 both; }
+.animate-leaderboard-spotlight { animation: leaderboard-spotlight 8s linear infinite; will-change: transform, opacity; }
 .animate-leaderboard-current-row-flash {
   animation: leaderboard-current-row-flash 1.2s ease-out 0.5s both;
 }
