@@ -1,4 +1,4 @@
-import { MockApiError } from '@/mock-api/mock-api.config';
+import { MockApiError } from '@/mock/api/config';
 import { DataSourceConfigError } from '@/server/providers/data-source';
 import { getLeaderboardProvider } from '@/server/providers/leaderboard.provider';
 import type { QuizMode } from '@/features/quiz/quiz.types';
