@@ -7,8 +7,8 @@ import {
   getStoredPlayerName,
   subscribeToPlayerName,
 } from '../welcome.hook';
-import { QuizLoadingSkeleton } from '../../quiz/components/quiz-loading-skeleton';
-import { WelcomeLoadingSkeleton } from './welcome-loading-skeleton';
+import { QuizSkeleton } from '../../quiz/components/quiz-skeleton';
+import { WelcomeSkeleton } from './welcome-skeleton';
 
 export function EntryGate() {
   const [playerName, setPlayerName] = useState<string | null | undefined>(undefined);
@@ -31,5 +31,5 @@ export function EntryGate() {
     }
   }, [isPlayerReady, playerName]);
 
-  return playerName ? <QuizLoadingSkeleton /> : <WelcomeLoadingSkeleton />;
+  return playerName ? <QuizSkeleton /> : <WelcomeSkeleton />;
 }

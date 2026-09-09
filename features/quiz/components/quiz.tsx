@@ -8,7 +8,6 @@ import { APP_ROUTES } from '@/features/shared/routes';
 import type { PlayerRank } from '@/features/rank/rank.types';
 import type { ExamQuestion, QuizState } from '../quiz.types';
 import { QuizActive } from './quiz-active';
-import { QuizLoadingSkeleton } from './quiz-loading-skeleton';
 import { QuizNotice } from './quiz-notice';
 import { QuizResult } from './quiz-result';
 
@@ -27,14 +26,11 @@ interface QuizProps {
   goToNext: () => void;
   goToPrevious: () => void;
   hasAnsweredCurrentQuestion: boolean;
-  hasQuizSetup: boolean;
-  isQuizSetupReady: boolean;
-  isPlayerReady: boolean;
   isSavingSummary: boolean;
   isSubmittingAnswer: boolean;
 
   pageKey: number;
-  playerName: string | null;
+  playerName: string;
   questionLoadError: string | null;
   questionLoadStatus: 'loading' | 'ready' | 'empty' | 'error';
   questions: ExamQuestion[];
@@ -63,9 +59,6 @@ export function Quiz({
   goToNext,
   goToPrevious,
   hasAnsweredCurrentQuestion,
-  hasQuizSetup,
-  isQuizSetupReady,
-  isPlayerReady,
   isSavingSummary,
   isSubmittingAnswer,
   pageKey,
@@ -85,16 +78,6 @@ export function Quiz({
   const router = useRouter();
 
   useEffect(() => {
-    if (!isQuizSetupReady) return;
-    if (isPlayerReady && !playerName) {
-      router.replace(APP_ROUTES.welcome);
-    }
-    if (isPlayerReady && playerName && !hasQuizSetup) {
-      router.replace(APP_ROUTES.quizSetup);
-    }
-  }, [hasQuizSetup, isPlayerReady, isQuizSetupReady, playerName, router]);
-
-  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight') goToNext();
       if (event.key === 'ArrowLeft') goToPrevious();
@@ -104,13 +87,6 @@ export function Quiz({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [goToNext, goToPrevious]);
 
-  if (!isPlayerReady || !playerName || !hasQuizSetup) {
-    return <QuizLoadingSkeleton />;
-  }
-
-  if (questionLoadStatus === 'loading') {
-    return <QuizLoadingSkeleton />;
-  }
 
   if (questionLoadStatus === 'error') {
     return (

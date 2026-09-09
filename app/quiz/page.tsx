@@ -1,5 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { APP_ROUTES } from '@/features/shared/routes';
+import { QuizSkeleton } from '@/features/quiz/components/quiz-skeleton';
+
 import { Quiz } from '@/features/quiz/components/quiz';
 import { useQuiz } from '@/features/quiz/quiz.hook';
 
@@ -38,6 +43,17 @@ export default function QuizPage() {
     summarySaveError,
     sympathyIdx,
   } = useQuiz();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isQuizSetupReady) return;
+    if (isPlayerReady && !playerName) router.replace(APP_ROUTES.welcome);
+    if (isPlayerReady && playerName && !hasQuizSetup) router.replace(APP_ROUTES.quizSetup);
+  }, [hasQuizSetup, isPlayerReady, isQuizSetupReady, playerName, router]);
+
+  if (!isQuizSetupReady || !isPlayerReady || !playerName || !hasQuizSetup || questionLoadStatus === 'loading') {
+    return <QuizSkeleton />;
+  }
 
   return (
     <Quiz
@@ -55,11 +71,8 @@ export default function QuizPage() {
       goToNext={goToNext}
       goToPrevious={goToPrevious}
       hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
-      hasQuizSetup={hasQuizSetup}
-      isQuizSetupReady={isQuizSetupReady}
       isSubmittingAnswer={isSubmittingAnswer}
       isSavingSummary={isSavingSummary}
-      isPlayerReady={isPlayerReady}
       pageKey={pageKey}
       playerName={playerName}
       questionLoadError={questionLoadError}
