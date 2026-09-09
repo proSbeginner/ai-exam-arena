@@ -1,13 +1,7 @@
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import type { CurrentAttemptSummary, LeaderboardData, LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
 import { filterLeaderboardEntries, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
-import { getMockAttempt } from '@/mock-api/quiz/mock-attempts';
-import {
-  getMockScenario,
-  simulateMockNetworkDelay,
-  throwIfMockServiceUnavailable,
-} from '../mock-api.config';
-
+import { getMockAttempt } from '@/mock/api/quiz/mock-attempts';
 const entries: LeaderboardEntry[] = [
   {
     playerId: 'mock-player-001',
@@ -221,11 +215,6 @@ const entries: LeaderboardEntry[] = [
 ];
 
 export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardData> {
-  await simulateMockNetworkDelay();
-  throwIfMockServiceUnavailable();
-
-  if (getMockScenario() === 'empty-questions') return { entries: [], currentAttempt: null };
-
   const modeEntries = filterLeaderboardEntries(entries.filter((entry) => entry.mode === mode));
   const playerAttempt = playerId ? await getMockAttempt(playerId, mode) : null;
 
