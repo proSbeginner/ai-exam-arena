@@ -22,7 +22,7 @@ export function RankEmblemTooltip({ rank, variant = 'quiz' }: RankEmblemTooltipP
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const containerRef = useRef<HTMLSpanElement>(null);
   const asset = getRankAsset(rank.name);
-  const stars = rank.stars > 0 ? '★'.repeat(rank.stars) : 'ยังไม่มีดาว';
+  const stars = rank.stars > 0 ? '★'.repeat(rank.stars) : '';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -78,7 +78,7 @@ export function RankEmblemTooltip({ rank, variant = 'quiz' }: RankEmblemTooltipP
                 className="size-36 object-contain drop-shadow-lg animate-rank-artwork-in"
                 aria-hidden
               />
-              <span className="-mt-2 text-amber-200" aria-label={`${rank.stars} ดาว`}>{stars}</span>
+              {rank.stars > 0 && <span className="-mt-2 text-amber-200" aria-label={`${rank.stars} ดาว`}>{stars}</span>}
               <strong className="text-lg font-black">{rank.name}</strong>
               <span className="text-xs font-bold">{rank.mmr.toLocaleString()} MMR</span>
             </span>,
@@ -86,9 +86,15 @@ export function RankEmblemTooltip({ rank, variant = 'quiz' }: RankEmblemTooltipP
           )
         : null}
 
-      <span className="hidden sm:inline-flex">
-          <RankEmblemBadge rank={rank} compact={isLeaderboard} />
-      </span>
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={`ดูรายละเอียด Rank ${rank.name}`}
+        aria-expanded={isOpen}
+        className="hidden cursor-pointer rounded-full border-0 bg-transparent p-0 sm:inline-flex"
+      >
+        <RankEmblemBadge rank={rank} compact={isLeaderboard} />
+      </button>
     </span>
   );
 }
