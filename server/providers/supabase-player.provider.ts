@@ -1,4 +1,4 @@
-import { MockApiError } from '@/mock-api/mock-api.config';
+import { MockApiError } from '@/mock/api/config';
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import type { DatabasePlayerRow } from '@/server/database/types';
 import { transformPlayer } from '@/server/database/transformers/player.transform';

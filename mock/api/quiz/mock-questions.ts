@@ -4,7 +4,7 @@ import {
   getMockScenario,
   simulateMockNetworkDelay,
   throwIfMockServiceUnavailable,
-} from '../mock-api.config';
+} from '../config';
 
 export async function getMockQuizQuestions() {
   await simulateMockNetworkDelay();

@@ -3,8 +3,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   authenticateMockPlayer,
   createMockPlayer,
-} from '@/mock-api/welcome/mock-player';
-import { getMockQuizQuestions } from '@/mock-api/quiz/mock-questions';
+} from '@/mock/api/welcome/mock-player';
+import { getMockQuizQuestions } from '@/mock/api/quiz/mock-questions';
 
 const originalScenario = process.env.MOCK_API_SCENARIO;
 const originalDelay = process.env.MOCK_API_DELAY_MS;

@@ -1,11 +1,11 @@
 import type { QuizAttemptRecord } from '@/features/quiz/quiz-attempt.types';
 import type { QuizSetup, QuizState } from '@/features/quiz/quiz.types';
 import { evaluateAnswer } from '@/features/quiz/quiz.logic';
-import { getMockQuizQuestions } from '@/mock-api/quiz/mock-questions';
+import { getMockQuizQuestions } from '@/mock/api/quiz/mock-questions';
 import { InvalidAttemptAnswerError } from '@/server/providers/attempt-errors';
 import { applyClientAttemptUpdate } from '@/features/quiz/utils/attemptState';
 import { ATTEMPT_STATUS } from '@/features/quiz/quiz.constants';
-import { simulateMockNetworkDelay, throwIfMockServiceUnavailable, MockApiError } from '../mock-api.config';
+import { simulateMockNetworkDelay, throwIfMockAnswerFailed, throwIfMockServiceUnavailable, MockApiError } from '../config';
 
 const attempts = new Map<string, QuizAttemptRecord>();
 
@@ -82,6 +82,7 @@ export async function updateMockAttempt(attemptId: string, state: QuizState) {
 export async function submitMockAnswer(attemptId: string, questionId: string, selectedOptionId: string) {
   await simulateMockNetworkDelay();
   throwIfMockServiceUnavailable();
+  throwIfMockAnswerFailed();
   const attempt = [...attempts.values()].find((item) => item.id === attemptId);
   if (!attempt) throw new MockApiError("Attempt not found.", 404, "ATTEMPT_NOT_FOUND");
   if (attempt.state.attemptStatus === ATTEMPT_STATUS.COMPLETED) throw new InvalidAttemptAnswerError("Attempt is already completed.");

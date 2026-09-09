@@ -6,7 +6,7 @@ import {
   deleteMockAdminQuestion,
   listMockAdminQuestions,
   updateMockAdminQuestion,
-} from '@/mock-api/quiz/mock-admin-questions';
+} from '@/mock/api/quiz/mock-admin-questions';
 
 const originalScenario = process.env.MOCK_API_SCENARIO;
 const originalDelay = process.env.MOCK_API_DELAY_MS;

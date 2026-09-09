@@ -3,7 +3,8 @@ export type MockApiScenario =
   | 'player-name-taken'
   | 'empty-questions'
   | 'unavailable'
-  | 'slow';
+  | 'slow'
+  | 'answer-failed';
 
 const scenarios = new Set<MockApiScenario>([
   'happy',
@@ -11,6 +12,7 @@ const scenarios = new Set<MockApiScenario>([
   'empty-questions',
   'unavailable',
   'slow',
+  'answer-failed',
 ]);
 
 export class MockApiError extends Error {
@@ -36,6 +38,12 @@ export async function simulateMockNetworkDelay(): Promise<void> {
   const effectiveDelay = getMockScenario() === 'slow' ? Math.max(delay, 1_500) : delay;
 
   await new Promise((resolve) => setTimeout(resolve, effectiveDelay));
+}
+
+export function throwIfMockAnswerFailed(): void {
+  if (getMockScenario() === 'answer-failed') {
+    throw new MockApiError('The mock answer service failed.', 503, 'ANSWER_SAVE_FAILED');
+  }
 }
 
 export function throwIfMockServiceUnavailable(): void {

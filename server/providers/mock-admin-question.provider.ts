@@ -1,11 +1,11 @@
 import type { ExamQuestion } from '@/features/quiz/quiz.types';
-import { getMockScenario, simulateMockNetworkDelay, throwIfMockServiceUnavailable } from '@/mock-api/mock-api.config';
+import { getMockScenario, simulateMockNetworkDelay, throwIfMockServiceUnavailable } from '@/mock/api/config';
 import {
   createMockAdminQuestion,
   deleteMockAdminQuestion,
   listMockAdminQuestions,
   updateMockAdminQuestion,
-} from '@/mock-api/quiz/mock-admin-questions';
+} from '@/mock/api/quiz/mock-admin-questions';
 import type { AdminQuestionProvider } from '@/server/providers/admin-question.provider';
 
 async function prepareMockRequest(): Promise<void> {

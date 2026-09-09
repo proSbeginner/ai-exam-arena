@@ -3,7 +3,7 @@ import {
   MockApiError,
   simulateMockNetworkDelay,
   throwIfMockServiceUnavailable,
-} from '../mock-api.config';
+} from '../config';
 import { recordFailedPinAttempt } from '@/features/welcome/welcome.logic';
 
 interface MockPlayer {

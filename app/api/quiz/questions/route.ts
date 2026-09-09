@@ -1,4 +1,4 @@
-import { MockApiError } from '@/mock-api/mock-api.config';
+import { MockApiError } from '@/mock/api/config';
 import { DataSourceConfigError } from '@/server/providers/data-source';
 import { getQuizProvider } from '@/server/providers/quiz.provider';
 

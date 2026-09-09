@@ -1,4 +1,4 @@
-import { createMockAttempt, discardMockAttempt, getMockAttempt, getMockAttemptById, updateMockAttempt, submitMockAnswer } from '@/mock-api/quiz/mock-attempts';
+import { createMockAttempt, discardMockAttempt, getMockAttempt, getMockAttemptById, updateMockAttempt, submitMockAnswer } from '@/mock/api/quiz/mock-attempts';
 import type { AttemptProvider } from '@/server/providers/attempt.provider';
 
 export const mockAttemptProvider: AttemptProvider = {

@@ -8,7 +8,7 @@ import {
   getMockAttempt,
   submitMockAnswer,
   updateMockAttempt,
-} from '@/mock-api/quiz/mock-attempts';
+} from '@/mock/api/quiz/mock-attempts';
 
 const originalScenario = process.env.MOCK_API_SCENARIO;
 const originalDelay = process.env.MOCK_API_DELAY_MS;
@@ -30,6 +30,19 @@ afterEach(() => {
 });
 
 describe('mock quiz attempts', () => {
+  it('fails only when saving an answer in the answer-failed scenario', async () => {
+    process.env.MOCK_API_SCENARIO = 'happy';
+    process.env.MOCK_API_DELAY_MS = '0';
+    const playerId = `test-answer-failed-${Date.now()}`;
+    const created = await createMockAttempt(playerId, 'TEST_PLAYER', setup, ['mock-question-001'], initialState);
+
+    process.env.MOCK_API_SCENARIO = 'answer-failed';
+    await expect(submitMockAnswer(created.id, 'mock-question-001', 'mock-question-001-option-003')).rejects.toMatchObject({
+      code: 'ANSWER_SAVE_FAILED',
+      status: 503,
+    });
+  });
+
   it('creates, reads, updates, and discards an attempt', async () => {
     process.env.MOCK_API_SCENARIO = 'happy';
     process.env.MOCK_API_DELAY_MS = '0';
