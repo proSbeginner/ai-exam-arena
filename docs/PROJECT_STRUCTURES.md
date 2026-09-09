@@ -46,7 +46,7 @@ features/quiz/
 ├── quiz-setup.hook.ts
 └── quiz-progress.storage.ts
 
-mock-api/quiz/
+mock/api/quiz/
 ├── mock-attempts.ts
 ├── mock-questions.ts
 └── questions.mock.ts
@@ -80,7 +80,7 @@ features/leaderboard/
 ├── leaderboard.logic.ts
 └── leaderboard.types.ts
 
-mock-api/leaderboard/
+mock/api/leaderboard/
 └── mock-leaderboard.ts
 ```
 
@@ -105,7 +105,7 @@ features/admin/
 ├── admin.logic.ts
 └── admin.types.ts
 
-mock-api/quiz/
+mock/api/quiz/
 └── mock-admin-questions.ts
 ```
 
@@ -158,8 +158,8 @@ The database design is documented in [`docs/DATABASE_SCHEMA.md`](./DATABASE_SCHE
 | `MOOD_IMAGES` | `features/quiz/quiz.assets.ts` | Mood-to-image mapping |
 | `CORRECT_IMAGES` | `features/quiz/quiz.assets.ts` | Correct-answer images |
 | `RANKS` | `features/quiz/quiz.constants.ts` | Rank configuration |
-| `questions` | `mock-api/quiz/questions.mock.ts` | Mock question fixture |
-| `getMockQuizQuestions()` | `mock-api/quiz/mock-questions.ts` | Mock question provider |
+| `questions` | `mock/api/quiz/questions.mock.ts` | Mock question fixture |
+| `getMockQuizQuestions()` | `mock/api/quiz/mock-questions.ts` | Mock question provider |
 
 ## Request flow
 
@@ -168,8 +168,8 @@ quiz.hook
   → features/quiz/services/quiz.api.ts
   → /api/quiz/questions
   → server/providers/quiz.provider.ts
-  → mock-api/quiz/mock-questions.ts
-  → mock-api/quiz/questions.mock.ts
+  → mock/api/quiz/mock-questions.ts
+  → mock/api/quiz/questions.mock.ts
 ```
 
 The quiz setup page uses the same API flow to count published questions eligible for the selected mode based on option count. It stores the selected mode and optional question limit in session storage before routing to the quiz page. The selected mode belongs to the attempt, not to the question record.
@@ -178,7 +178,7 @@ When `DATA_SOURCE=supabase`, the provider resolver will use the Supabase impleme
 
 ## Mock attempt storage
 
-Quiz attempts are currently stored by `mock-api/quiz/mock-attempts.ts` in a server-memory `Map`:
+Quiz attempts are currently stored by `mock/api/quiz/mock-attempts.ts` in a server-memory `Map`:
 
 ```ts
 const attempts = new Map<string, QuizAttemptRecord>();
@@ -212,6 +212,6 @@ The map is keyed by `playerId` and quiz mode, and contains the attempt state, se
 - `server/providers/` selects the data source for API routes and exposes provider interfaces to routes.
 - `server/database/` owns database row types and database-to-application transformers.
 - `supabase/` owns the Supabase REST client and migrations.
-- `mock-api/` owns mock providers and mock fixtures.
+- `mock/api/` owns mock providers and mock fixtures.
 - Unit tests live beside the module they verify using the `.test.ts` suffix. The top-level `tests/` directory is reserved for shared test setup and future integration or end-to-end tests.
 - The root `data/` directory should not be used for mixed feature data and will be removed after the approved migration.
