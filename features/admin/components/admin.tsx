@@ -44,6 +44,8 @@ export function Admin() {
           error={admin.error}
           form={admin.form}
           formError={admin.formError}
+          showFormError={admin.showFormError}
+          questionFocusKey={admin.questionFocusKey}
           isDuplicateLabel={admin.isDuplicateLabel}
           isLoading={admin.isLoading}
           onAddLabel={admin.addLabel}

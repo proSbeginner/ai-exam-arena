@@ -47,6 +47,8 @@ export function useAdmin() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [saveSuccessMode, setSaveSuccessMode] = useState<'created' | 'updated' | null>(null);
+  const [showFormError, setShowFormError] = useState(false);
+  const [questionFocusKey, setQuestionFocusKey] = useState(0);
 
   const loadQuestions = async (delayMs = 0) => {
     setIsLoading(true);
@@ -100,20 +102,24 @@ export function useAdmin() {
     setForm(EMPTY_ADMIN_FORM);
     setEditingId(null);
     setError(null);
+    setShowFormError(false);
   };
 
   const editQuestion = (question: ExamQuestion) => {
     setEditingId(question.id);
     setForm(toInput(question));
+    setShowFormError(false);
   };
 
   const submit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (formError) {
+      setShowFormError(true);
       setError(formError);
       return;
     }
     setIsLoading(true);
+    setShowFormError(false);
     setError(null);
     try {
       const wasEditing = Boolean(editingId);
@@ -121,6 +127,7 @@ export function useAdmin() {
       if (editingId) await updateAdminQuestion(email, editingId, payload);
       else await createAdminQuestion(email, payload);
       resetForm();
+      setQuestionFocusKey((current) => current + 1);
       await loadQuestions();
       setSaveSuccessMode(wasEditing ? 'updated' : 'created');
     } catch (submitError) {
@@ -157,6 +164,8 @@ export function useAdmin() {
     isAuthorized,
     isDuplicateLabel,
     saveSuccessMode,
+    showFormError,
+    questionFocusKey,
     isLoading,
     loadQuestions,
     questions,

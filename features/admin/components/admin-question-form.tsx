@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { SubmitEvent } from 'react';
 
 import type { AdminQuestionFormState } from '../admin.types';
@@ -13,6 +13,8 @@ interface AdminQuestionFormProps {
   error: string | null;
   form: AdminQuestionFormState;
   formError: string | null;
+  showFormError: boolean;
+  questionFocusKey: number;
   isDuplicateLabel: boolean;
   isLoading: boolean;
   onAddLabel: () => void;
@@ -28,10 +30,15 @@ interface AdminQuestionFormProps {
 }
 
 export function AdminQuestionForm({
-  editingId, error, form, formError, isDuplicateLabel, isLoading, onAddLabel, onChange, onChangeOption,
+  editingId, error, form, formError, showFormError, questionFocusKey, isDuplicateLabel, isLoading, onAddLabel, onChange, onChangeOption,
   onChangeLabelInput, onClear, onCorrectOptionChange, onRemoveLabel, onRemoveOption, onAddOption, onSubmit,
 }: AdminQuestionFormProps) {
   const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
+  const questionInputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (questionFocusKey > 0) questionInputRef.current?.focus();
+  }, [questionFocusKey]);
 
   return (
     <>
@@ -48,13 +55,13 @@ export function AdminQuestionForm({
           </select>
         </label>
       </div>
-      <AdminField label="Question (English)" required><textarea id="admin-english" name="english" value={form.english} onChange={(event) => onChange('english', event.target.value)} placeholder="Question (English)" rows={4} className="w-full resize-y rounded-xl border-2 border-purple-200 bg-purple-50 px-4 py-3 font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-0" /></AdminField>
+      <AdminField label="Question (English)" required><textarea ref={questionInputRef} id="admin-english" name="english" value={form.english} onChange={(event) => onChange('english', event.target.value)} placeholder="Question (English)" rows={4} className="w-full resize-y rounded-xl border-2 border-purple-200 bg-purple-50 px-4 py-3 font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-0" /></AdminField>
       <AdminField label="แปลไทยสไตล์จีซู"><textarea id="admin-thai" name="thaiDrama" value={form.thai_drama} onChange={(event) => onChange('thai_drama', event.target.value)} placeholder="แปลไทยสไตล์จีซู" rows={4} className="w-full resize-y rounded-xl border-2 border-purple-200 bg-purple-50 px-4 py-3 font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-0" /></AdminField>
       <AdminField label="Labels"><AdminLabelInput isDuplicate={isDuplicateLabel} labels={form.labels} value={form.labelInput} onAdd={onAddLabel} onChange={onChangeLabelInput} onRemove={onRemoveLabel} /></AdminField>
       <AdminOptionsEditor options={form.options} correctOptionId={form.correctOptionId} onAdd={onAddOption} onChange={onChangeOption} onCorrectChange={onCorrectOptionChange} onRemove={onRemoveOption} />
       <AdminField label="Fun fact"><textarea id="admin-fun-fact" name="funFact" value={form.funFact} onChange={(event) => onChange('funFact', event.target.value)} placeholder="เกร็ดความรู้หลังตอบคำถาม" rows={4} className="w-full resize-y rounded-xl border-2 border-purple-200 bg-purple-50 px-4 py-3 font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-0" /></AdminField>
       <AdminField label="แหล่งอ้างอิง"><textarea id="admin-source" name="source" value={form.sourceName} onChange={(event) => onChange('sourceName', event.target.value)} placeholder="แหล่งอ้างอิง" rows={3} className="w-full resize-y rounded-xl border-2 border-purple-200 bg-purple-50 px-4 py-3 font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-0" /></AdminField>
-      {formError && <p className="text-xs font-medium text-red-500" role="alert">{formError}</p>}
+      {showFormError && formError && <p className="text-xs font-medium text-red-500" role="alert">{formError}</p>}
       <button type="submit" disabled={isLoading} className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 font-bold text-white disabled:opacity-50">{isLoading ? 'กำลังบันทึก...' : editingId ? 'บันทึกการแก้ไข' : 'เพิ่มคำถาม'}</button>
       </form>
       {isClearDialogOpen && (
