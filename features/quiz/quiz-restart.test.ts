@@ -40,7 +40,7 @@ describe('restartQuizAttempt', () => {
     expect(mocks.clearQuizReviewAttemptId).toHaveBeenCalledOnce();
     expect(mocks.discardQuizAttempt).toHaveBeenCalledWith('attempt-1');
     expect(mocks.saveQuizSetup).toHaveBeenCalledWith({ mode: 'university', questionLimit: 5 });
-    expect(navigate).toHaveBeenCalledWith('/quiz/setup');
+    expect(navigate).toHaveBeenCalledWith('/quiz-setup');
     expect(mocks.discardQuizAttempt.mock.invocationCallOrder[0]).toBeLessThan(mocks.clearQuizProgress.mock.invocationCallOrder[0]);
     expect(mocks.discardQuizAttempt.mock.invocationCallOrder[0]).toBeLessThan(mocks.saveQuizSetup.mock.invocationCallOrder[0]);
     expect(mocks.saveQuizSetup.mock.invocationCallOrder[0]).toBeLessThan(navigate.mock.invocationCallOrder[0]);
@@ -58,7 +58,7 @@ describe('restartQuizAttempt', () => {
 
     expect(mocks.discardQuizAttempt).not.toHaveBeenCalled();
     expect(mocks.saveQuizSetup).toHaveBeenCalledWith({ mode: 'primary', questionLimit: null });
-    expect(navigate).toHaveBeenCalledWith('/quiz/setup');
+    expect(navigate).toHaveBeenCalledWith('/quiz-setup');
   });
 
   it('does not clear progress or navigate when deleting the old attempt fails', async () => {

@@ -34,7 +34,7 @@ describe('resolveContinuePlayerQuiz', () => {
     const result = await resolveContinuePlayerQuiz({
       playerId: 'player-1', mode: 'secondary', getQuizAttempt: vi.fn().mockResolvedValue(null),
     });
-    expect(result).toEqual({ type: 'redirect-to-setup', route: '/quiz/setup', setup: { mode: 'secondary', questionLimit: null } });
+    expect(result).toEqual({ type: 'redirect-to-setup', route: '/quiz-setup', setup: { mode: 'secondary', questionLimit: null } });
   });
 
   it('continues an existing attempt with its original mode and question count', async () => {

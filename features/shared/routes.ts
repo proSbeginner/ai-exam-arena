@@ -1,7 +1,7 @@
 export const APP_ROUTES = {
   home: '/',
   welcome: '/welcome',
-  quizSetup: '/quiz/setup',
+  quizSetup: '/quiz-setup',
   quiz: '/quiz',
   admin: '/admin',
   leaderboard: '/leaderboard',
