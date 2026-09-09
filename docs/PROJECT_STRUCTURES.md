@@ -9,7 +9,7 @@ features/welcome/
 ├── components/
 │   ├── entry-gate.tsx
 │   ├── welcome.tsx
-│   └── welcome-loading-skeleton.tsx
+│   └── welcome-skeleton.tsx
 ├── services/
 │   └── welcome.api.ts
 ├── welcome.constants.ts
@@ -47,9 +47,12 @@ features/quiz/
 └── quiz-progress.storage.ts
 
 mock/api/quiz/
-├── mock-attempts.ts
-├── mock-questions.ts
-└── questions.mock.ts
+├── attempts/
+│   ├── mock-attempts.ts
+│   └── mock-attempts.test.ts
+└── questions/
+    ├── mock-questions.ts
+    └── mock-questions.test.ts
 ```
 
 ## Approved shared component structure
@@ -61,7 +64,13 @@ features/shared/
 │   ├── confirmation-dialog.tsx
 │   ├── leaderboard-link.tsx
 │   ├── info-dialog.tsx
-│   └── text-input.tsx
+│   ├── player-mmr-badge.tsx
+│   ├── player-rank-badge.tsx
+│   ├── rank-emblem-badge.tsx
+│   ├── rank-emblem-tooltip.tsx
+│   ├── text-input.tsx
+│   ├── app-toolbar.tsx
+│   └── app-toolbar-skeleton.tsx
 └── routes.ts
 ```
 
@@ -105,8 +114,9 @@ features/admin/
 ├── admin.logic.ts
 └── admin.types.ts
 
-mock/api/quiz/
-└── mock-admin-questions.ts
+mock/api/admin/questions/
+├── mock-admin-questions.ts
+└── mock-admin-questions.test.ts
 ```
 
 ## Approved database structure
@@ -132,13 +142,24 @@ server/
     ├── supabase-leaderboard.provider.ts
     ├── supabase-player.provider.ts
     ├── supabase-quiz.provider.ts
+    ├── mock-rating.provider.ts
+    ├── rating.provider.ts
+    ├── supabase-rating.provider.ts
+    ├── supabase-rating.provider.test.ts
+    ├── mock-quiz.provider.test.ts
+    ├── mock-leaderboard.provider.test.ts
+    ├── mock-admin-question.provider.test.ts
     └── ...
 
 supabase/
 ├── client.ts
 └── migrations/
     ├── 0001_initial_schema.sql
-    └── 0002_grant_server_provider_access.sql
+    ├── 0002_grant_server_provider_access.sql
+    ├── 0003_player_ratings.sql
+    ├── 0004_player_rating_events.sql
+    ├── 0005_grant_player_rating_access.sql
+    └── 0006_atomic_apply_attempt_rating.sql
 ```
 
 The database design is documented in [`docs/DATABASE_SCHEMA.md`](./DATABASE_SCHEMA.md). Supabase migrations are the source of truth for production database structure; mock providers remain available for local development and tests.
@@ -158,8 +179,8 @@ The database design is documented in [`docs/DATABASE_SCHEMA.md`](./DATABASE_SCHE
 | `MOOD_IMAGES` | `features/quiz/quiz.assets.ts` | Mood-to-image mapping |
 | `CORRECT_IMAGES` | `features/quiz/quiz.assets.ts` | Correct-answer images |
 | `RANKS` | `features/quiz/quiz.constants.ts` | Rank configuration |
-| `questions` | `mock/api/quiz/questions.mock.ts` | Mock question fixture |
-| `getMockQuizQuestions()` | `mock/api/quiz/mock-questions.ts` | Mock question provider |
+| `questions` | `mock/api/quiz/questions/mock-questions.ts` | Mock question fixture |
+| `getMockQuizQuestions()` | `mock/api/quiz/questions/mock-questions.ts` | Mock question provider |
 
 ## Request flow
 
@@ -168,8 +189,7 @@ quiz.hook
   → features/quiz/services/quiz.api.ts
   → /api/quiz/questions
   → server/providers/quiz.provider.ts
-  → mock/api/quiz/mock-questions.ts
-  → mock/api/quiz/questions.mock.ts
+  → mock/api/quiz/questions/mock-questions.ts
 ```
 
 The quiz setup page uses the same API flow to count published questions eligible for the selected mode based on option count. It stores the selected mode and optional question limit in session storage before routing to the quiz page. The selected mode belongs to the attempt, not to the question record.
@@ -178,7 +198,7 @@ When `DATA_SOURCE=supabase`, the provider resolver will use the Supabase impleme
 
 ## Mock attempt storage
 
-Quiz attempts are currently stored by `mock/api/quiz/mock-attempts.ts` in a server-memory `Map`:
+Quiz attempts are currently stored by `mock/api/quiz/attempts/mock-attempts.ts` in a server-memory `Map`:
 
 ```ts
 const attempts = new Map<string, QuizAttemptRecord>();
@@ -215,3 +235,13 @@ The map is keyed by `playerId` and quiz mode, and contains the attempt state, se
 - `mock/api/` owns mock providers and mock fixtures.
 - Unit tests live beside the module they verify using the `.test.ts` suffix. The top-level `tests/` directory is reserved for shared test setup and future integration or end-to-end tests.
 - The root `data/` directory should not be used for mixed feature data and will be removed after the approved migration.
+
+## Current mock API organization
+
+Mock scenarios and network delays are owned by their domain provider in `server/providers/mock-*.provider.ts`. They are not configured through a shared `mock/api/config.ts` file or environment variables. Mock fixtures live under `mock/api/<domain>`, and tests sit beside the fixture or provider they verify.
+
+The quiz answer flow uses `server/providers/mock-attempt.provider.ts` for the `answer-failed` scenario. The client displays the existing answer error and allows the player to retry after the request fails or times out.
+
+## Loading skeleton convention
+
+Each page-level loading state should replace the page components it represents, including the app toolbar when that toolbar appears on the page. Skeleton layout should use the same content width and horizontal spacing as the loaded component. Route-level `loading.tsx` files are kept only where Next.js can show a navigation fallback before the page component mounts; page-owned `isLoading` state remains responsible for API loading.
