@@ -1,5 +1,5 @@
-import { QuizLoadingSkeleton } from '@/features/quiz/components/quiz-loading-skeleton';
+import { QuizSetupSkeleton } from '@/features/quiz/components/quiz-setup-skeleton';
 
 export default function QuizSetupLoading() {
-  return <QuizLoadingSkeleton />;
+  return <QuizSetupSkeleton />;
 }

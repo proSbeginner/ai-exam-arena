@@ -8,7 +8,6 @@ import type { QuizMode } from '../quiz.types';
 interface QuizSetupProps {
   availableQuestionCount: number;
   error: string | null;
-  isLoading: boolean;
   modeOptions: Array<{ value: QuizMode; label: string; description: string }>;
   questionLimit: string;
   selectedMode: QuizMode;
@@ -22,7 +21,6 @@ interface QuizSetupProps {
 export function QuizSetup({
   availableQuestionCount,
   error,
-  isLoading,
   modeOptions,
   questionLimit,
   selectedMode,
@@ -79,10 +77,9 @@ export function QuizSetup({
         <button
           type="button"
           onClick={startQuiz}
-          disabled={isLoading}
           className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3.5 text-lg font-bold text-white shadow-lg transition-all hover:shadow-pink-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isLoading ? 'กำลังโหลดคำถาม...' : 'เริ่มทำข้อสอบ'}
+          เริ่มทำข้อสอบ
         </button>
       </section>
     </main>
