@@ -3,6 +3,7 @@
 import { LeaderboardLink } from './leaderboard-link';
 import { RankEmblemTooltip } from './rank-emblem-tooltip';
 import { PlayerRankBadge } from './player-rank-badge';
+import { PlayerNameRibbon } from './player-name-ribbon';
 import type { PlayerRank } from '@/features/rank/rank.types';
 import { useEffect, useState } from 'react';
 
@@ -41,14 +42,14 @@ export function AppToolbar({
   }, []);
 
   return (
-    <header className={`mx-auto flex w-full max-w-lg items-center justify-between py-4 transition-transform duration-300 ${isHidden ? '-translate-y-full pointer-events-none' : 'translate-y-0'}`}>
+    <header className={`mx-auto flex w-full max-w-lg items-center justify-between py-4 transition-transform duration-300 ${isHidden ? '-translate-y-[calc(100%+1rem)] pointer-events-none' : 'translate-y-0'}`}>
       <div className="flex min-w-0 items-center gap-2">
         {currentMmrRank ? (
           <RankEmblemTooltip variant="toolbar" rank={currentMmrRank} />
         ) : currentRank ? (
           <PlayerRankBadge rank={currentRank} />
         ) : null}
-        <span className="max-w-28 truncate text-sm font-bold text-gray-500 sm:max-w-none">{playerName}</span>
+        <PlayerNameRibbon playerName={playerName} />
       </div>
       {showNavigation && (
         <div className="flex shrink-0 items-center gap-2">
