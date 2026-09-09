@@ -279,7 +279,7 @@ export function useQuiz() {
           await submitQuizAnswer(attemptId, questions[quizState.currentQIndex].id, selectedOptionId);
         }
       } catch {
-        setAnswerError('บันทึกคำตอบไม่สำเร็จ กรุณาลองตอบข้อนี้อีกครั้ง');
+        setAnswerError('บันทึกคำตอบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
         setIsSubmittingAnswer(false);
         return;
       }

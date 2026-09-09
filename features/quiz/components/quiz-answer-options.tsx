@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import type { ExamQuestion } from '../quiz.types';
 import { HoldToAnswerButton } from './hold-to-answer-button';
 
 interface QuizAnswerOptionsProps {
-  answerQuestion: (selectedOptionId: string) => void;
+  answerQuestion: (selectedOptionId: string) => Promise<void>;
   currentQuestion: ExamQuestion;
   hasAnsweredCurrentQuestion: boolean;
   selectedAnswer: string | undefined;
+  isSubmittingAnswer: boolean;
 }
 
 export function QuizAnswerOptions({
@@ -13,7 +15,10 @@ export function QuizAnswerOptions({
   currentQuestion,
   hasAnsweredCurrentQuestion,
   selectedAnswer,
+  isSubmittingAnswer,
 }: QuizAnswerOptionsProps) {
+  const [pendingOptionId, setPendingOptionId] = useState<string | null>(null);
+
   return (
     <div className="space-y-3 pt-2">
       {currentQuestion.options.map((option, index) => {
@@ -24,8 +29,11 @@ export function QuizAnswerOptions({
         return (
           <HoldToAnswerButton
             key={option.id}
-            onConfirm={() => answerQuestion(option.id)}
-            disabled={hasAnsweredCurrentQuestion}
+            onConfirm={() => {
+              setPendingOptionId(option.id);
+              void answerQuestion(option.id).finally(() => setPendingOptionId(null));
+            }}
+            disabled={hasAnsweredCurrentQuestion || isSubmittingAnswer}
             testId={`answer-option-${option.id}`}
             className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left transition-all ${
               hasAnsweredCurrentQuestion && isCorrectOption
@@ -52,6 +60,9 @@ export function QuizAnswerOptions({
             </span>
             {hasAnsweredCurrentQuestion && isCorrectOption && <span className="text-lg font-bold text-green-500">✓</span>}
             {isWrongSelection && <span className="text-lg font-bold text-red-500">✗</span>}
+            {isSubmittingAnswer && pendingOptionId === option.id && (
+              <span className="ml-3 size-5 animate-spin rounded-full border-2 border-purple-200 border-t-purple-600" aria-label="กำลังบันทึก" />
+            )}
           </HoldToAnswerButton>
         );
       })}

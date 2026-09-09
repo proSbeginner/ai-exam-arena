@@ -18,7 +18,7 @@ import { QuizStreakBadge } from './quiz-streak-badge';
 import { QuizConfettiBurst } from './quiz-confetti-burst';
 
 interface QuizActiveProps {
-  answerQuestion: (selectedOptionId: string) => void;
+  answerQuestion: (selectedOptionId: string) => Promise<void>;
   answerError: string | null;
   answeredCount: number;
   selectPlayer: () => void;
@@ -174,6 +174,7 @@ export function QuizActive({
             currentQuestion={currentQuestion}
             hasAnsweredCurrentQuestion={hasAnsweredCurrentQuestion}
             selectedAnswer={selectedAnswer}
+            isSubmittingAnswer={isSubmittingAnswer}
           />
           {answerError && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-600">{answerError}</p>}
 

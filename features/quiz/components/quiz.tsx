@@ -12,7 +12,7 @@ import { QuizNotice } from './quiz-notice';
 import { QuizResult } from './quiz-result';
 
 interface QuizProps {
-  answerQuestion: (selectedOptionId: string) => void;
+  answerQuestion: (selectedOptionId: string) => Promise<void>;
   answerError: string | null;
   answeredCount: number;
   selectPlayer: () => void;

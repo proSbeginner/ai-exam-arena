@@ -1,4 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { submitAnswerByScenario } from '@/server/providers/mock-attempt.provider';
 
 import { ATTEMPT_STATUS } from '@/features/quiz/quiz.constants';
 import type { QuizSetup, QuizState } from '@/features/quiz/quiz.types';
@@ -8,10 +10,7 @@ import {
   getMockAttempt,
   submitMockAnswer,
   updateMockAttempt,
-} from '@/mock/api/quiz/mock-attempts';
-
-const originalScenario = process.env.MOCK_API_SCENARIO;
-const originalDelay = process.env.MOCK_API_DELAY_MS;
+} from '@/mock/api/quiz/attempts/mock-attempts';
 
 const setup: QuizSetup = { mode: 'university', questionLimit: 2 };
 const initialState: QuizState = {
@@ -24,28 +23,22 @@ const initialState: QuizState = {
   attemptStatus: ATTEMPT_STATUS.ACTIVE,
 };
 
-afterEach(() => {
-  process.env.MOCK_API_SCENARIO = originalScenario;
-  process.env.MOCK_API_DELAY_MS = originalDelay;
-});
-
 describe('mock quiz attempts', () => {
+  it('treats discarding a missing attempt as successful', async () => {
+    await expect(discardMockAttempt('missing-attempt-id')).resolves.toBeUndefined();
+  });
+
   it('fails only when saving an answer in the answer-failed scenario', async () => {
-    process.env.MOCK_API_SCENARIO = 'happy';
-    process.env.MOCK_API_DELAY_MS = '0';
     const playerId = `test-answer-failed-${Date.now()}`;
     const created = await createMockAttempt(playerId, 'TEST_PLAYER', setup, ['mock-question-001'], initialState);
 
-    process.env.MOCK_API_SCENARIO = 'answer-failed';
-    await expect(submitMockAnswer(created.id, 'mock-question-001', 'mock-question-001-option-003')).rejects.toMatchObject({
+    await expect(submitAnswerByScenario('answer-failed', created.id, 'mock-question-001', 'mock-question-001-option-003')).rejects.toMatchObject({
       code: 'ANSWER_SAVE_FAILED',
       status: 503,
     });
   });
 
   it('creates, reads, updates, and discards an attempt', async () => {
-    process.env.MOCK_API_SCENARIO = 'happy';
-    process.env.MOCK_API_DELAY_MS = '0';
     const playerId = `test-attempt-${Date.now()}`;
 
     const created = await createMockAttempt(playerId, 'TEST_PLAYER', setup, ['mock-question-001', 'mock-question-002'], initialState);
