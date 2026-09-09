@@ -1,7 +1,7 @@
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import type { CurrentAttemptSummary, LeaderboardData, LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
 import { filterLeaderboardEntries, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
-import { getMockAttempt } from '@/mock/api/quiz/mock-attempts';
+import { getMockAttempt } from '@/mock/api/quiz/attempts/mock-attempts';
 const entries: LeaderboardEntry[] = [
   {
     playerId: 'mock-player-001',
