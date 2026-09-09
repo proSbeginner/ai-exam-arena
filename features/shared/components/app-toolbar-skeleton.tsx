@@ -1,6 +1,6 @@
 export function AppToolbarSkeleton() {
   return (
-    <div aria-hidden className="flex items-center justify-between py-4">
+    <div aria-hidden className="mx-auto flex w-full max-w-lg items-center justify-between py-4">
       <div className="flex items-center gap-2">
         <div className="size-9 rounded-full bg-purple-200/70" />
         <div className="h-4 w-24 rounded-full bg-gray-200" />

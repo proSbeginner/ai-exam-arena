@@ -1,68 +1,52 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
-import { useRouter } from 'next/navigation';
-
-import { getStoredPlayerId, getStoredPlayerName, subscribeToPlayerName } from '@/features/welcome/welcome.hook';
-import { QUIZ_MODE_OPTIONS } from '@/features/quiz/quiz.constants';
-import { getStoredQuizSetup, saveQuizSetup, subscribeToQuizSetup } from '@/features/quiz/quiz-setup.hook';
-import { saveQuizReviewAttemptId } from '@/features/quiz/quiz-progress.storage';
-import { getQuizAttempt } from '@/features/quiz/services/quiz-attempt.api';
-import { restartQuizAttempt } from '@/features/quiz/quiz-restart';
 import { ConfirmationDialog } from '@/features/shared/components/confirmation-dialog';
+import type { PlayerRank } from '@/features/rank/rank.types';
 import type { QuizMode } from '@/features/quiz/quiz.types';
-import { APP_ROUTES } from '@/features/shared/routes';
-
-import { getPlayerRank } from '../leaderboard.logic';
+import type { CurrentAttemptSummary, LeaderboardEntry } from '../leaderboard.types';
+import { QUIZ_MODE_OPTIONS } from '@/features/quiz/quiz.constants';
+import { LEADERBOARD_ATTEMPT_STATUS } from '../leaderboard.constants';
 import { RankEmblemTooltip } from '@/features/shared/components/rank-emblem-tooltip';
 import { AppToolbar } from '@/features/shared/components/app-toolbar';
-import { AppToolbarSkeleton } from '@/features/shared/components/app-toolbar-skeleton';
-import { LeaderboardLoadingSkeleton } from './leaderboard-loading-skeleton';
 
-import { useLeaderboard } from '../leaderboard.hook';
-import { LEADERBOARD_ATTEMPT_STATUS } from '../leaderboard.constants';
-import { resolveContinuePlayerQuiz } from '../continue-player-quiz.logic';
+interface LeaderboardProps {
+  mode: QuizMode;
+  entries: LeaderboardEntry[];
+  currentAttempt: CurrentAttemptSummary | null;
+  error: string | null;
+  playerId: string | null;
+  playerName: string;
+  playerRank: number | null;
+  currentMmrRank: PlayerRank | null;
+  showRestartConfirmation: boolean;
+  onModeChange: (mode: QuizMode) => void;
+  onSelectPlayer: () => void;
+  onContinue: () => void;
+  onRestart: () => void;
+  onCancelRestart: () => void;
+  onConfirmRestart: () => void;
+}
 
-export function Leaderboard() {
-  const router = useRouter();
-  const [modeOverride, setModeOverride] = useState<QuizMode | null>(null);
-  const storedQuizSetup = useSyncExternalStore(subscribeToQuizSetup, getStoredQuizSetup, () => null);
-  const mode = modeOverride ?? storedQuizSetup?.mode ?? 'university';
-  const playerId = useSyncExternalStore(subscribeToPlayerName, getStoredPlayerId, () => null);
-  const playerName = useSyncExternalStore(subscribeToPlayerName, getStoredPlayerName, () => null);
-  const { entries, currentAttempt, error, isLoading } = useLeaderboard(mode, playerId);
+export function Leaderboard({
+  mode,
+  entries,
+  currentAttempt,
+  error,
+  playerId,
+  playerName,
+  playerRank,
+  currentMmrRank,
+  showRestartConfirmation,
+  onModeChange,
+  onSelectPlayer,
+  onContinue,
+  onRestart,
+  onCancelRestart,
+  onConfirmRestart,
+}: LeaderboardProps) {
   const leaderboardVersion = entries
-    .map((entry, index) => `${index}:${entry.playerId}:${entry.completedAt}:${entry.answeredCount}:${entry.correctCount}`)
+    .map((entry, index) => [index, entry.playerId, entry.completedAt, entry.answeredCount, entry.correctCount].join(':'))
     .join('|') || 'empty';
-  const playerRank = playerId ? getPlayerRank(entries, playerId) : null;
-  const currentPlayerEntry = playerId ? entries.find((entry) => entry.playerId === playerId) : undefined;
-  const [showRestartConfirmation, setShowRestartConfirmation] = useState(false);
-
-  const continuePlayerQuiz = async () => {
-    const action = await resolveContinuePlayerQuiz({ playerId, mode, currentAttempt, getQuizAttempt });
-    if (!action) return;
-
-    saveQuizSetup(action.setup);
-    if (action.type === 'open-quiz' && action.reviewAttemptId) saveQuizReviewAttemptId(action.reviewAttemptId);
-    router.push(action.route);
-  };
-
-  const restartPlayerQuiz = async () => {
-    if (!currentAttempt) return;
-
-    await restartQuizAttempt({
-      attemptId: currentAttempt.attemptId,
-      mode: currentAttempt.mode || mode,
-      questionCount: null,
-      navigate: router.push,
-    });
-    setShowRestartConfirmation(false);
-  };
-
-  const returnToWelcome = () => {
-    router.push(APP_ROUTES.welcome);
-  };
-
   return (
     <main
       className="relative flex min-h-screen items-center justify-center isolate overflow-hidden bg-slate-50 p-4 pt-20 font-sans sm:p-8"
@@ -71,16 +55,12 @@ export function Leaderboard() {
         <div className="leaderboard-spotlight animate-leaderboard-spotlight absolute inset-[-50%]" />
       </div>
       <div className="fixed inset-x-0 top-0 z-30 px-4">
-        {isLoading ? (
-          <AppToolbarSkeleton />
-        ) : (
-          <AppToolbar
-            playerName={playerName ?? ''}
-            selectPlayer={() => router.push(APP_ROUTES.welcome)}
-            currentMmrRank={currentPlayerEntry?.rank}
-            showNavigation={false}
-          />
-        )}
+        <AppToolbar
+          playerName={playerName}
+          selectPlayer={onSelectPlayer}
+          currentMmrRank={currentMmrRank}
+          showNavigation={false}
+        />
       </div>
       <section className="relative z-10 mx-auto w-full max-w-3xl rounded-3xl bg-white/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8">
         <div className="text-center">
@@ -96,7 +76,7 @@ export function Leaderboard() {
             <button
               key={option.value}
               type="button"
-              onClick={() => setModeOverride(option.value)}
+              onClick={() => onModeChange(option.value)}
               className={`cursor-pointer rounded-xl border-2 px-3 py-2 text-sm font-bold transition-colors ${
                 mode === option.value
                   ? 'border-purple-500 bg-purple-50 text-purple-700'
@@ -123,13 +103,12 @@ export function Leaderboard() {
             <span className="text-right">Score</span>
           </div>
 
-          {isLoading && <LeaderboardLoadingSkeleton />}
-          {!isLoading && error && <p className="px-4 py-10 text-center text-sm text-red-500">{error}</p>}
-          {!isLoading && !error && entries.length === 0 && (
+                    {error && <p className="px-4 py-10 text-center text-sm text-red-500">{error}</p>}
+          {!error && entries.length === 0 && (
             <p className="px-4 py-10 text-center text-sm text-gray-400">ยังไม่มีข้อมูลการจัดอันดับในโหมดนี้</p>
           )}
           <div className="max-h-[35rem] overflow-y-auto">
-            {!isLoading && !error && entries.map((entry, index) => (
+            {!error && entries.map((entry, index) => (
               <div
                 key={`${entry.playerId}-${entry.completedAt}-${leaderboardVersion}`}
                 className={`grid grid-cols-[2rem_2.5rem_minmax(0,1fr)_3.5rem_4.5rem] items-center gap-2 border-t border-purple-50 bg-white px-2 py-4 text-sm sm:grid-cols-[4rem_9rem_1fr_7rem_7rem] sm:px-4 ${entry.playerId === playerId ? 'animate-leaderboard-current-row-flash' : ''}`}
@@ -155,7 +134,7 @@ export function Leaderboard() {
               {(!currentAttempt || currentAttempt.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.ABANDONED || currentAttempt.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED) && (
                 <button
                   type="button"
-                  onClick={() => void continuePlayerQuiz()}
+                  onClick={onContinue}
                   className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white px-4 py-2.5 text-sm font-bold text-purple-600 transition-all hover:border-purple-400 active:scale-95"
                 >
                   {currentAttempt?.attemptStatus === LEADERBOARD_ATTEMPT_STATUS.COMPLETED
@@ -168,7 +147,7 @@ export function Leaderboard() {
               {currentAttempt && (
                 <button
                   type="button"
-                  onClick={() => setShowRestartConfirmation(true)}
+                  onClick={onRestart}
                   className="flex-1 cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:shadow-pink-500/30 active:scale-95"
                 >
                   เล่นใหม่
@@ -179,7 +158,7 @@ export function Leaderboard() {
           {!playerId && (
             <button
               type="button"
-              onClick={returnToWelcome}
+              onClick={onSelectPlayer}
               className="flex-1 cursor-pointer rounded-xl border-2 border-purple-200 bg-white px-4 py-2.5 text-sm font-bold text-purple-600 transition-colors hover:border-purple-400"
             >
               กลับหน้า Welcome
@@ -191,8 +170,8 @@ export function Leaderboard() {
         <ConfirmationDialog
           title="เล่นใหม่หรือไม่ ?"
           message="ความคืบหน้าของชุดปัจจุบันจะถูกทิ้ง และระบบจะสุ่มคำถามชุดใหม่ให้"
-          onCancel={() => setShowRestartConfirmation(false)}
-          onConfirm={() => void restartPlayerQuiz()}
+          onCancel={onCancelRestart}
+          onConfirm={onConfirmRestart}
         />
       )}
     </main>
