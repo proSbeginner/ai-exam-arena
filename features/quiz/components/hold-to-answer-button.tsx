@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 
-const HOLD_DURATION_MS = 800;
+const HOLD_DURATION_MS = 600;
 
 interface HoldToAnswerButtonProps {
   children: ReactNode;
