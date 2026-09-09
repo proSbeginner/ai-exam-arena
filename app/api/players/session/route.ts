@@ -1,4 +1,4 @@
-import { MockApiError } from '@/mock/api/config';
+import { ApiError } from '@/server/errors/api-error';
 import { DataSourceConfigError } from '@/server/providers/data-source';
 import { getPlayerProvider } from '@/server/providers/player.provider';
 
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const player = await getPlayerProvider().authenticatePlayer(body.playerName, body.pin);
     return Response.json({ player });
   } catch (error) {
-    if (error instanceof MockApiError) {
+    if (error instanceof ApiError) {
       return Response.json(
         { error: { code: error.code, message: error.message } },
         { status: error.status },

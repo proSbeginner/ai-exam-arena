@@ -1,4 +1,4 @@
-import { MockApiError } from '@/mock/api/config';
+import { ApiError } from '@/server/errors/api-error';
 import { DataSourceConfigError } from '@/server/providers/data-source';
 import { getLeaderboardProvider } from '@/server/providers/leaderboard.provider';
 import type { QuizMode } from '@/features/quiz/quiz.types';
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     const leaderboard = await getLeaderboardProvider().getLeaderboard(mode, playerId);
     return Response.json({ ...leaderboard, leaderboard: leaderboard.entries, mode });
   } catch (error) {
-    if (error instanceof MockApiError) {
+    if (error instanceof ApiError) {
       return Response.json(
         { error: { code: error.code, message: error.message } },
         { status: error.status },

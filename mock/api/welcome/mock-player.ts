@@ -1,9 +1,4 @@
-import {
-  getMockScenario,
-  MockApiError,
-  simulateMockNetworkDelay,
-  throwIfMockServiceUnavailable,
-} from '../config';
+import { ApiError } from '@/server/errors/api-error';
 import { recordFailedPinAttempt } from '@/features/welcome/welcome.logic';
 
 interface MockPlayer {
@@ -30,24 +25,18 @@ function toPlayerProfile(player: MockPlayer) {
 
 function validatePin(pin: string): void {
   if (!/^\d{6}$/.test(pin)) {
-    throw new MockApiError('The PIN must contain exactly 6 digits.', 400, 'INVALID_PIN');
+    throw new ApiError('The PIN must contain exactly 6 digits.', 400, 'INVALID_PIN');
   }
 }
 
 export async function createMockPlayer(playerName: string, pin: string) {
-  await simulateMockNetworkDelay();
-  throwIfMockServiceUnavailable();
-
   validatePin(pin);
 
   const normalizedPlayerName = normalizePlayerName(playerName);
 
-  if (getMockScenario() === 'player-name-taken') {
-    throw new MockApiError('This player name is already in use.', 409, 'PLAYER_NAME_TAKEN');
-  }
 
   if (players.has(normalizedPlayerName)) {
-    throw new MockApiError('This player name is already in use.', 409, 'PLAYER_NAME_TAKEN');
+    throw new ApiError('This player name is already in use.', 409, 'PLAYER_NAME_TAKEN');
   }
 
   const player: MockPlayer = {
@@ -63,24 +52,19 @@ export async function createMockPlayer(playerName: string, pin: string) {
 }
 
 export async function hasMockPlayer(playerName: string): Promise<boolean> {
-  await simulateMockNetworkDelay();
-  throwIfMockServiceUnavailable();
   return players.has(normalizePlayerName(playerName));
 }
 
 export async function authenticateMockPlayer(playerName: string, pin: string) {
-  await simulateMockNetworkDelay();
-  throwIfMockServiceUnavailable();
-
   validatePin(pin);
 
   const player = players.get(normalizePlayerName(playerName));
   if (!player) {
-    throw new MockApiError('The player name or PIN is incorrect.', 401, 'INVALID_CREDENTIALS');
+    throw new ApiError('The player name or PIN is incorrect.', 401, 'INVALID_CREDENTIALS');
   }
 
   if (player.locked) {
-    throw new MockApiError('ใส่ PIN ผิดหลายครั้ง ระบบล็อกบัญชีไว้ กรุณาติดต่อ Admin', 423, 'PLAYER_LOCKED');
+    throw new ApiError('ใส่ PIN ผิดหลายครั้ง ระบบล็อกบัญชีไว้ กรุณาติดต่อ Admin', 423, 'PLAYER_LOCKED');
   }
 
   if (player.pin !== pin) {
@@ -88,10 +72,10 @@ export async function authenticateMockPlayer(playerName: string, pin: string) {
     player.failedPinAttempts = pinAttemptState.failedPinAttempts;
     player.locked = pinAttemptState.locked;
     if (player.locked) {
-      throw new MockApiError('ใส่ PIN ผิดหลายครั้ง ระบบล็อกบัญชีไว้ กรุณาติดต่อ Admin', 423, 'PLAYER_LOCKED');
+      throw new ApiError('ใส่ PIN ผิดหลายครั้ง ระบบล็อกบัญชีไว้ กรุณาติดต่อ Admin', 423, 'PLAYER_LOCKED');
     }
 
-    throw new MockApiError('The player name or PIN is incorrect.', 401, 'INVALID_CREDENTIALS');
+    throw new ApiError('The player name or PIN is incorrect.', 401, 'INVALID_CREDENTIALS');
   }
 
   player.failedPinAttempts = 0;

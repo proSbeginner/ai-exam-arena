@@ -1,7 +1,7 @@
 import type { LeaderboardData } from "@/features/leaderboard/leaderboard.types";
 import type { QuizMode } from "@/features/quiz/quiz.types";
-import { MockApiError } from "@/mock/api/config";
-import { getMockLeaderboard } from "@/mock/api/leaderboard";
+import { ApiError } from "@/server/errors/api-error";
+import { getMockLeaderboard } from "@/mock/api/leaderboard/mock-leaderboard";
 import type { LeaderboardProvider } from "@/server/providers/leaderboard.provider";
 
 export type MockScenario =
@@ -30,7 +30,7 @@ export async function getLeaderboardByScenario(
       return emptyLeaderboard;
 
     case "unavailable":
-      throw new MockApiError(
+      throw new ApiError(
         "The mock leaderboard service is unavailable.",
         503,
         "LEADERBOARD_UNAVAILABLE",

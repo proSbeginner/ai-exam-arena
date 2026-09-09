@@ -1,4 +1,4 @@
-import { MockApiError } from '@/mock/api/config';
+import { ApiError } from '@/server/errors/api-error';
 import { DataSourceConfigError } from '@/server/providers/data-source';
 import { getQuizProvider } from '@/server/providers/quiz.provider';
 
@@ -7,7 +7,7 @@ export async function GET() {
     const questions = await getQuizProvider().getQuestions();
     return Response.json({ questions });
   } catch (error) {
-    if (error instanceof MockApiError) {
+    if (error instanceof ApiError) {
       return Response.json(
         { error: { code: error.code, message: error.message } },
         { status: error.status },

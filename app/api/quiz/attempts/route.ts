@@ -1,4 +1,4 @@
-import { MockApiError } from '@/mock/api/config';
+import { ApiError } from '@/server/errors/api-error';
 import { getAttemptProvider } from '@/server/providers/attempt.provider';
 import { DataSourceConfigError } from '@/server/providers/data-source';
 import type { QuizMode, QuizSetup, QuizState } from '@/features/quiz/quiz.types';
@@ -10,7 +10,7 @@ function isMode(value: unknown): value is QuizMode {
 }
 
 function errorResponse(error: unknown) {
-  if (error instanceof MockApiError) return Response.json({ error: { code: error.code, message: error.message } }, { status: error.status });
+  if (error instanceof ApiError) return Response.json({ error: { code: error.code, message: error.message } }, { status: error.status });
   if (error instanceof DataSourceConfigError) return Response.json({ error: { code: error.code, message: error.message } }, { status: 503 });
   return Response.json({ error: { code: 'UNKNOWN_ERROR', message: 'The attempt service failed unexpectedly.' } }, { status: 500 });
 }

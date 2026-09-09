@@ -1,36 +1,57 @@
 import type { ExamQuestion } from '@/features/quiz/quiz.types';
-import { getMockScenario, simulateMockNetworkDelay, throwIfMockServiceUnavailable } from '@/mock/api/config';
+import { ApiError } from '@/server/errors/api-error';
 import {
   createMockAdminQuestion,
   deleteMockAdminQuestion,
   listMockAdminQuestions,
   updateMockAdminQuestion,
-} from '@/mock/api/quiz/mock-admin-questions';
+} from '@/mock/api/admin/questions/mock-admin-questions';
 import type { AdminQuestionProvider } from '@/server/providers/admin-question.provider';
 
-async function prepareMockRequest(): Promise<void> {
-  await simulateMockNetworkDelay();
-  throwIfMockServiceUnavailable();
+export type MockAdminQuestionScenario =
+  | 'success'
+  | 'empty'
+  | 'unavailable'
+  | 'unknown-error';
+
+export const MOCK_ADMIN_QUESTION_SCENARIO: MockAdminQuestionScenario = 'success';
+export const MOCK_DELAY_MS = 500;
+
+async function prepareMockRequest(scenario: MockAdminQuestionScenario): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY_MS));
+
+  if (scenario === 'unavailable') {
+    throw new ApiError(
+      'The mock admin question service is unavailable.',
+      503,
+      'ADMIN_QUESTION_UNAVAILABLE',
+    );
+  }
+
+  if (scenario === 'unknown-error') {
+    throw new Error('The mock admin question service failed unexpectedly.');
+  }
+}
+
+export async function listAdminQuestionsByScenario(
+  scenario: MockAdminQuestionScenario,
+): Promise<ExamQuestion[]> {
+  await prepareMockRequest(scenario);
+  return scenario === 'empty' ? [] : listMockAdminQuestions();
 }
 
 export const mockAdminQuestionProvider: AdminQuestionProvider = {
-  async listQuestions(): Promise<ExamQuestion[]> {
-    await prepareMockRequest();
-    return getMockScenario() === 'empty-questions' ? [] : listMockAdminQuestions();
-  },
-
+  listQuestions: () => listAdminQuestionsByScenario(MOCK_ADMIN_QUESTION_SCENARIO),
   async createQuestion(input) {
-    await prepareMockRequest();
+    await prepareMockRequest(MOCK_ADMIN_QUESTION_SCENARIO);
     return createMockAdminQuestion(input);
   },
-
   async updateQuestion(id, input) {
-    await prepareMockRequest();
+    await prepareMockRequest(MOCK_ADMIN_QUESTION_SCENARIO);
     return updateMockAdminQuestion(id, input);
   },
-
   async deleteQuestion(id) {
-    await prepareMockRequest();
+    await prepareMockRequest(MOCK_ADMIN_QUESTION_SCENARIO);
     return deleteMockAdminQuestion(id);
   },
 };

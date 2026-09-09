@@ -1,4 +1,4 @@
-import { MockApiError } from '@/mock/api/config';
+import { ApiError } from '@/server/errors/api-error';
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import type { DatabasePlayerRow } from '@/server/database/types';
 import { transformPlayer } from '@/server/database/transformers/player.transform';
@@ -11,7 +11,7 @@ function normalizePlayerName(playerName: string): string {
 
 function validatePin(pin: string): void {
   if (!/^\d{6}$/.test(pin)) {
-    throw new MockApiError('The PIN must contain exactly 6 digits.', 400, 'INVALID_PIN');
+    throw new ApiError('The PIN must contain exactly 6 digits.', 400, 'INVALID_PIN');
   }
 }
 
@@ -42,7 +42,7 @@ async function createSupabasePlayer(playerName: string, pin: string): Promise<Pl
   validatePin(pin);
   const normalizedPlayerName = normalizePlayerName(playerName);
   const existing = await findSupabasePlayer(normalizedPlayerName);
-  if (existing) throw new MockApiError('This player name is already in use.', 409, 'PLAYER_NAME_TAKEN');
+  if (existing) throw new ApiError('This player name is already in use.', 409, 'PLAYER_NAME_TAKEN');
 
   const players = await supabaseRequest<DatabasePlayerRow[]>('players', {
     method: 'POST',
@@ -60,8 +60,8 @@ async function authenticateSupabasePlayer(playerName: string, pin: string): Prom
   validatePin(pin);
   const player = await findSupabasePlayer(playerName);
   if (!player || player.locked_at) {
-    if (player?.locked_at) throw new MockApiError('ใส่ PIN ผิดหลายครั้ง ระบบล็อกบัญชีไว้ กรุณาติดต่อ Admin', 423, 'PLAYER_LOCKED');
-    throw new MockApiError('The player name or PIN is incorrect.', 401, 'INVALID_CREDENTIALS');
+    if (player?.locked_at) throw new ApiError('ใส่ PIN ผิดหลายครั้ง ระบบล็อกบัญชีไว้ กรุณาติดต่อ Admin', 423, 'PLAYER_LOCKED');
+    throw new ApiError('The player name or PIN is incorrect.', 401, 'INVALID_CREDENTIALS');
   }
 
   if (!verifyPin(pin, player.pin_hash)) {
@@ -72,8 +72,8 @@ async function authenticateSupabasePlayer(playerName: string, pin: string): Prom
       method: 'PATCH',
       body: JSON.stringify({ failed_pin_attempts: failedPinAttempts, locked_at: locked ? new Date().toISOString() : null }),
     });
-    if (locked) throw new MockApiError('ใส่ PIN ผิดหลายครั้ง ระบบล็อกบัญชีไว้ กรุณาติดต่อ Admin', 423, 'PLAYER_LOCKED');
-    throw new MockApiError('The player name or PIN is incorrect.', 401, 'INVALID_CREDENTIALS');
+    if (locked) throw new ApiError('ใส่ PIN ผิดหลายครั้ง ระบบล็อกบัญชีไว้ กรุณาติดต่อ Admin', 423, 'PLAYER_LOCKED');
+    throw new ApiError('The player name or PIN is incorrect.', 401, 'INVALID_CREDENTIALS');
   }
 
   await supabaseRequest(`players?id=eq.${player.id}`, { method: 'PATCH', body: JSON.stringify({ failed_pin_attempts: 0 }) });
