@@ -1,31 +1,37 @@
-'use client';
+"use client";
 
-import { useMemo, useState, type SubmitEvent } from 'react';
+import { useMemo, useState, type SubmitEvent } from "react";
 
-import type { ExamQuestion, QuizOption } from '@/features/quiz/quiz.types';
-import { validateAdminQuestion } from './admin.logic';
-import { ADMIN_REFRESH_DELAY_MS, EMPTY_ADMIN_FORM, MAX_ADMIN_OPTIONS } from './admin.constants';
-import type { AdminQuestionFormState } from './admin.types';
+import type { ExamQuestion, QuizOption } from "@/features/quiz/quiz.types";
+import { validateAdminQuestion } from "./admin.logic";
+import {
+  ADMIN_REFRESH_DELAY_MS,
+  EMPTY_ADMIN_FORM,
+  MAX_ADMIN_OPTIONS,
+} from "./admin.constants";
+import type { AdminQuestionFormState } from "./admin.types";
 import {
   createAdminQuestion,
   deleteAdminQuestion,
   getAdminQuestions,
   updateAdminQuestion,
-} from './services/admin.api';
+} from "./services/admin.api";
 
 function toInput(question: ExamQuestion): AdminQuestionFormState {
   return {
     ...EMPTY_ADMIN_FORM,
     ...question,
     labels: question.labels ?? [],
-    labelInput: '',
-    funFact: question.funFact ?? '',
-    sourceName: question.source?.name ?? '',
+    labelInput: "",
+    funFact: question.funFact ?? "",
+    sourceName: question.source?.name ?? "",
   };
 }
 
 function toPayload(form: AdminQuestionFormState) {
-  const options = form.options.filter((option) => option.english.trim() || option.thai_drama.trim());
+  const options = form.options.filter(
+    (option) => option.english.trim() || option.thai_drama.trim(),
+  );
   return {
     labels: form.labels,
     english: form.english,
@@ -39,37 +45,53 @@ function toPayload(form: AdminQuestionFormState) {
 }
 
 export function useAdmin() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
   const [form, setForm] = useState(EMPTY_ADMIN_FORM);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const [saveSuccessMode, setSaveSuccessMode] = useState<'created' | 'updated' | null>(null);
-  const [showFormError, setShowFormError] = useState(false);
+  const [saveSuccessMode, setSaveSuccessMode] = useState<
+    "created" | "updated" | null
+  >(null);
   const [questionFocusKey, setQuestionFocusKey] = useState(0);
 
   const loadQuestions = async (delayMs = 0) => {
     setIsLoading(true);
     setError(null);
-    if (delayMs > 0) await new Promise((resolve) => setTimeout(resolve, delayMs));
+    if (delayMs > 0)
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
     try {
       setQuestions(await getAdminQuestions(email));
       setIsAuthorized(true);
     } catch (loadError) {
       setIsAuthorized(false);
-      setError(loadError instanceof Error ? loadError.message : 'ไม่สามารถโหลดคำถามได้');
+      setError(
+        loadError instanceof Error
+          ? loadError.message
+          : "ไม่สามารถโหลดคำถามได้",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const formError = useMemo(() => validateAdminQuestion(toPayload(form)), [form]);
-  const updateForm = <K extends keyof AdminQuestionFormState>(key: K, value: AdminQuestionFormState[K]) => {
+  const formError = useMemo(
+    () => validateAdminQuestion(toPayload(form)),
+    [form],
+  );
+  const updateForm = <K extends keyof AdminQuestionFormState>(
+    key: K,
+    value: AdminQuestionFormState[K],
+  ) => {
     setForm((current) => ({ ...current, [key]: value }));
   };
-  const updateOption = (index: number, key: keyof QuizOption, value: string) => {
+  const updateOption = (
+    index: number,
+    key: keyof QuizOption,
+    value: string,
+  ) => {
     setForm((current) => ({
       ...current,
       options: current.options.map((option, optionIndex) =>
@@ -81,45 +103,66 @@ export function useAdmin() {
     if (form.options.length >= MAX_ADMIN_OPTIONS) return;
     setForm((current) => ({
       ...current,
-      options: [...current.options, { id: `option-${current.options.length + 1}`, english: '', thai_drama: '' }],
+      options: [
+        ...current.options,
+        {
+          id: `option-${current.options.length + 1}`,
+          english: "",
+          thai_drama: "",
+        },
+      ],
     }));
   };
   const addLabel = () => {
-    const label = form.labelInput.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '');
+    const label = form.labelInput
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9_]/g, "");
     if (!label || form.labels.includes(label)) return;
-    setForm((current) => ({ ...current, labels: [...current.labels, label], labelInput: '' }));
+    setForm((current) => ({
+      ...current,
+      labels: [...current.labels, label],
+      labelInput: "",
+    }));
   };
   const updateLabelInput = (value: string) => {
-    setForm((current) => ({ ...current, labelInput: value.toUpperCase().replace(/[^A-Z0-9_]/g, '') }));
+    setForm((current) => ({
+      ...current,
+      labelInput: value.toUpperCase().replace(/[^A-Z0-9_]/g, ""),
+    }));
   };
   const removeLabel = (label: string) => {
-    setForm((current) => ({ ...current, labels: current.labels.filter((item) => item !== label) }));
+    setForm((current) => ({
+      ...current,
+      labels: current.labels.filter((item) => item !== label),
+    }));
   };
-  const normalizedLabelInput = form.labelInput.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '');
-  const isDuplicateLabel = Boolean(normalizedLabelInput && form.labels.includes(normalizedLabelInput));
+  const normalizedLabelInput = form.labelInput
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_]/g, "");
+  const isDuplicateLabel = Boolean(
+    normalizedLabelInput && form.labels.includes(normalizedLabelInput),
+  );
 
   const resetForm = () => {
     setForm(EMPTY_ADMIN_FORM);
     setEditingId(null);
     setError(null);
-    setShowFormError(false);
   };
 
   const editQuestion = (question: ExamQuestion) => {
     setEditingId(question.id);
     setForm(toInput(question));
-    setShowFormError(false);
   };
 
   const submit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (formError) {
-      setShowFormError(true);
       setError(formError);
       return;
     }
     setIsLoading(true);
-    setShowFormError(false);
     setError(null);
     try {
       const wasEditing = Boolean(editingId);
@@ -129,9 +172,13 @@ export function useAdmin() {
       resetForm();
       setQuestionFocusKey((current) => current + 1);
       await loadQuestions();
-      setSaveSuccessMode(wasEditing ? 'updated' : 'created');
+      setSaveSuccessMode(wasEditing ? "updated" : "created");
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'ไม่สามารถบันทึกคำถามได้');
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : "ไม่สามารถบันทึกคำถามได้",
+      );
       setIsLoading(false);
     }
   };
@@ -139,13 +186,17 @@ export function useAdmin() {
   const closeSaveSuccessDialog = () => setSaveSuccessMode(null);
 
   const remove = async (id: string) => {
-    if (!window.confirm('ยืนยันการลบคำถามนี้หรือไม่?')) return;
+    if (!window.confirm("ยืนยันการลบคำถามนี้หรือไม่?")) return;
     setIsLoading(true);
     try {
       await deleteAdminQuestion(email, id);
       await loadQuestions();
     } catch (removeError) {
-      setError(removeError instanceof Error ? removeError.message : 'ไม่สามารถลบคำถามได้');
+      setError(
+        removeError instanceof Error
+          ? removeError.message
+          : "ไม่สามารถลบคำถามได้",
+      );
       setIsLoading(false);
     }
   };
@@ -164,7 +215,6 @@ export function useAdmin() {
     isAuthorized,
     isDuplicateLabel,
     saveSuccessMode,
-    showFormError,
     questionFocusKey,
     isLoading,
     loadQuestions,

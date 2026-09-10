@@ -6,13 +6,14 @@ import { AdminAccessGate } from './admin-access-gate';
 import { AdminQuestionForm } from './admin-question-form';
 import { AdminQuestionList } from './admin-question-list';
 import { InfoDialog } from '@/features/shared/components/info-dialog';
+import { Toast } from '@/features/shared/components/toast';
 
 export function Admin() {
   const admin = useAdmin();
   const [isQuestionBankOpen, setIsQuestionBankOpen] = useState(false);
 
   if (!admin.isAuthorized) {
-    return (
+    return <>
       <AdminAccessGate
         email={admin.email}
         error={admin.error}
@@ -23,11 +24,13 @@ export function Admin() {
           void admin.loadQuestions();
         }}
       />
-    );
+    </>;
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-4 sm:p-8">
+    <>
+      <Toast key={admin.error ?? 'admin-error-none'} message={admin.error} variant="error" />
+      <main className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-4 sm:p-8">
       <section className="mx-auto w-full max-w-3xl">
         <div className="mb-4 flex justify-end">
           <button
@@ -41,10 +44,7 @@ export function Admin() {
         </div>
         <AdminQuestionForm
           editingId={admin.editingId}
-          error={admin.error}
           form={admin.form}
-          formError={admin.formError}
-          showFormError={admin.showFormError}
           questionFocusKey={admin.questionFocusKey}
           isDuplicateLabel={admin.isDuplicateLabel}
           isLoading={admin.isLoading}
@@ -76,6 +76,7 @@ export function Admin() {
           />
         )}
       </section>
-    </main>
+      </main>
+    </>
   );
 }
