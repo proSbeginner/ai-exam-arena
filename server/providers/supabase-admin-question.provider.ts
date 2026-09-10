@@ -34,6 +34,47 @@ async function insertOptions(questionId: string, input: AdminQuestionInput): Pro
   });
 }
 
+async function updateOptions(questionId: string, input: AdminQuestionInput): Promise<void> {
+  const query = supabaseQuery({
+    select: 'id,option_key',
+    question_id: `eq.${questionId}`,
+  });
+  const existingOptions = await supabaseRequest<Array<{ id: string; option_key: string }>>(
+    `question_options?${query}`,
+  );
+  const existingByKey = new Map(existingOptions.map((option) => [option.option_key, option]));
+
+  for (const [displayOrder, option] of input.options.entries()) {
+    const payload = {
+      option_key: option.id,
+      english: option.english,
+      thai_drama: option.thai_drama,
+      is_correct: option.id === input.correctOptionId,
+      display_order: displayOrder,
+    };
+    const existing = existingByKey.get(option.id);
+
+    if (existing) {
+      await supabaseRequest(`question_options?id=eq.${existing.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      });
+    } else {
+      await supabaseRequest('question_options', {
+        method: 'POST',
+        body: JSON.stringify({ question_id: questionId, ...payload }),
+      });
+    }
+  }
+
+  const inputKeys = new Set(input.options.map((option) => option.id));
+  for (const option of existingOptions) {
+    if (!inputKeys.has(option.option_key)) {
+      await supabaseRequest(`question_options?id=eq.${option.id}`, { method: 'DELETE' });
+    }
+  }
+}
+
 async function getQuestion(id: string): Promise<ExamQuestion | null> {
   const query = supabaseQuery({ select: '*,question_options(*)', id: `eq.${id}`, limit: '1' });
   const rows = await supabaseRequest<DatabaseQuestionRow[]>(`questions?${query}`);
@@ -67,8 +108,7 @@ export const supabaseAdminQuestionProvider: AdminQuestionProvider = {
       method: 'PATCH',
       body: JSON.stringify(questionPayload(input)),
     });
-    await supabaseRequest(`question_options?question_id=eq.${id}`, { method: 'DELETE' });
-    await insertOptions(id, input);
+    await updateOptions(id, input);
     return getQuestion(id);
   },
 
