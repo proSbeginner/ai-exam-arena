@@ -49,7 +49,11 @@ export function AppToolbar({
         ) : currentRank ? (
           <PlayerRankBadge rank={currentRank} />
         ) : null}
-        <PlayerNameRibbon playerName={playerName} />
+        {currentMmrRank || currentRank ? (
+          <span className="max-w-28 truncate text-sm font-bold text-gray-500 sm:max-w-none">{playerName}</span>
+        ) : (
+          <PlayerNameRibbon playerName={playerName} />
+        )}
       </div>
       {showNavigation && (
         <div className="flex shrink-0 items-center gap-2">
