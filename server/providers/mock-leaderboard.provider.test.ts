@@ -5,11 +5,11 @@ import {
   type MockScenario,
 } from '@/server/providers/mock-leaderboard.provider';
 
-const scenarios: MockScenario[] = ['success', 'empty', 'unavailable', 'unknown-error'];
+const scenarios: MockScenario[] = ['success', 'repeat-player', 'empty', 'unavailable', 'unknown-error'];
 
 describe('mock leaderboard provider', () => {
   it('supports every leaderboard scenario', async () => {
-    expect(scenarios).toHaveLength(4);
+    expect(scenarios).toHaveLength(5);
     await expect(getLeaderboardByScenario('success', 'university')).resolves.toMatchObject({
       entries: expect.any(Array),
       currentAttempt: null,
@@ -17,6 +17,9 @@ describe('mock leaderboard provider', () => {
     await expect(getLeaderboardByScenario('empty', 'university')).resolves.toEqual({
       entries: [],
       currentAttempt: null,
+    });
+    await expect(getLeaderboardByScenario('repeat-player', 'university')).resolves.toMatchObject({
+      entries: [expect.objectContaining({ playerName: 'REPEAT_PLAYER', answeredCount: 30 })],
     });
   });
 

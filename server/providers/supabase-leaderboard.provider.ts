@@ -1,6 +1,6 @@
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import type { CurrentAttemptSummary, LeaderboardData } from '@/features/leaderboard/leaderboard.types';
-import { filterLeaderboardEntries, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
+import { filterLeaderboardEntries, getBestAttemptsPerPlayer, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
 import type { DatabaseAttemptRow, DatabaseLeaderboardAttemptRow } from '@/server/database/types';
 import { transformLeaderboardAttempt } from '@/server/database/transformers/leaderboard.transform';
 import { getRatingProvider } from '@/server/providers/rating.provider';
@@ -44,7 +44,7 @@ async function getSupabaseLeaderboard(mode: QuizMode, playerId?: string): Promis
     : null;
 
   return {
-    entries: sortLeaderboard(filterLeaderboardEntries(rankedEntries)),
+    entries: sortLeaderboard(getBestAttemptsPerPlayer(filterLeaderboardEntries(rankedEntries))),
     currentAttempt,
   };
 }

@@ -1,11 +1,12 @@
 import type { LeaderboardData } from "@/features/leaderboard/leaderboard.types";
 import type { QuizMode } from "@/features/quiz/quiz.types";
 import { ApiError } from "@/server/errors/api-error";
-import { getMockLeaderboard } from "@/mock/api/leaderboard/mock-leaderboard";
+import { getMockLeaderboard, repeatPlayerEntries } from "@/mock/api/leaderboard/mock-leaderboard";
 import type { LeaderboardProvider } from "@/server/providers/leaderboard.provider";
 
 export type MockScenario =
   | "success"
+  | "repeat-player"
   | "empty"
   | "unavailable"
   | "unknown-error";
@@ -25,6 +26,9 @@ export async function getLeaderboardByScenario(
   switch (scenario) {
     case "success":
       return getMockLeaderboard(mode, playerId);
+
+    case "repeat-player":
+      return getMockLeaderboard(mode, playerId, repeatPlayerEntries);
 
     case "empty":
       return emptyLeaderboard;

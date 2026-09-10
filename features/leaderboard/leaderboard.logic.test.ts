@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { filterLeaderboardEntries, getPlayerRank, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
+import { filterLeaderboardEntries, getBestAttemptsPerPlayer, getPlayerRank, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
 import type { LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
 
 const entry = (overrides: Partial<LeaderboardEntry>): LeaderboardEntry => ({
@@ -44,6 +44,35 @@ describe('leaderboard logic', () => {
     ]);
 
     expect(sorted.map((item) => item.playerId)).toEqual(['correct', 'time', 'volume', 'accuracy']);
+  });
+
+
+  it('keeps only the best attempt per player and mode', () => {
+    const best = getBestAttemptsPerPlayer([
+      entry({ attemptId: 'short', playerId: 'same', answeredCount: 10, questionCount: 10, accuracy: 100 }),
+      entry({ attemptId: 'long', playerId: 'same', answeredCount: 30, questionCount: 30, accuracy: 95 }),
+      entry({ attemptId: 'other-mode', playerId: 'same', mode: 'secondary', answeredCount: 1 }),
+    ]);
+
+    expect(best.map((item) => item.attemptId)).toEqual(['long', 'other-mode']);
+  });
+
+  it('prefers completed attempts over abandoned attempts for the same player and mode', () => {
+    const best = getBestAttemptsPerPlayer([
+      entry({ attemptId: 'abandoned', attemptStatus: 'abandoned', answeredCount: 30 }),
+      entry({ attemptId: 'completed', answeredCount: 1 }),
+    ]);
+
+    expect(best.map((item) => item.attemptId)).toEqual(['completed']);
+  });
+
+  it('uses accuracy and correct count as tie-breakers', () => {
+    const best = getBestAttemptsPerPlayer([
+      entry({ attemptId: 'accuracy-low', answeredCount: 10, accuracy: 80, correctCount: 8 }),
+      entry({ attemptId: 'accuracy-high', answeredCount: 10, accuracy: 90, correctCount: 9 }),
+    ]);
+
+    expect(best.map((item) => item.attemptId)).toEqual(['accuracy-high']);
   });
 
   it('returns a one-based rank for a player', () => {

@@ -1,9 +1,9 @@
 import type { QuizMode } from '@/features/quiz/quiz.types';
 import type { CurrentAttemptSummary, LeaderboardData, LeaderboardEntry } from '@/features/leaderboard/leaderboard.types';
-import { filterLeaderboardEntries, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
+import { filterLeaderboardEntries, getBestAttemptsPerPlayer, sortLeaderboard } from '@/features/leaderboard/leaderboard.logic';
 import { getRankFromMmr } from '@/features/rank/rank.logic';
 import { getMockAttempt } from '@/mock/api/quiz/attempts/mock-attempts';
-const entries: LeaderboardEntry[] = [
+const successEntries: LeaderboardEntry[] = [
   {
     playerId: 'mock-player-001',
     playerName: 'CLOUD_MASTER',
@@ -215,6 +215,33 @@ const entries: LeaderboardEntry[] = [
   },
 ];
 
+export const repeatPlayerEntries: LeaderboardEntry[] = [
+  {
+    attemptId: 'mock-attempt-repeat-short',
+    playerId: 'mock-player-repeat-001',
+    playerName: 'REPEAT_PLAYER',
+    mode: 'university',
+    answeredCount: 10,
+    questionCount: 10,
+    correctCount: 10,
+    accuracy: 100,
+    attemptStatus: 'completed',
+    completedAt: '2026-01-03T10:00:00.000Z',
+  },
+  {
+    attemptId: 'mock-attempt-repeat-long',
+    playerId: 'mock-player-repeat-001',
+    playerName: 'REPEAT_PLAYER',
+    mode: 'university',
+    answeredCount: 30,
+    questionCount: 30,
+    correctCount: 28,
+    accuracy: 93.33,
+    attemptStatus: 'completed',
+    completedAt: '2026-01-03T11:00:00.000Z',
+  },
+];
+
 const mockMmrByPlayerId: Record<string, number> = {
   'mock-player-001': 100,
   'mock-player-002': 360,
@@ -235,10 +262,11 @@ const mockMmrByPlayerId: Record<string, number> = {
   'mock-player-017': 2400,
   'mock-player-018': 2700,
   'mock-player-019': 3200,
+  'mock-player-repeat-001': 1320,
 };
 
-export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Promise<LeaderboardData> {
-  const modeEntries = filterLeaderboardEntries(entries.filter((entry) => entry.mode === mode)).map((entry) => {
+export async function getMockLeaderboard(mode: QuizMode, playerId?: string, sourceEntries: LeaderboardEntry[] = successEntries): Promise<LeaderboardData> {
+  const modeEntries = filterLeaderboardEntries(sourceEntries.filter((entry) => entry.mode === mode)).map((entry) => {
     const mmr = mockMmrByPlayerId[entry.playerId] ?? 0;
     return { ...entry, mmr, rank: getRankFromMmr(mmr) };
   });
@@ -256,7 +284,7 @@ export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Pro
   }
 
   if (!playerAttempt || playerAttempt.state.attemptStatus === 'active') {
-    return { entries: sortLeaderboard(modeEntries), currentAttempt };
+    return { entries: sortLeaderboard(getBestAttemptsPerPlayer(modeEntries)), currentAttempt };
   }
 
   const answeredCount = Object.keys(playerAttempt.state.answeredMap).length;
@@ -275,7 +303,7 @@ export async function getMockLeaderboard(mode: QuizMode, playerId?: string): Pro
   };
 
   return {
-    entries: sortLeaderboard(answeredCount > 0 ? [...modeEntries, currentAttemptEntry] : modeEntries),
+    entries: sortLeaderboard(getBestAttemptsPerPlayer(answeredCount > 0 ? [...modeEntries, currentAttemptEntry] : modeEntries)),
     currentAttempt,
   };
 }
