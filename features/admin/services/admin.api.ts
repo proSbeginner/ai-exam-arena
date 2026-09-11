@@ -3,7 +3,6 @@ import type { ExamQuestion } from "@/features/quiz/quiz.types";
 
 interface QuestionsResponse {
   questions?: ExamQuestion[];
-  total?: number;
   question?: ExamQuestion;
   error?: { message?: string };
 }
@@ -22,14 +21,23 @@ async function parseResponse(response: Response): Promise<QuestionsResponse> {
 export async function getAdminQuestions(
   email: string,
   limit?: number,
-): Promise<{ questions: ExamQuestion[]; total: number }> {
+): Promise<ExamQuestion[]> {
   const query = limit === undefined ? "" : `?limit=${limit}`;
   const response = await fetch(`/api/admin/questions${query}`, {
     headers: adminHeaders(email),
     cache: "no-store",
   });
-  const payload = await parseResponse(response);
-  return { questions: payload.questions ?? [], total: payload.total ?? 0 };
+  return (await parseResponse(response)).questions ?? [];
+}
+
+export async function getAdminQuestionCount(email: string): Promise<number> {
+  const response = await fetch('/api/admin/questions/count', {
+    headers: adminHeaders(email),
+    cache: 'no-store',
+  });
+  const payload = (await response.json()) as { total?: number; error?: { message?: string } };
+  if (!response.ok) throw new Error(payload.error?.message ?? 'ไม่สามารถนับคำถามได้');
+  return payload.total ?? 0;
 }
 
 export async function createAdminQuestion(

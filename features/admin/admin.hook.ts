@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type SubmitEvent } from "react";
+import { useEffect, useMemo, useState, type SubmitEvent } from "react";
 
 import type { ExamQuestion, QuizOption } from "@/features/quiz/quiz.types";
 import { validateAdminQuestion } from "./admin.logic";
@@ -14,6 +14,7 @@ import type { AdminQuestionFormState } from "./admin.types";
 import {
   createAdminQuestion,
   deleteAdminQuestion,
+  getAdminQuestionCount,
   getAdminQuestions,
   updateAdminQuestion,
 } from "./services/admin.api";
@@ -68,12 +69,11 @@ export function useAdmin() {
     if (delayMs > 0)
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     try {
-      const result = await getAdminQuestions(
+      const questions = await getAdminQuestions(
         email,
         limit === null ? undefined : limit,
       );
-      setQuestions(result.questions);
-      setTotalQuestions(result.total);
+      setQuestions(questions);
       setIsAuthorized(true);
     } catch (loadError) {
       setIsAuthorized(false);
@@ -86,6 +86,14 @@ export function useAdmin() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!isAuthorized) return;
+
+    void getAdminQuestionCount(email)
+      .then((count) => setTotalQuestions(count))
+      .catch(() => undefined);
+  }, [email, isAuthorized]);
 
   const formError = useMemo(
     () => validateAdminQuestion(toPayload(form)),
@@ -178,7 +186,10 @@ export function useAdmin() {
       const wasEditing = Boolean(editingId);
       const payload = toPayload(form);
       if (editingId) await updateAdminQuestion(email, editingId, payload);
-      else await createAdminQuestion(email, payload);
+      else {
+        await createAdminQuestion(email, payload);
+        setTotalQuestions((current) => current + 1);
+      }
       resetForm();
       setQuestionFocusKey((current) => current + 1);
       await loadQuestions();
@@ -200,6 +211,7 @@ export function useAdmin() {
     setIsLoading(true);
     try {
       await deleteAdminQuestion(email, id);
+      setTotalQuestions((current) => Math.max(0, current - 1));
       await loadQuestions();
     } catch (removeError) {
       setError(

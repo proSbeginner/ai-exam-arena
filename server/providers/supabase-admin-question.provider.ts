@@ -3,7 +3,7 @@ import type { ExamQuestion } from "@/features/quiz/quiz.types";
 import type { DatabaseQuestionRow } from "@/server/database/types";
 import { transformQuestion } from "@/server/database/transformers/question.transform";
 import type { AdminQuestionProvider } from "@/server/providers/admin-question.provider";
-import { supabaseQuery, supabaseRequest } from "@/supabase/client";
+import { supabaseCount, supabaseQuery, supabaseRequest } from "@/supabase/client";
 
 function questionPayload(input: AdminQuestionInput) {
   return {
@@ -98,10 +98,7 @@ async function getQuestion(id: string): Promise<ExamQuestion | null> {
 }
 
 async function countQuestions(): Promise<number> {
-  const rows = await supabaseRequest<Array<{ id: string }>>(
-    "questions?select=id",
-  );
-  return rows.length;
+  return supabaseCount('questions?select=id');
 }
 
 export const supabaseAdminQuestionProvider: AdminQuestionProvider = {
