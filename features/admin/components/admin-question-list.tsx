@@ -100,41 +100,46 @@ export function AdminQuestionList({
             </span>
           </div>
         </div>
-        <div className="mb-4 flex items-end gap-2">
-          <label className="min-w-0 flex-1 text-xs font-bold text-gray-500">
-            โหลดคำถามล่าสุด
+        <div className="mb-4 space-y-3 rounded-2xl border border-purple-100 bg-purple-50/40 p-3">
+          <div className="flex items-end gap-2">
+            <label className="min-w-0 flex-1 text-xs font-bold text-purple-700">
+              โหลดล่าสุด
+              <input
+                type="number"
+                min="1"
+                step="1"
+                inputMode="numeric"
+                value={limitInput}
+                onChange={(event) => setLimitInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") applyLimit();
+                }}
+                placeholder="ทั้งหมด"
+                aria-label="จำนวนคำถามล่าสุด"
+                className="mt-1 w-full rounded-xl border border-purple-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={applyLimit}
+              disabled={isLoading}
+              className="cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:shadow-pink-500/25 disabled:cursor-wait disabled:opacity-50"
+            >
+              {isLoading ? "กำลังโหลด..." : "โหลด"}
+            </button>
+          </div>
+          <label className="block text-xs font-bold text-purple-700">
+            ค้นหาในรายการ
             <input
-              type="number"
-              min="1"
-              step="1"
-              inputMode="numeric"
-              value={limitInput}
-              onChange={(event) => setLimitInput(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") applyLimit();
-              }}
-              placeholder="ทั้งหมด"
-              aria-label="จำนวนคำถามล่าสุด"
-              className="mt-1 w-full rounded-xl border-2 border-purple-200 bg-purple-50 px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-0"
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="พิมพ์คำถามหรือ Label..."
+              aria-label="ค้นหาคำถาม"
+              className="mt-1 w-full rounded-xl border border-purple-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-100"
             />
           </label>
-          <button
-            type="button"
-            onClick={applyLimit}
-            disabled={isLoading}
-            className="cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-3 text-sm font-bold text-white disabled:cursor-wait disabled:opacity-50"
-          >
-            โหลด
-          </button>
         </div>
-        <input
-          type="search"
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
-          placeholder="ค้นหาคำถาม..."
-          aria-label="ค้นหาคำถาม"
-          className="mb-4 w-full rounded-xl border-2 border-purple-200 bg-purple-50 px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-0"
-        />
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
           {filteredQuestions.length > 0 ? (
             filteredQuestions.map((question) => (
