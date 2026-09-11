@@ -1,18 +1,27 @@
-import type { AdminQuestionInput } from '@/features/admin/admin.types';
-import type { ExamQuestion } from '@/features/quiz/quiz.types';
-import { questions } from '@/mock/api/quiz/questions/mock-questions';
+import type { AdminQuestionInput } from "@/features/admin/admin.types";
+import type { ExamQuestion } from "@/features/quiz/quiz.types";
+import { questions } from "@/mock/api/quiz/questions/mock-questions";
 
-export function listMockAdminQuestions(): ExamQuestion[] {
-  return [...questions];
+export function listMockAdminQuestions(limit?: number): ExamQuestion[] {
+  if (limit === undefined) return [...questions];
+  return [...questions].reverse().slice(0, limit);
 }
 
-export function createMockAdminQuestion(input: AdminQuestionInput): ExamQuestion {
-  const question: ExamQuestion = { ...input, id: `mock-question-${crypto.randomUUID()}` };
+export function createMockAdminQuestion(
+  input: AdminQuestionInput,
+): ExamQuestion {
+  const question: ExamQuestion = {
+    ...input,
+    id: `mock-question-${crypto.randomUUID()}`,
+  };
   questions.push(question);
   return question;
 }
 
-export function updateMockAdminQuestion(id: string, input: AdminQuestionInput): ExamQuestion | null {
+export function updateMockAdminQuestion(
+  id: string,
+  input: AdminQuestionInput,
+): ExamQuestion | null {
   const index = questions.findIndex((question) => question.id === id);
   if (index < 0) return null;
   const question: ExamQuestion = { ...input, id };

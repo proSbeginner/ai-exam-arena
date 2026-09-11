@@ -1,6 +1,7 @@
 import type { AdminQuestionFormState } from './admin.types';
 
-export const ADMIN_REFRESH_DELAY_MS = 500;
+export const ADMIN_LOAD_DELAY_MS = 500;
+export const DEFAULT_ADMIN_QUESTION_LIMIT = 10;
 export const MAX_ADMIN_OPTIONS = 10;
 
 export const EMPTY_ADMIN_FORM: AdminQuestionFormState = {

@@ -9,7 +9,7 @@ interface AdminQuestionListProps {
   isLoading: boolean;
   onEdit: (question: ExamQuestion) => void;
   onClose: () => void;
-  onRefresh: () => void;
+  onLoad: (limit: number | null) => void;
   onRemove: (id: string) => void;
   questions: ExamQuestion[];
 }
@@ -19,13 +19,25 @@ export function AdminQuestionList({
   isLoading,
   onEdit,
   onClose,
-  onRefresh,
+  onLoad,
   onRemove,
   questions,
 }: AdminQuestionListProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [limitInput, setLimitInput] = useState("10");
   const normalizedSearchTerm = searchTerm.trim().toLocaleLowerCase();
+  const applyLimit = () => {
+    const trimmedLimit = limitInput.trim();
+    onLoad(trimmedLimit ? Number(trimmedLimit) : null);
+  };
+  const handleLabelClick = (label: string) => {
+    setSearchTerm((current) =>
+      current.trim().toLocaleLowerCase() === label.toLocaleLowerCase()
+        ? ""
+        : label,
+    );
+  };
   const filteredQuestions = normalizedSearchTerm
     ? questions.filter((question) =>
         [
@@ -70,15 +82,6 @@ export function AdminQuestionList({
             คลังคำถาม ({filteredQuestions.length})
           </h2>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={onRefresh}
-              disabled={isLoading}
-              aria-busy={isLoading}
-              className="cursor-pointer text-sm font-bold text-purple-500 disabled:cursor-wait disabled:opacity-50"
-            >
-              {isLoading ? "กำลังโหลด..." : "รีเฟรช"}
-            </button>
             <span className="group relative">
               <button
                 type="button"
@@ -97,6 +100,33 @@ export function AdminQuestionList({
             </span>
           </div>
         </div>
+        <div className="mb-4 flex items-end gap-2">
+          <label className="min-w-0 flex-1 text-xs font-bold text-gray-500">
+            โหลดคำถามล่าสุด
+            <input
+              type="number"
+              min="1"
+              step="1"
+              inputMode="numeric"
+              value={limitInput}
+              onChange={(event) => setLimitInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") applyLimit();
+              }}
+              placeholder="ทั้งหมด"
+              aria-label="จำนวนคำถามล่าสุด"
+              className="mt-1 w-full rounded-xl border-2 border-purple-200 bg-purple-50 px-4 py-3 text-sm font-medium text-gray-700 outline-none transition-colors placeholder:text-purple-300 focus:border-pink-400 focus:ring-0"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={applyLimit}
+            disabled={isLoading}
+            className="cursor-pointer rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-4 py-3 text-sm font-bold text-white disabled:cursor-wait disabled:opacity-50"
+          >
+            โหลด
+          </button>
+        </div>
         <input
           type="search"
           value={searchTerm}
@@ -113,7 +143,7 @@ export function AdminQuestionList({
                 question={question}
                 onEdit={onEdit}
                 onRemove={onRemove}
-                onLabelClick={setSearchTerm}
+                onLabelClick={handleLabelClick}
               />
             ))
           ) : (

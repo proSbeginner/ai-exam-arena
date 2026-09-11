@@ -5,7 +5,8 @@ import { useMemo, useState, type SubmitEvent } from "react";
 import type { ExamQuestion, QuizOption } from "@/features/quiz/quiz.types";
 import { validateAdminQuestion } from "./admin.logic";
 import {
-  ADMIN_REFRESH_DELAY_MS,
+  ADMIN_LOAD_DELAY_MS,
+  DEFAULT_ADMIN_QUESTION_LIMIT,
   EMPTY_ADMIN_FORM,
   MAX_ADMIN_OPTIONS,
 } from "./admin.constants";
@@ -57,13 +58,18 @@ export function useAdmin() {
   >(null);
   const [questionFocusKey, setQuestionFocusKey] = useState(0);
 
-  const loadQuestions = async (delayMs = 0) => {
+  const loadQuestions = async (
+    delayMs = 0,
+    limit: number | null = DEFAULT_ADMIN_QUESTION_LIMIT,
+  ) => {
     setIsLoading(true);
     setError(null);
     if (delayMs > 0)
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     try {
-      setQuestions(await getAdminQuestions(email));
+      setQuestions(
+        await getAdminQuestions(email, limit === null ? undefined : limit),
+      );
       setIsAuthorized(true);
     } catch (loadError) {
       setIsAuthorized(false);
@@ -205,7 +211,7 @@ export function useAdmin() {
     addLabel,
     addOption,
     closeSaveSuccessDialog,
-    ADMIN_REFRESH_DELAY_MS,
+    ADMIN_LOAD_DELAY_MS,
     editQuestion,
     email,
     editingId,
