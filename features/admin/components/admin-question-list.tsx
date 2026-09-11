@@ -66,7 +66,7 @@ export function AdminQuestionList({ isOpen, isLoading, onEdit, onClose, onRefres
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
           {filteredQuestions.length > 0 ? (
             filteredQuestions.map((question) => (
-              <AdminQuestionCard key={question.id} question={question} onEdit={onEdit} onRemove={onRemove} />
+              <AdminQuestionCard key={question.id} question={question} onEdit={onEdit} onRemove={onRemove} onLabelClick={setSearchTerm} />
             ))
           ) : (
             <p className="py-8 text-center text-sm font-medium text-gray-400">ไม่พบคำถามที่ค้นหา</p>

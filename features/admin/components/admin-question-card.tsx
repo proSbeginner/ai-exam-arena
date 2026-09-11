@@ -6,10 +6,11 @@ import { AdminQuestionPreview } from './admin-question-preview';
 interface AdminQuestionCardProps {
   onEdit: (question: ExamQuestion) => void;
   onRemove: (id: string) => void;
+  onLabelClick: (label: string) => void;
   question: ExamQuestion;
 }
 
-export function AdminQuestionCard({ onEdit, onRemove, question }: AdminQuestionCardProps) {
+export function AdminQuestionCard({ onEdit, onRemove, onLabelClick, question }: AdminQuestionCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   return (
@@ -26,7 +27,7 @@ export function AdminQuestionCard({ onEdit, onRemove, question }: AdminQuestionC
           </div>
         </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {question.labels?.map((label) => <span key={label} className="rounded-full bg-purple-50 px-2 py-0.5 text-xs text-purple-600">{label}</span>)}
+          {question.labels?.map((label) => <button key={label} type="button" onClick={() => onLabelClick(label)} className="cursor-pointer rounded-full bg-purple-50 px-2 py-0.5 text-xs text-purple-600 transition-colors hover:bg-purple-100 hover:text-pink-500">{label}</button>)}
           <span className="w-full text-xs text-gray-500">{question.options.length} ตัวเลือก</span>
         </div>
       </article>
