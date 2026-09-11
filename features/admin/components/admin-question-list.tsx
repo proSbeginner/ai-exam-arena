@@ -12,6 +12,7 @@ interface AdminQuestionListProps {
   onLoad: (limit: number | null) => void;
   onRemove: (id: string) => void;
   questions: ExamQuestion[];
+  totalQuestions: number;
 }
 
 export function AdminQuestionList({
@@ -22,6 +23,7 @@ export function AdminQuestionList({
   onLoad,
   onRemove,
   questions,
+  totalQuestions,
 }: AdminQuestionListProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -79,7 +81,10 @@ export function AdminQuestionList({
       >
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="text-2xl font-black text-gray-800">
-            คลังคำถาม ({filteredQuestions.length})
+            คลังคำถาม
+            <span className="ml-2 text-sm font-medium text-gray-400">
+              จากทั้งหมด {totalQuestions} ข้อ
+            </span>
           </h2>
           <div className="flex items-center gap-3">
             <span className="group relative">

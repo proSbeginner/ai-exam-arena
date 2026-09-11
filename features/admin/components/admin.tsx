@@ -84,6 +84,7 @@ export function Admin() {
             }
             onRemove={(id) => void admin.remove(id)}
             questions={admin.questions}
+            totalQuestions={admin.totalQuestions}
           />
           {admin.saveSuccessMode && (
             <InfoDialog

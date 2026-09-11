@@ -2,6 +2,10 @@ import type { AdminQuestionInput } from "@/features/admin/admin.types";
 import type { ExamQuestion } from "@/features/quiz/quiz.types";
 import { questions } from "@/mock/api/quiz/questions/mock-questions";
 
+export function countMockAdminQuestions(): number {
+  return questions.length;
+}
+
 export function listMockAdminQuestions(limit?: number): ExamQuestion[] {
   if (limit === undefined) return [...questions];
   return [...questions].reverse().slice(0, limit);

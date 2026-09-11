@@ -3,6 +3,7 @@ import { ApiError } from "@/server/errors/api-error";
 import {
   createMockAdminQuestion,
   deleteMockAdminQuestion,
+  countMockAdminQuestions,
   listMockAdminQuestions,
   updateMockAdminQuestion,
 } from "@/mock/api/admin/questions/mock-admin-questions";
@@ -45,6 +46,10 @@ export async function listAdminQuestionsByScenario(
 }
 
 export const mockAdminQuestionProvider: AdminQuestionProvider = {
+  countQuestions: async () => {
+    await prepareMockRequest(MOCK_ADMIN_QUESTION_SCENARIO);
+    return countMockAdminQuestions();
+  },
   listQuestions: (limit) =>
     listAdminQuestionsByScenario(MOCK_ADMIN_QUESTION_SCENARIO, limit),
   async createQuestion(input) {

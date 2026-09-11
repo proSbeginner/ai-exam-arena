@@ -3,6 +3,7 @@ import type { ExamQuestion } from "@/features/quiz/quiz.types";
 
 interface QuestionsResponse {
   questions?: ExamQuestion[];
+  total?: number;
   question?: ExamQuestion;
   error?: { message?: string };
 }
@@ -21,13 +22,14 @@ async function parseResponse(response: Response): Promise<QuestionsResponse> {
 export async function getAdminQuestions(
   email: string,
   limit?: number,
-): Promise<ExamQuestion[]> {
+): Promise<{ questions: ExamQuestion[]; total: number }> {
   const query = limit === undefined ? "" : `?limit=${limit}`;
   const response = await fetch(`/api/admin/questions${query}`, {
     headers: adminHeaders(email),
     cache: "no-store",
   });
-  return (await parseResponse(response)).questions ?? [];
+  const payload = await parseResponse(response);
+  return { questions: payload.questions ?? [], total: payload.total ?? 0 };
 }
 
 export async function createAdminQuestion(

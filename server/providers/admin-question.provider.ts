@@ -6,6 +6,7 @@ import { supabaseAdminQuestionProvider } from "@/server/providers/supabase-admin
 
 export interface AdminQuestionProvider {
   listQuestions(limit?: number): Promise<ExamQuestion[]>;
+  countQuestions(): Promise<number>;
   createQuestion(input: AdminQuestionInput): Promise<ExamQuestion>;
   updateQuestion(
     id: string,

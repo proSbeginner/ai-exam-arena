@@ -48,6 +48,7 @@ function toPayload(form: AdminQuestionFormState) {
 export function useAdmin() {
   const [email, setEmail] = useState("");
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
+  const [totalQuestions, setTotalQuestions] = useState(0);
   const [form, setForm] = useState(EMPTY_ADMIN_FORM);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -67,9 +68,12 @@ export function useAdmin() {
     if (delayMs > 0)
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     try {
-      setQuestions(
-        await getAdminQuestions(email, limit === null ? undefined : limit),
+      const result = await getAdminQuestions(
+        email,
+        limit === null ? undefined : limit,
       );
+      setQuestions(result.questions);
+      setTotalQuestions(result.total);
       setIsAuthorized(true);
     } catch (loadError) {
       setIsAuthorized(false);
@@ -226,6 +230,7 @@ export function useAdmin() {
     loadQuestions,
     questions,
     remove,
+    totalQuestions,
     removeLabel,
     resetForm,
     setEmail,

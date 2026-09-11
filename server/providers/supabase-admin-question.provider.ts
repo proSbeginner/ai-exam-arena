@@ -97,7 +97,15 @@ async function getQuestion(id: string): Promise<ExamQuestion | null> {
   return rows[0] ? transformQuestion(rows[0]) : null;
 }
 
+async function countQuestions(): Promise<number> {
+  const rows = await supabaseRequest<Array<{ id: string }>>(
+    "questions?select=id",
+  );
+  return rows.length;
+}
+
 export const supabaseAdminQuestionProvider: AdminQuestionProvider = {
+  countQuestions,
   async listQuestions(limit) {
     const query = supabaseQuery({
       select: "*,question_options(*)",

@@ -26,9 +26,12 @@ export async function GET(request: Request) {
     );
   }
   try {
-    return Response.json({
-      questions: await getAdminQuestionProvider().listQuestions(limit),
-    });
+    const provider = getAdminQuestionProvider();
+    const [questions, total] = await Promise.all([
+      provider.listQuestions(limit),
+      provider.countQuestions(),
+    ]);
+    return Response.json({ questions, total });
   } catch (error) {
     if (error instanceof DataSourceConfigError)
       return Response.json(
